@@ -1,0 +1,12 @@
+syntax = "proto3"; /* default is proto2 */
+option java_package = "proto";
+service Greeter {
+  rpc SayHello (HelloRequest) returns (HelloReply) {}
+}
+message HelloRequest {
+  /*type   name = id; */
+  string name = 1; /* Id must be bigger than 0 and be the same on client and server */
+}
+message HelloReply {
+  string message = 1;
+}
