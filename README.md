@@ -6,7 +6,7 @@ Semestral work from Distributed Computing subject
 
 **EN version**
 
-*Chat program*
+*Chat program* </br>
 A Program that allows messages to be sent between nodes
 
 - Problem type: the semester project will address the Leader Election problem.
@@ -14,9 +14,9 @@ A Program that allows messages to be sent between nodes
 - Programming language and message transport: the semester project will be implemented in the Java programming language, using the gRPC framework for communication between nodes.
 - Functionality of the semester project: the semester project will simulate a chat application in a distributed environment. System nodes will be able of sending/receiving messages, logging in/logging out of the system, exiting without logging out, and collaborating in leader selection.
 
-**CZ version** 
+**CZ version**
 
-*Chatovací program*
+*Chatovací program* </br>
 Program umožnující zasílání zpráv mezi jednotlivými uzly
 
 - Typ problému: semestrální práce bude řešit problém volby vůdce.
