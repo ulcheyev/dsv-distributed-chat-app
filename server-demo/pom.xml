@@ -32,11 +32,11 @@
                         </goals>
                         <configuration>
                             <includeMavenTypes>direct</includeMavenTypes>
-
+                            <protocCommand>protoc</protocCommand>
+                            <protocArtifact>com.google.protobuf:protoc:3.21.1</protocArtifact>
                             <inputDirectories>
                                 <include>src/main/resources</include>
                             </inputDirectories>
-
                             <outputTargets>
                                 <outputTarget>
                                     <type>java</type>
@@ -44,7 +44,7 @@
                                 </outputTarget>
                                 <outputTarget>
                                     <type>grpc-java</type>
-                                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.15.0</pluginArtifact>
+                                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.59.0</pluginArtifact>
                                     <outputDirectory>src/main/java/cz/cvut/fel/dsv/chat</outputDirectory>
                                 </outputTarget>
                             </outputTargets>
