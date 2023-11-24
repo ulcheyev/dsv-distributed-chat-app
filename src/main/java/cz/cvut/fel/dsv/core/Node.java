@@ -4,9 +4,6 @@ import cz.cvut.fel.dsv.service.ChatServiceImpl;
 import io.grpc.*;
 import io.grpc.stub.StreamObserver;
 import lombok.Getter;
-import org.checkerframework.checker.units.qual.A;
-import org.checkerframework.checker.units.qual.C;
-import org.checkerframework.checker.units.qual.N;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -14,7 +11,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-public class Node {
+public class Node{
 
     private static final Logger logger = Logger.getLogger(Node.class.getName());
 
@@ -148,4 +145,5 @@ public class Node {
         final Node node = new Node();
         node.handleArgs(args);
     }
+
 }

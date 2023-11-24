@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 
-// todo  change impl
+// Todo  change impl
 public class ConsoleHandler implements Runnable {
 
     private boolean reading = true;
@@ -22,7 +22,7 @@ public class ConsoleHandler implements Runnable {
 
 
     private void parse_commandline(String commandline) {
-        myNode.sendMessage(commandline);
+        new Thread( () -> myNode.sendMessage(commandline)).start();
     }
 
 
@@ -31,7 +31,7 @@ public class ConsoleHandler implements Runnable {
         String commandline = "";
         while (reading) {
             commandline = "";
-            System.out.print("\n"+myNode.getUsername()+"> ");
+            System.out.print(myNode.getUsername()+"> ");
             try {
                 commandline = reader.readLine();
                 parse_commandline(commandline);
