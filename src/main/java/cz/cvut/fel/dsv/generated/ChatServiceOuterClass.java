@@ -16,15 +16,10 @@ public final class ChatServiceOuterClass {
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_generated_ChatMessageRequest_descriptor;
+    internal_static_generated_ChatMessage_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_generated_ChatMessageRequest_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_generated_ChatMessageResponse_descriptor;
-  static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_generated_ChatMessageResponse_fieldAccessorTable;
+      internal_static_generated_ChatMessage_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -34,31 +29,22 @@ public final class ChatServiceOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\021ChatService.proto\022\tgenerated\"%\n\022ChatMe" +
-      "ssageRequest\022\017\n\007message\030\001 \001(\t\"&\n\023ChatMes" +
-      "sageResponse\022\017\n\007message\030\001 \001(\t2\243\001\n\013ChatSe" +
-      "rvice\022I\n\004chat\022\035.generated.ChatMessageReq" +
-      "uest\032\036.generated.ChatMessageResponse(\0010\001" +
-      "\022I\n\010chatTest\022\035.generated.ChatMessageRequ" +
-      "est\032\036.generated.ChatMessageResponseB\002P\001b" +
-      "\006proto3"
+      "\n\021ChatService.proto\022\tgenerated\"6\n\013ChatMe" +
+      "ssage\022\026\n\016senderUsername\030\001 \001(\t\022\017\n\007message" +
+      "\030\002 \001(\t2I\n\013ChatService\022:\n\004chat\022\026.generate" +
+      "d.ChatMessage\032\026.generated.ChatMessage(\0010" +
+      "\001B\002P\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         });
-    internal_static_generated_ChatMessageRequest_descriptor =
+    internal_static_generated_ChatMessage_descriptor =
       getDescriptor().getMessageTypes().get(0);
-    internal_static_generated_ChatMessageRequest_fieldAccessorTable = new
+    internal_static_generated_ChatMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_generated_ChatMessageRequest_descriptor,
-        new java.lang.String[] { "Message", });
-    internal_static_generated_ChatMessageResponse_descriptor =
-      getDescriptor().getMessageTypes().get(1);
-    internal_static_generated_ChatMessageResponse_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_generated_ChatMessageResponse_descriptor,
-        new java.lang.String[] { "Message", });
+        internal_static_generated_ChatMessage_descriptor,
+        new java.lang.String[] { "SenderUsername", "Message", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

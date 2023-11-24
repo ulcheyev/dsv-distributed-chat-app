@@ -5,18 +5,19 @@
 package generated;
 
 /**
- * Protobuf type {@code generated.ChatMessageRequest}
+ * Protobuf type {@code generated.ChatMessage}
  */
-public final class ChatMessageRequest extends
+public final class ChatMessage extends
     com.google.protobuf.GeneratedMessageV3 implements
-    // @@protoc_insertion_point(message_implements:generated.ChatMessageRequest)
-    ChatMessageRequestOrBuilder {
+    // @@protoc_insertion_point(message_implements:generated.ChatMessage)
+    ChatMessageOrBuilder {
 private static final long serialVersionUID = 0L;
-  // Use ChatMessageRequest.newBuilder() to construct.
-  private ChatMessageRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+  // Use ChatMessage.newBuilder() to construct.
+  private ChatMessage(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
     super(builder);
   }
-  private ChatMessageRequest() {
+  private ChatMessage() {
+    senderUsername_ = "";
     message_ = "";
   }
 
@@ -24,27 +25,66 @@ private static final long serialVersionUID = 0L;
   @SuppressWarnings({"unused"})
   protected java.lang.Object newInstance(
       UnusedPrivateParameter unused) {
-    return new ChatMessageRequest();
+    return new ChatMessage();
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return generated.ChatServiceOuterClass.internal_static_generated_ChatMessageRequest_descriptor;
+    return generated.ChatServiceOuterClass.internal_static_generated_ChatMessage_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return generated.ChatServiceOuterClass.internal_static_generated_ChatMessageRequest_fieldAccessorTable
+    return generated.ChatServiceOuterClass.internal_static_generated_ChatMessage_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            generated.ChatMessageRequest.class, generated.ChatMessageRequest.Builder.class);
+            generated.ChatMessage.class, generated.ChatMessage.Builder.class);
   }
 
-  public static final int MESSAGE_FIELD_NUMBER = 1;
+  public static final int SENDERUSERNAME_FIELD_NUMBER = 1;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object senderUsername_ = "";
+  /**
+   * <code>string senderUsername = 1;</code>
+   * @return The senderUsername.
+   */
+  @java.lang.Override
+  public java.lang.String getSenderUsername() {
+    java.lang.Object ref = senderUsername_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      senderUsername_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string senderUsername = 1;</code>
+   * @return The bytes for senderUsername.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getSenderUsernameBytes() {
+    java.lang.Object ref = senderUsername_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      senderUsername_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int MESSAGE_FIELD_NUMBER = 2;
   @SuppressWarnings("serial")
   private volatile java.lang.Object message_ = "";
   /**
-   * <code>string message = 1;</code>
+   * <code>string message = 2;</code>
    * @return The message.
    */
   @java.lang.Override
@@ -61,7 +101,7 @@ private static final long serialVersionUID = 0L;
     }
   }
   /**
-   * <code>string message = 1;</code>
+   * <code>string message = 2;</code>
    * @return The bytes for message.
    */
   @java.lang.Override
@@ -93,8 +133,11 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(senderUsername_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 1, senderUsername_);
+    }
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(message_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 1, message_);
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 2, message_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -105,8 +148,11 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(senderUsername_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, senderUsername_);
+    }
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(message_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, message_);
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, message_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -118,11 +164,13 @@ private static final long serialVersionUID = 0L;
     if (obj == this) {
      return true;
     }
-    if (!(obj instanceof generated.ChatMessageRequest)) {
+    if (!(obj instanceof generated.ChatMessage)) {
       return super.equals(obj);
     }
-    generated.ChatMessageRequest other = (generated.ChatMessageRequest) obj;
+    generated.ChatMessage other = (generated.ChatMessage) obj;
 
+    if (!getSenderUsername()
+        .equals(other.getSenderUsername())) return false;
     if (!getMessage()
         .equals(other.getMessage())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
@@ -136,6 +184,8 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
+    hash = (37 * hash) + SENDERUSERNAME_FIELD_NUMBER;
+    hash = (53 * hash) + getSenderUsername().hashCode();
     hash = (37 * hash) + MESSAGE_FIELD_NUMBER;
     hash = (53 * hash) + getMessage().hashCode();
     hash = (29 * hash) + getUnknownFields().hashCode();
@@ -143,44 +193,44 @@ private static final long serialVersionUID = 0L;
     return hash;
   }
 
-  public static generated.ChatMessageRequest parseFrom(
+  public static generated.ChatMessage parseFrom(
       java.nio.ByteBuffer data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static generated.ChatMessageRequest parseFrom(
+  public static generated.ChatMessage parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static generated.ChatMessageRequest parseFrom(
+  public static generated.ChatMessage parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static generated.ChatMessageRequest parseFrom(
+  public static generated.ChatMessage parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static generated.ChatMessageRequest parseFrom(byte[] data)
+  public static generated.ChatMessage parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static generated.ChatMessageRequest parseFrom(
+  public static generated.ChatMessage parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static generated.ChatMessageRequest parseFrom(java.io.InputStream input)
+  public static generated.ChatMessage parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static generated.ChatMessageRequest parseFrom(
+  public static generated.ChatMessage parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -188,26 +238,26 @@ private static final long serialVersionUID = 0L;
         .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
-  public static generated.ChatMessageRequest parseDelimitedFrom(java.io.InputStream input)
+  public static generated.ChatMessage parseDelimitedFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input);
   }
 
-  public static generated.ChatMessageRequest parseDelimitedFrom(
+  public static generated.ChatMessage parseDelimitedFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-  public static generated.ChatMessageRequest parseFrom(
+  public static generated.ChatMessage parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static generated.ChatMessageRequest parseFrom(
+  public static generated.ChatMessage parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -220,7 +270,7 @@ private static final long serialVersionUID = 0L;
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-  public static Builder newBuilder(generated.ChatMessageRequest prototype) {
+  public static Builder newBuilder(generated.ChatMessage prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
   @java.lang.Override
@@ -236,26 +286,26 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
-   * Protobuf type {@code generated.ChatMessageRequest}
+   * Protobuf type {@code generated.ChatMessage}
    */
   public static final class Builder extends
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:generated.ChatMessageRequest)
-      generated.ChatMessageRequestOrBuilder {
+      // @@protoc_insertion_point(builder_implements:generated.ChatMessage)
+      generated.ChatMessageOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return generated.ChatServiceOuterClass.internal_static_generated_ChatMessageRequest_descriptor;
+      return generated.ChatServiceOuterClass.internal_static_generated_ChatMessage_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return generated.ChatServiceOuterClass.internal_static_generated_ChatMessageRequest_fieldAccessorTable
+      return generated.ChatServiceOuterClass.internal_static_generated_ChatMessage_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              generated.ChatMessageRequest.class, generated.ChatMessageRequest.Builder.class);
+              generated.ChatMessage.class, generated.ChatMessage.Builder.class);
     }
 
-    // Construct using generated.ChatMessageRequest.newBuilder()
+    // Construct using generated.ChatMessage.newBuilder()
     private Builder() {
 
     }
@@ -269,6 +319,7 @@ private static final long serialVersionUID = 0L;
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
+      senderUsername_ = "";
       message_ = "";
       return this;
     }
@@ -276,17 +327,17 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return generated.ChatServiceOuterClass.internal_static_generated_ChatMessageRequest_descriptor;
+      return generated.ChatServiceOuterClass.internal_static_generated_ChatMessage_descriptor;
     }
 
     @java.lang.Override
-    public generated.ChatMessageRequest getDefaultInstanceForType() {
-      return generated.ChatMessageRequest.getDefaultInstance();
+    public generated.ChatMessage getDefaultInstanceForType() {
+      return generated.ChatMessage.getDefaultInstance();
     }
 
     @java.lang.Override
-    public generated.ChatMessageRequest build() {
-      generated.ChatMessageRequest result = buildPartial();
+    public generated.ChatMessage build() {
+      generated.ChatMessage result = buildPartial();
       if (!result.isInitialized()) {
         throw newUninitializedMessageException(result);
       }
@@ -294,16 +345,19 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public generated.ChatMessageRequest buildPartial() {
-      generated.ChatMessageRequest result = new generated.ChatMessageRequest(this);
+    public generated.ChatMessage buildPartial() {
+      generated.ChatMessage result = new generated.ChatMessage(this);
       if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
     }
 
-    private void buildPartial0(generated.ChatMessageRequest result) {
+    private void buildPartial0(generated.ChatMessage result) {
       int from_bitField0_ = bitField0_;
       if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.senderUsername_ = senderUsername_;
+      }
+      if (((from_bitField0_ & 0x00000002) != 0)) {
         result.message_ = message_;
       }
     }
@@ -342,19 +396,24 @@ private static final long serialVersionUID = 0L;
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof generated.ChatMessageRequest) {
-        return mergeFrom((generated.ChatMessageRequest)other);
+      if (other instanceof generated.ChatMessage) {
+        return mergeFrom((generated.ChatMessage)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
 
-    public Builder mergeFrom(generated.ChatMessageRequest other) {
-      if (other == generated.ChatMessageRequest.getDefaultInstance()) return this;
+    public Builder mergeFrom(generated.ChatMessage other) {
+      if (other == generated.ChatMessage.getDefaultInstance()) return this;
+      if (!other.getSenderUsername().isEmpty()) {
+        senderUsername_ = other.senderUsername_;
+        bitField0_ |= 0x00000001;
+        onChanged();
+      }
       if (!other.getMessage().isEmpty()) {
         message_ = other.message_;
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000002;
         onChanged();
       }
       this.mergeUnknownFields(other.getUnknownFields());
@@ -384,10 +443,15 @@ private static final long serialVersionUID = 0L;
               done = true;
               break;
             case 10: {
-              message_ = input.readStringRequireUtf8();
+              senderUsername_ = input.readStringRequireUtf8();
               bitField0_ |= 0x00000001;
               break;
             } // case 10
+            case 18: {
+              message_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000002;
+              break;
+            } // case 18
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -405,9 +469,81 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
+    private java.lang.Object senderUsername_ = "";
+    /**
+     * <code>string senderUsername = 1;</code>
+     * @return The senderUsername.
+     */
+    public java.lang.String getSenderUsername() {
+      java.lang.Object ref = senderUsername_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        senderUsername_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string senderUsername = 1;</code>
+     * @return The bytes for senderUsername.
+     */
+    public com.google.protobuf.ByteString
+        getSenderUsernameBytes() {
+      java.lang.Object ref = senderUsername_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        senderUsername_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string senderUsername = 1;</code>
+     * @param value The senderUsername to set.
+     * @return This builder for chaining.
+     */
+    public Builder setSenderUsername(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      senderUsername_ = value;
+      bitField0_ |= 0x00000001;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string senderUsername = 1;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearSenderUsername() {
+      senderUsername_ = getDefaultInstance().getSenderUsername();
+      bitField0_ = (bitField0_ & ~0x00000001);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string senderUsername = 1;</code>
+     * @param value The bytes for senderUsername to set.
+     * @return This builder for chaining.
+     */
+    public Builder setSenderUsernameBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      senderUsername_ = value;
+      bitField0_ |= 0x00000001;
+      onChanged();
+      return this;
+    }
+
     private java.lang.Object message_ = "";
     /**
-     * <code>string message = 1;</code>
+     * <code>string message = 2;</code>
      * @return The message.
      */
     public java.lang.String getMessage() {
@@ -423,7 +559,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string message = 1;</code>
+     * <code>string message = 2;</code>
      * @return The bytes for message.
      */
     public com.google.protobuf.ByteString
@@ -440,7 +576,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string message = 1;</code>
+     * <code>string message = 2;</code>
      * @param value The message to set.
      * @return This builder for chaining.
      */
@@ -448,22 +584,22 @@ private static final long serialVersionUID = 0L;
         java.lang.String value) {
       if (value == null) { throw new NullPointerException(); }
       message_ = value;
-      bitField0_ |= 0x00000001;
+      bitField0_ |= 0x00000002;
       onChanged();
       return this;
     }
     /**
-     * <code>string message = 1;</code>
+     * <code>string message = 2;</code>
      * @return This builder for chaining.
      */
     public Builder clearMessage() {
       message_ = getDefaultInstance().getMessage();
-      bitField0_ = (bitField0_ & ~0x00000001);
+      bitField0_ = (bitField0_ & ~0x00000002);
       onChanged();
       return this;
     }
     /**
-     * <code>string message = 1;</code>
+     * <code>string message = 2;</code>
      * @param value The bytes for message to set.
      * @return This builder for chaining.
      */
@@ -472,7 +608,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) { throw new NullPointerException(); }
       checkByteStringIsUtf8(value);
       message_ = value;
-      bitField0_ |= 0x00000001;
+      bitField0_ |= 0x00000002;
       onChanged();
       return this;
     }
@@ -489,23 +625,23 @@ private static final long serialVersionUID = 0L;
     }
 
 
-    // @@protoc_insertion_point(builder_scope:generated.ChatMessageRequest)
+    // @@protoc_insertion_point(builder_scope:generated.ChatMessage)
   }
 
-  // @@protoc_insertion_point(class_scope:generated.ChatMessageRequest)
-  private static final generated.ChatMessageRequest DEFAULT_INSTANCE;
+  // @@protoc_insertion_point(class_scope:generated.ChatMessage)
+  private static final generated.ChatMessage DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new generated.ChatMessageRequest();
+    DEFAULT_INSTANCE = new generated.ChatMessage();
   }
 
-  public static generated.ChatMessageRequest getDefaultInstance() {
+  public static generated.ChatMessage getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
-  private static final com.google.protobuf.Parser<ChatMessageRequest>
-      PARSER = new com.google.protobuf.AbstractParser<ChatMessageRequest>() {
+  private static final com.google.protobuf.Parser<ChatMessage>
+      PARSER = new com.google.protobuf.AbstractParser<ChatMessage>() {
     @java.lang.Override
-    public ChatMessageRequest parsePartialFrom(
+    public ChatMessage parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -524,17 +660,17 @@ private static final long serialVersionUID = 0L;
     }
   };
 
-  public static com.google.protobuf.Parser<ChatMessageRequest> parser() {
+  public static com.google.protobuf.Parser<ChatMessage> parser() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.google.protobuf.Parser<ChatMessageRequest> getParserForType() {
+  public com.google.protobuf.Parser<ChatMessage> getParserForType() {
     return PARSER;
   }
 
   @java.lang.Override
-  public generated.ChatMessageRequest getDefaultInstanceForType() {
+  public generated.ChatMessage getDefaultInstanceForType() {
     return DEFAULT_INSTANCE;
   }
 
