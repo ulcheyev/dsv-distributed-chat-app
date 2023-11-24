@@ -7,6 +7,36 @@ message ChatMessage {
   string message = 2;
 }
 
+message Address {
+  string hostname = 1;
+  int32 port = 2;
+}
+
+message Candidate {
+  int64 id = 1;
+  Address address = 2;
+}
+
+message CandidateId {
+  int64 id = 1;
+}
+
+message Neighbour {
+  Address next = 1;
+  Address nextNext = 2;
+  Address prev = 3;
+  Address leader = 4;
+}
+
+message Empty {
+
+}
+
 service ChatService {
   rpc chat(stream ChatMessage) returns(stream ChatMessage);
+  rpc election(CandidateId) returns(Empty);
+  rpc elected(Candidate) returns(Empty);
+  rpc changeNextNext(Address) returns(Empty);
+  rpc changePrev(Address) returns(Address);
+  rpc join(Address) returns(Neighbour);
 }

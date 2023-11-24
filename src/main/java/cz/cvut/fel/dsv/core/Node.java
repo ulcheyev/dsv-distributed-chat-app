@@ -1,28 +1,33 @@
 package cz.cvut.fel.dsv.core;
 
 import cz.cvut.fel.dsv.service.ChatServiceImpl;
-import io.grpc.*;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import io.grpc.Server;
+import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 import lombok.Getter;
 import lombok.Setter;
-import org.checkerframework.checker.units.qual.A;
 
-import java.io.Reader;
 import java.net.InetAddress;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class Node{
-
+    @Getter private long nodeId;
+    @Getter private Neighbour myNeighbour;
+    @Setter @Getter private boolean voting;
     private static final Logger logger = Logger.getLogger(Node.class.getName());
 
     @Getter private Address currentNodeAddress;
     private ConsoleHandler consoleHandler; // todo change impl
     private Server server;
 
-
+    public Node() {
+    }
 
     // Todo implement client logic
     @Getter private String username;
@@ -65,6 +70,8 @@ public class Node{
             }
         });
 
+        // TODO: Leader election
+
         consoleHandler = new ConsoleHandler(this);
         new Thread(consoleHandler).start();
     }
@@ -72,7 +79,7 @@ public class Node{
     private void startServer(int port)  {
         this.server = ServerBuilder
                 .forPort(currentNodeAddress.getPort())
-                .addService(new ChatServiceImpl())
+                .addService(new ChatServiceImpl(this))
                 .build();
         try {
             server.start();
@@ -118,7 +125,9 @@ public class Node{
     private void handleArgs(String[] args){
         try {
             this.username = args[0];
-            this.currentNodeAddress = new Address(InetAddress.getLocalHost().getHostName(), Integer.parseInt(args[1]));
+            this.currentNodeAddress = new Address(InetAddress.getLocalHost().getHostAddress(), Integer.parseInt(args[1]));
+            this.nodeId = generateId(this.currentNodeAddress);
+            this.myNeighbour = new Neighbour(this.currentNodeAddress);
             if(args.length == 2){ // todo for test it will be a server
                 this.startServer(currentNodeAddress.getPort());
             }
@@ -133,6 +142,18 @@ public class Node{
             logger.severe("Error while handling input args. Max. quantity pf parameters is 4, Min. is 2.");
             logger.info(e.getMessage());
         }
+    }
+
+    private long generateId(Address myAddress) {
+        String[] parsedArray = myAddress.getHostname().split("\\.");
+        long temp;
+        long generatedId = 0;
+        for (var s : parsedArray) {
+            temp = Long.parseLong(s);
+            generatedId *= 1000;
+            generatedId += temp + LocalDateTime.now().getNano();
+        }
+        return generatedId + myAddress.getPort() * 10_000L;
     }
 
     public static void main(String[] args) {
