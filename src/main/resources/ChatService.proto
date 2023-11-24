@@ -1,0 +1,16 @@
+syntax ="proto3";
+option java_multiple_files = true;
+package generated;
+
+message ChatMessageRequest {
+  string message = 1;
+}
+
+message ChatMessageResponse {
+  string message = 1;
+}
+
+service ChatService {
+  rpc chat(stream ChatMessageRequest) returns(stream ChatMessageResponse);
+  rpc chatTest(ChatMessageRequest) returns (ChatMessageResponse);
+}
