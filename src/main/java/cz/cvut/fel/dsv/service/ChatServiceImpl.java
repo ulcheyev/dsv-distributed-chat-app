@@ -1,6 +1,7 @@
 package cz.cvut.fel.dsv.service;
 
 import io.grpc.stub.StreamObserver;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ public class ChatServiceImpl extends generated.ChatServiceGrpc.ChatServiceImplBa
 
     // todo co se tam deje uvnitr
     private static List<StreamObserver<generated.ChatMessage>> observers = new ArrayList<>();
+//    private static List<Rooms> rooms = new ArrayList<>();
 
     @Override
     public StreamObserver<generated.ChatMessage> chat(

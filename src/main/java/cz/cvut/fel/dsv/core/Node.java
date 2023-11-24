@@ -4,9 +4,12 @@ import cz.cvut.fel.dsv.service.ChatServiceImpl;
 import io.grpc.*;
 import io.grpc.stub.StreamObserver;
 import lombok.Getter;
+import lombok.Setter;
+import org.checkerframework.checker.units.qual.A;
 
+import java.io.Reader;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -24,34 +27,17 @@ public class Node{
     // Todo implement client logic
     @Getter private String username;
     // Todo change implementation of leader access
-    private Address nodeAddressToConnect = new Address("localhost", 8080);
-    private Address leaderAddress = new Address("localhost", 8080);
+    private Address nodeAddressToConnect = new Address("localhost", 8080); // standard
+    private Address leaderAddress; // standard leader
     private ManagedChannel managedChannel;
     private StreamObserver<generated.ChatMessage> streamObserver;
 
-    public Node(){}
 
-    public Node(String username,
-                Address address,
-                Server server,
-                Address nodeAddressToConnect) {
-        assert server != null;
-        this.username = username;
-        this.currentNodeAddress = address;
-        this.server = server;
-        this.nodeAddressToConnect = nodeAddressToConnect;
-    }
+    private void initRemoteMethodProperties() {
 
-    public Node(String username,
-                Address address,
-                Server server) {
-        this.username = username;
-        this.currentNodeAddress = address;
-        assert server != null;
-        this.server = server;
-    }
+        // todo for test leader will be 8080
+        leaderAddress = new Address("localhost", 8080);
 
-    private void init() {
         managedChannel = ManagedChannelBuilder
                 .forAddress(leaderAddress.getHostname(), leaderAddress.getPort())
                 .usePlaintext()
@@ -61,12 +47,17 @@ public class Node{
         streamObserver = asyncStub.chat(new StreamObserver<>() {
             @Override
             public void onNext(generated.ChatMessage chatMessage) {
-                logger.info("Client: Message received from: " + chatMessage.getSenderUsername() +
-                        "\n\t\tBody: " + chatMessage.getMessage());
+//                logger.info("Client: Message received from: " + chatMessage.getSenderUsername() +
+//                        "\n\t\tBody: " + chatMessage.getMessage());
+                // todo problem when node is typed smth -> it will be deleted
+                System.out.print('\r');
+                System.out.println("[" + chatMessage.getSenderUsername()+"] " + chatMessage.getMessage());
+                System.out.print(username+"> "); //todo how to write this when something changed in console
+
             }
             @Override
             public void onError(Throwable throwable) {
-                logger.severe("Client: Error." + throwable.getMessage());
+                logger.severe("Client: Error. " + throwable.getMessage());
             }
             @Override
             public void onCompleted() {
@@ -78,8 +69,11 @@ public class Node{
         new Thread(consoleHandler).start();
     }
 
-    private void startServer()  {
-
+    private void startServer(int port)  {
+        this.server = ServerBuilder
+                .forPort(currentNodeAddress.getPort())
+                .addService(new ChatServiceImpl())
+                .build();
         try {
             server.start();
             Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -99,21 +93,22 @@ public class Node{
     }
 
     public void sendMessage(String msg) {
-        CountDownLatch finishLatch = new CountDownLatch(1);
-        streamObserver.onNext(generated.ChatMessage.newBuilder()
-                .setMessage(msg)
-                .setSenderUsername(this.username)
-                .build());
-        // waiting Todo change
-        try {
-            if(!finishLatch.await(1, TimeUnit.MINUTES)) {
-                logger.warning("Cannot finish the request during 1 minute.");
+        if(!Objects.equals(msg, "")) {
+            CountDownLatch finishLatch = new CountDownLatch(1);
+            streamObserver.onNext(generated.ChatMessage.newBuilder()
+                    .setMessage(msg)
+                    .setSenderUsername(this.username)
+                    .build());
+            // waiting Todo change
+            try {
+                if (!finishLatch.await(1, TimeUnit.MINUTES)) {
+                    logger.warning("Cannot finish the request during 1 minute.");
+                }
+            } catch (InterruptedException e) {
+                logger.severe("Error while waiting on finish request.");
+                logger.severe(e.getMessage());
             }
-        }catch (InterruptedException e) {
-            logger.severe("Error while waiting on finish request.");
-            logger.severe(e.getMessage());
         }
-
     }
 
     private void stopServer() {
@@ -123,20 +118,19 @@ public class Node{
     private void handleArgs(String[] args){
         try {
             this.username = args[0];
-            if(args.length == 2){ // server
-                this.currentNodeAddress = new Address(InetAddress.getLocalHost().getHostName(), Integer.parseInt(args[1]));
-                this.server = ServerBuilder
-                        .forPort(currentNodeAddress.getPort())
-                        .addService(new ChatServiceImpl())
-                        .build();
-                this.startServer();
+            this.currentNodeAddress = new Address(InetAddress.getLocalHost().getHostName(), Integer.parseInt(args[1]));
+            if(args.length == 2){ // todo for test it will be a server
+                this.startServer(currentNodeAddress.getPort());
             }
-            else if (args.length == 3) { // client
-                this.nodeAddressToConnect = new Address(args[1], Integer.parseInt(args[2]));
+            else if (args.length == 4) { // todo for test it will be a client
+                this.nodeAddressToConnect = new Address(args[2], Integer.parseInt(args[3]));
+                initRemoteMethodProperties();
             }
-            init();
-        } catch (UnknownHostException e){
-            logger.severe("Error while reading local host address");
+            else {
+                System.err.println("Error while handling input args. Max. quantity pf parameters is 4, Min. is 2.");
+            }
+        } catch (Exception e){
+            logger.severe("Error while handling input args. Max. quantity pf parameters is 4, Min. is 2.");
             logger.info(e.getMessage());
         }
     }

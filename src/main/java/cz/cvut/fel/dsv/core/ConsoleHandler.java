@@ -21,6 +21,8 @@ public class ConsoleHandler implements Runnable {
     }
 
 
+
+    // todo implement some logic based on input
     private void parse_commandline(String commandline) {
         new Thread( () -> myNode.sendMessage(commandline)).start();
     }
@@ -42,5 +44,8 @@ public class ConsoleHandler implements Runnable {
             }
         }
         System.out.println("Closing ConsoleHandler.");
+    }
+
+    public static void deleteCurrentLine() {
     }
 }
