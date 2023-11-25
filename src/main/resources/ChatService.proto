@@ -7,6 +7,23 @@ message ChatMessage {
   string message = 2;
 }
 
+message RoomRequestMessage {
+  string roomName = 1;
+  string senderUsername = 2;
+}
+
+message RoomResponseMessage{
+  string response = 1;
+}
+
+message RoomChatMessage {
+    ChatMessage msg = 1;
+    string room = 2;
+}
+
 service ChatService {
+  rpc createRoom(RoomRequestMessage) returns(RoomResponseMessage);
+  rpc joinToRoom(RoomRequestMessage) returns(stream RoomChatMessage);
+  rpc sendMessageToRoom(RoomChatMessage) returns(RoomResponseMessage);
   rpc chat(stream ChatMessage) returns(stream ChatMessage);
 }

@@ -24,7 +24,23 @@ public class ConsoleHandler implements Runnable {
 
     // todo implement some logic based on input
     private void parse_commandline(String commandline) {
-        new Thread( () -> myNode.sendMessage(commandline)).start();
+        if(commandline.charAt(0) == 'c' && commandline.charAt(1) == 'r') {
+            String roomName = commandline.substring(3);
+            myNode.createRoom(roomName);
+
+        }
+        else if(commandline.charAt(0) == 'j') {
+            String roomName = commandline.substring(2);
+            new Thread( () -> myNode.joinRoom(roomName)).start();
+        } else if(commandline.charAt(0) == 'r'){
+            String[] tokens = commandline.split(" ");
+            String roomName = tokens[1];
+            String msg = tokens[2];
+            new Thread( () -> myNode.sendMessageToRoom(roomName, msg)).start();
+        }
+        else {
+            new Thread( () -> myNode.sendMessage(commandline)).start();
+        }
     }
 
 

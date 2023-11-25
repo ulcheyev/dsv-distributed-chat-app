@@ -1,6 +1,10 @@
 package cz.cvut.fel.dsv.core;
 
 import cz.cvut.fel.dsv.service.ChatServiceImpl;
+import generated.ChatServiceGrpc;
+import generated.RoomChatMessage;
+import generated.RoomRequestMessage;
+import generated.RoomResponseMessage;
 import io.grpc.*;
 import io.grpc.stub.StreamObserver;
 import lombok.Getter;
@@ -31,6 +35,9 @@ public class Node{
     private Address leaderAddress; // standard leader
     private ManagedChannel managedChannel;
     private StreamObserver<generated.ChatMessage> streamObserver;
+
+    // todo test
+    private StreamObserver<generated.RoomChatMessage> roomMessageObserver;
 
 
     private void initRemoteMethodProperties() {
@@ -92,6 +99,7 @@ public class Node{
         }
     }
 
+    // todo will be global room!!!
     public void sendMessage(String msg) {
         if(!Objects.equals(msg, "")) {
             CountDownLatch finishLatch = new CountDownLatch(1);
@@ -133,6 +141,66 @@ public class Node{
             logger.severe("Error while handling input args. Max. quantity pf parameters is 4, Min. is 2.");
             logger.info(e.getMessage());
         }
+    }
+
+
+    public void createRoom(String roomName) {
+        var th = new Thread( () -> {ChatServiceGrpc.ChatServiceBlockingStub chatServiceBlockingStub = ChatServiceGrpc.newBlockingStub(managedChannel);
+            RoomResponseMessage room = chatServiceBlockingStub.createRoom(RoomRequestMessage
+                    .newBuilder()
+                    .setRoomName(roomName)
+                    .setSenderUsername(username)
+                    .build());});
+        th.start();
+        try {
+            th.join();
+        }catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
+        joinRoom(roomName);
+    }
+
+    public void joinRoom(String roomName) {
+        var th = new Thread( () ->  {
+            ChatServiceGrpc.ChatServiceStub chatServiceBlockingStub = ChatServiceGrpc.newStub(managedChannel);
+            chatServiceBlockingStub.joinToRoom(RoomRequestMessage
+                            .newBuilder()
+                            .setRoomName(roomName)
+                            .setSenderUsername(username)
+                            .build(),
+                    new StreamObserver<RoomChatMessage>() {
+                        @Override
+                        public void onNext(RoomChatMessage roomChatMessage) {
+                            logger.info("[Room] " + roomChatMessage.getRoom() + ", [user] " + roomChatMessage.getMsg().getSenderUsername() + ", [msg] "
+                                    + roomChatMessage.getMsg().getMessage());
+                        }
+
+                        @Override
+                        public void onError(Throwable throwable) {
+
+                        }
+
+                        @Override
+                        public void onCompleted() {
+
+                        }
+                    });
+        });
+        th.start();
+        try {
+            th.join();
+        }catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
+
+    }
+
+    public void sendMessageToRoom(String room, String msg){
+        ChatServiceGrpc.ChatServiceBlockingStub asyncStub = ChatServiceGrpc.newBlockingStub(managedChannel);
+       asyncStub.sendMessageToRoom(RoomChatMessage.newBuilder()
+               .setMsg(generated.ChatMessage.newBuilder().setMessage(msg).setSenderUsername(username).build())
+               .setRoom(room)
+               .build());
     }
 
     public static void main(String[] args) {

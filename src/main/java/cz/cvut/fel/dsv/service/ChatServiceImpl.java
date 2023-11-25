@@ -1,20 +1,29 @@
 package cz.cvut.fel.dsv.service;
 
+import cz.cvut.fel.dsv.core.Room;
+import generated.ChatMessage;
+import generated.RoomChatMessage;
+import generated.RoomRequestMessage;
+import generated.RoomResponseMessage;
 import io.grpc.stub.StreamObserver;
 import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class ChatServiceImpl extends generated.ChatServiceGrpc.ChatServiceImplBase {
 
     private static final Logger logger = Logger.getLogger(ChatServiceImpl.class.getName());
+    private static Map<String, Room> roomMap = new HashMap();
 
     // todo co se tam deje uvnitr
     private static List<StreamObserver<generated.ChatMessage>> observers = new ArrayList<>();
 //    private static List<Rooms> rooms = new ArrayList<>();
 
+    // todo will be global room
     @Override
     public StreamObserver<generated.ChatMessage> chat(
             StreamObserver<generated.ChatMessage> responseObserver)
@@ -52,5 +61,31 @@ public class ChatServiceImpl extends generated.ChatServiceGrpc.ChatServiceImplBa
             }
         };
     }
+
+
+    @Override
+    public void createRoom(RoomRequestMessage request, StreamObserver<RoomResponseMessage> responseObserver) {
+        Room room = new Room(request.getRoomName());
+        roomMap.put(room.getName(), room);
+        responseObserver.onNext(RoomResponseMessage.newBuilder().setResponse("Room has been created").build());
+        responseObserver.onCompleted();
+        logger.info("Room with " + room.getName() + " has been created");
+    }
+
+    @Override
+    public void joinToRoom(RoomRequestMessage request, StreamObserver<RoomChatMessage> responseObserver) {
+        Room room = roomMap.get(request.getRoomName());
+        room.addUser(request.getSenderUsername(), responseObserver);
+        logger.info("User with username " + request.getSenderUsername() + " has joined in room " + room.getName());
+    }
+
+    @Override
+    public void sendMessageToRoom(RoomChatMessage request, StreamObserver<RoomResponseMessage> responseObserver) {
+        logger.info("Sending in " + request.getRoom()+ " by " + request.getMsg().getSenderUsername());
+        for(var room: roomMap.entrySet()) {
+            room.getValue().sendMessage(request.getMsg().getSenderUsername(), request.getMsg().getMessage());
+        }
+    }
+
 
 }
