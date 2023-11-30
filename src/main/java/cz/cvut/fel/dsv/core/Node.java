@@ -1,6 +1,7 @@
 package cz.cvut.fel.dsv.core;
 
 import cz.cvut.fel.dsv.service.ChatServiceImpl;
+import generated.ChatServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
@@ -16,13 +17,14 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-public class Node{
-    @Getter private long nodeId;
-    @Getter private Neighbour myNeighbour;
-    @Setter @Getter private boolean voting;
+@Getter
+public class Node implements Runnable {
+    private long nodeId;
+    @Setter private Neighbour myNeighbour;
+    @Setter private boolean voting;
     private static final Logger logger = Logger.getLogger(Node.class.getName());
 
-    @Getter private Address currentNodeAddress;
+    private Address currentNodeAddress;
     private ConsoleHandler consoleHandler; // todo change impl
     private Server server;
 
@@ -30,55 +32,17 @@ public class Node{
     }
 
     // Todo implement client logic
-    @Getter private String username;
+    private String username;
     // Todo change implementation of leader access
-    private Address nodeAddressToConnect = new Address("localhost", 8080); // standard
+    private Address nodeAddressToConnect;// standard
     private Address leaderAddress; // standard leader
     private ManagedChannel managedChannel;
     private StreamObserver<generated.ChatMessage> streamObserver;
 
 
-    private void initRemoteMethodProperties() {
-
-        // todo for test leader will be 8080
-        leaderAddress = new Address("localhost", 8080);
-
-        managedChannel = ManagedChannelBuilder
-                .forAddress(leaderAddress.getHostname(), leaderAddress.getPort())
-                .usePlaintext()
-                .build();
-
-        generated.ChatServiceGrpc.ChatServiceStub asyncStub = generated.ChatServiceGrpc.newStub(managedChannel);
-        streamObserver = asyncStub.chat(new StreamObserver<>() {
-            @Override
-            public void onNext(generated.ChatMessage chatMessage) {
-//                logger.info("Client: Message received from: " + chatMessage.getSenderUsername() +
-//                        "\n\t\tBody: " + chatMessage.getMessage());
-                // todo problem when node is typed smth -> it will be deleted
-                System.out.print('\r');
-                System.out.println("[" + chatMessage.getSenderUsername()+"] " + chatMessage.getMessage());
-                System.out.print(username+"> "); //todo how to write this when something changed in console
-
-            }
-            @Override
-            public void onError(Throwable throwable) {
-                logger.severe("Client: Error. " + throwable.getMessage());
-            }
-            @Override
-            public void onCompleted() {
-                logger.info("Client: Completed.");
-            }
-        });
-
-        // TODO: Leader election
-
-        consoleHandler = new ConsoleHandler(this);
-        new Thread(consoleHandler).start();
-    }
-
     private void startServer(int port)  {
         this.server = ServerBuilder
-                .forPort(currentNodeAddress.getPort())
+                .forPort(port)
                 .addService(new ChatServiceImpl(this))
                 .build();
         try {
@@ -91,7 +55,7 @@ public class Node{
                 }
             });
             logger.info("Server started: " + server);
-            server.awaitTermination();
+//            server.awaitTermination();
 
         } catch (Exception e) {
             System.err.println("Error while starting the server.");
@@ -124,23 +88,22 @@ public class Node{
 
     private void handleArgs(String[] args){
         try {
-            this.username = args[0];
-            this.currentNodeAddress = new Address(InetAddress.getLocalHost().getHostAddress(), Integer.parseInt(args[1]));
-            this.nodeId = generateId(this.currentNodeAddress);
-            this.myNeighbour = new Neighbour(this.currentNodeAddress);
-            if(args.length == 2){ // todo for test it will be a server
-                this.startServer(currentNodeAddress.getPort());
-            }
-            else if (args.length == 4) { // todo for test it will be a client
+            if (args.length == 2) {
+                this.username = args[0];
+                this.currentNodeAddress = new Address(InetAddress.getLocalHost().getHostAddress(), Integer.parseInt(args[1]));
+                this.nodeId = generateId(this.currentNodeAddress);
+                this.myNeighbour = new Neighbour(this.currentNodeAddress);
+                this.nodeAddressToConnect = this.currentNodeAddress;
+            } else {
+                this.username = args[0];
+                this.currentNodeAddress = new Address(InetAddress.getLocalHost().getHostAddress(), Integer.parseInt(args[1]));
+                this.nodeId = generateId(this.currentNodeAddress);
+                this.myNeighbour = new Neighbour(this.currentNodeAddress);
                 this.nodeAddressToConnect = new Address(args[2], Integer.parseInt(args[3]));
-                initRemoteMethodProperties();
             }
-            else {
-                System.err.println("Error while handling input args. Max. quantity pf parameters is 4, Min. is 2.");
-            }
-        } catch (Exception e){
-            logger.severe("Error while handling input args. Max. quantity pf parameters is 4, Min. is 2.");
-            logger.info(e.getMessage());
+        } catch (Exception e) {
+            logger.severe("Error.");
+            logger.info("popka zhopka");
         }
     }
 
@@ -156,9 +119,63 @@ public class Node{
         return generatedId + myAddress.getPort() * 10_000L;
     }
 
+    public void getStatus() {
+        System.out.println("Node status: " + this);
+    }
+
+    @Override
+    public String toString() {
+        return "\n\tID: " + this.nodeId + ";\n" +
+                "\tADDRESS: " + this.currentNodeAddress + ";\n" +
+                "\tNEIGHBOUR: " + this.myNeighbour + ";\n" +
+                "\tCONNECT TO: " + this.nodeAddressToConnect + ";\n";
+    }
+
     public static void main(String[] args) {
         final Node node = new Node();
         node.handleArgs(args);
+        node.run();
     }
 
+    @Override
+    public void run() {
+        startServer(this.currentNodeAddress.getPort());
+        // todo for test leader will be 8080
+        leaderAddress = new Address("localhost", 8080);
+
+        managedChannel = ManagedChannelBuilder
+                .forAddress(leaderAddress.getHostname(), leaderAddress.getPort())
+                .usePlaintext()
+                .build();
+
+        generated.ChatServiceGrpc.ChatServiceStub asyncStub = generated.ChatServiceGrpc.newStub(managedChannel);
+        ChatServiceGrpc.ChatServiceBlockingStub stub = ChatServiceGrpc.newBlockingStub(managedChannel);
+        streamObserver = asyncStub.chat(new StreamObserver<>() {
+            @Override
+            public void onNext(generated.ChatMessage chatMessage) {
+//                logger.info("Client: Message received from: " + chatMessage.getSenderUsername() +
+//                        "\n\t\tBody: " + chatMessage.getMessage());
+                // todo problem when node is typed smth -> it will be deleted
+                System.out.print('\r');
+                System.out.println("[" + chatMessage.getSenderUsername()+"] " + chatMessage.getMessage());
+                System.out.print(username+"> "); //todo how to write this when something changed in console
+
+            }
+            @Override
+            public void onError(Throwable throwable) {
+                logger.severe("Client: Error. " + throwable.getMessage());
+            }
+            @Override
+            public void onCompleted() {
+                logger.info("Client: Completed.");
+            }
+        });
+
+        generated.Address address = Mapper.addrToGenAddr(this.nodeAddressToConnect);
+        Neighbour neighbour = Mapper.genNeiToNei(stub.join(address));
+        setMyNeighbour(neighbour);
+        getStatus();
+        consoleHandler = new ConsoleHandler(this);
+        new Thread(consoleHandler).start();
+    }
 }
