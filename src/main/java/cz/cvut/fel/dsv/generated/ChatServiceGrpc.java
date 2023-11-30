@@ -77,6 +77,37 @@ public final class ChatServiceGrpc {
     return getJoinToRoomMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<generated.RoomRequestMessage,
+      generated.RoomResponseMessage> getExitRoomMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "exitRoom",
+      requestType = generated.RoomRequestMessage.class,
+      responseType = generated.RoomResponseMessage.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<generated.RoomRequestMessage,
+      generated.RoomResponseMessage> getExitRoomMethod() {
+    io.grpc.MethodDescriptor<generated.RoomRequestMessage, generated.RoomResponseMessage> getExitRoomMethod;
+    if ((getExitRoomMethod = ChatServiceGrpc.getExitRoomMethod) == null) {
+      synchronized (ChatServiceGrpc.class) {
+        if ((getExitRoomMethod = ChatServiceGrpc.getExitRoomMethod) == null) {
+          ChatServiceGrpc.getExitRoomMethod = getExitRoomMethod =
+              io.grpc.MethodDescriptor.<generated.RoomRequestMessage, generated.RoomResponseMessage>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "exitRoom"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.RoomRequestMessage.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.RoomResponseMessage.getDefaultInstance()))
+              .setSchemaDescriptor(new ChatServiceMethodDescriptorSupplier("exitRoom"))
+              .build();
+        }
+      }
+    }
+    return getExitRoomMethod;
+  }
+
   private static volatile io.grpc.MethodDescriptor<generated.RoomChatMessage,
       generated.RoomResponseMessage> getSendMessageToRoomMethod;
 
@@ -106,37 +137,6 @@ public final class ChatServiceGrpc {
       }
     }
     return getSendMessageToRoomMethod;
-  }
-
-  private static volatile io.grpc.MethodDescriptor<generated.ChatMessage,
-      generated.ChatMessage> getChatMethod;
-
-  @io.grpc.stub.annotations.RpcMethod(
-      fullMethodName = SERVICE_NAME + '/' + "chat",
-      requestType = generated.ChatMessage.class,
-      responseType = generated.ChatMessage.class,
-      methodType = io.grpc.MethodDescriptor.MethodType.BIDI_STREAMING)
-  public static io.grpc.MethodDescriptor<generated.ChatMessage,
-      generated.ChatMessage> getChatMethod() {
-    io.grpc.MethodDescriptor<generated.ChatMessage, generated.ChatMessage> getChatMethod;
-    if ((getChatMethod = ChatServiceGrpc.getChatMethod) == null) {
-      synchronized (ChatServiceGrpc.class) {
-        if ((getChatMethod = ChatServiceGrpc.getChatMethod) == null) {
-          ChatServiceGrpc.getChatMethod = getChatMethod =
-              io.grpc.MethodDescriptor.<generated.ChatMessage, generated.ChatMessage>newBuilder()
-              .setType(io.grpc.MethodDescriptor.MethodType.BIDI_STREAMING)
-              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "chat"))
-              .setSampledToLocalTracing(true)
-              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  generated.ChatMessage.getDefaultInstance()))
-              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  generated.ChatMessage.getDefaultInstance()))
-              .setSchemaDescriptor(new ChatServiceMethodDescriptorSupplier("chat"))
-              .build();
-        }
-      }
-    }
-    return getChatMethod;
   }
 
   /**
@@ -203,16 +203,16 @@ public final class ChatServiceGrpc {
 
     /**
      */
-    default void sendMessageToRoom(generated.RoomChatMessage request,
+    default void exitRoom(generated.RoomRequestMessage request,
         io.grpc.stub.StreamObserver<generated.RoomResponseMessage> responseObserver) {
-      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getSendMessageToRoomMethod(), responseObserver);
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getExitRoomMethod(), responseObserver);
     }
 
     /**
      */
-    default io.grpc.stub.StreamObserver<generated.ChatMessage> chat(
-        io.grpc.stub.StreamObserver<generated.ChatMessage> responseObserver) {
-      return io.grpc.stub.ServerCalls.asyncUnimplementedStreamingCall(getChatMethod(), responseObserver);
+    default void sendMessageToRoom(generated.RoomChatMessage request,
+        io.grpc.stub.StreamObserver<generated.RoomResponseMessage> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getSendMessageToRoomMethod(), responseObserver);
     }
   }
 
@@ -261,18 +261,18 @@ public final class ChatServiceGrpc {
 
     /**
      */
-    public void sendMessageToRoom(generated.RoomChatMessage request,
+    public void exitRoom(generated.RoomRequestMessage request,
         io.grpc.stub.StreamObserver<generated.RoomResponseMessage> responseObserver) {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
-          getChannel().newCall(getSendMessageToRoomMethod(), getCallOptions()), request, responseObserver);
+          getChannel().newCall(getExitRoomMethod(), getCallOptions()), request, responseObserver);
     }
 
     /**
      */
-    public io.grpc.stub.StreamObserver<generated.ChatMessage> chat(
-        io.grpc.stub.StreamObserver<generated.ChatMessage> responseObserver) {
-      return io.grpc.stub.ClientCalls.asyncBidiStreamingCall(
-          getChannel().newCall(getChatMethod(), getCallOptions()), responseObserver);
+    public void sendMessageToRoom(generated.RoomChatMessage request,
+        io.grpc.stub.StreamObserver<generated.RoomResponseMessage> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getSendMessageToRoomMethod(), getCallOptions()), request, responseObserver);
     }
   }
 
@@ -309,6 +309,13 @@ public final class ChatServiceGrpc {
 
     /**
      */
+    public generated.RoomResponseMessage exitRoom(generated.RoomRequestMessage request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getExitRoomMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
     public generated.RoomResponseMessage sendMessageToRoom(generated.RoomChatMessage request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getSendMessageToRoomMethod(), getCallOptions(), request);
@@ -341,6 +348,14 @@ public final class ChatServiceGrpc {
 
     /**
      */
+    public com.google.common.util.concurrent.ListenableFuture<generated.RoomResponseMessage> exitRoom(
+        generated.RoomRequestMessage request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getExitRoomMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
     public com.google.common.util.concurrent.ListenableFuture<generated.RoomResponseMessage> sendMessageToRoom(
         generated.RoomChatMessage request) {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
@@ -350,8 +365,8 @@ public final class ChatServiceGrpc {
 
   private static final int METHODID_CREATE_ROOM = 0;
   private static final int METHODID_JOIN_TO_ROOM = 1;
-  private static final int METHODID_SEND_MESSAGE_TO_ROOM = 2;
-  private static final int METHODID_CHAT = 3;
+  private static final int METHODID_EXIT_ROOM = 2;
+  private static final int METHODID_SEND_MESSAGE_TO_ROOM = 3;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -378,6 +393,10 @@ public final class ChatServiceGrpc {
           serviceImpl.joinToRoom((generated.RoomRequestMessage) request,
               (io.grpc.stub.StreamObserver<generated.RoomChatMessage>) responseObserver);
           break;
+        case METHODID_EXIT_ROOM:
+          serviceImpl.exitRoom((generated.RoomRequestMessage) request,
+              (io.grpc.stub.StreamObserver<generated.RoomResponseMessage>) responseObserver);
+          break;
         case METHODID_SEND_MESSAGE_TO_ROOM:
           serviceImpl.sendMessageToRoom((generated.RoomChatMessage) request,
               (io.grpc.stub.StreamObserver<generated.RoomResponseMessage>) responseObserver);
@@ -392,9 +411,6 @@ public final class ChatServiceGrpc {
     public io.grpc.stub.StreamObserver<Req> invoke(
         io.grpc.stub.StreamObserver<Resp> responseObserver) {
       switch (methodId) {
-        case METHODID_CHAT:
-          return (io.grpc.stub.StreamObserver<Req>) serviceImpl.chat(
-              (io.grpc.stub.StreamObserver<generated.ChatMessage>) responseObserver);
         default:
           throw new AssertionError();
       }
@@ -418,19 +434,19 @@ public final class ChatServiceGrpc {
               generated.RoomChatMessage>(
                 service, METHODID_JOIN_TO_ROOM)))
         .addMethod(
+          getExitRoomMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              generated.RoomRequestMessage,
+              generated.RoomResponseMessage>(
+                service, METHODID_EXIT_ROOM)))
+        .addMethod(
           getSendMessageToRoomMethod(),
           io.grpc.stub.ServerCalls.asyncUnaryCall(
             new MethodHandlers<
               generated.RoomChatMessage,
               generated.RoomResponseMessage>(
                 service, METHODID_SEND_MESSAGE_TO_ROOM)))
-        .addMethod(
-          getChatMethod(),
-          io.grpc.stub.ServerCalls.asyncBidiStreamingCall(
-            new MethodHandlers<
-              generated.ChatMessage,
-              generated.ChatMessage>(
-                service, METHODID_CHAT)))
         .build();
   }
 
@@ -481,8 +497,8 @@ public final class ChatServiceGrpc {
               .setSchemaDescriptor(new ChatServiceFileDescriptorSupplier())
               .addMethod(getCreateRoomMethod())
               .addMethod(getJoinToRoomMethod())
+              .addMethod(getExitRoomMethod())
               .addMethod(getSendMessageToRoomMethod())
-              .addMethod(getChatMethod())
               .build();
         }
       }

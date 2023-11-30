@@ -2,6 +2,26 @@ syntax ="proto3";
 option java_multiple_files = true;
 package generated;
 
+
+message PermissionRequest {
+  int64 nodeId = 1;
+  string timestamp = 2;
+}
+
+message PermissionResponse {
+  bool granted = 1;
+  repeated PermissionRequest deferredRequests = 2;
+}
+
+message Remote {
+  int64 nodeId = 1;
+}
+
+message RemoteResponse {
+  bool added = 1;
+  repeated Remote remotes = 2;
+}
+
 message ChatMessage {
   string senderUsername = 1;
   string message = 2;
@@ -21,9 +41,22 @@ message RoomChatMessage {
     string room = 2;
 }
 
-service ChatService {
-  rpc createRoom(RoomRequestMessage) returns(RoomResponseMessage);
-  rpc joinToRoom(RoomRequestMessage) returns(stream RoomChatMessage);
-  rpc sendMessageToRoom(RoomChatMessage) returns(RoomResponseMessage);
-  rpc chat(stream ChatMessage) returns(stream ChatMessage);
+service ChatPermissionService {
+  rpc receiveRequest(PermissionRequest) returns (PermissionResponse);
+  rpc receiveResponse(PermissionResponse) returns (PermissionResponse);
 }
+
+
+service MyRemotesService {
+  rpc addRemote(Remote) returns (RemoteResponse);
+  rpc removeRemote(Remote) returns (RemoteResponse);
+  rpc updateRemotes(stream Remote) returns (RemoteResponse);
+}
+
+service ChatService {
+  rpc createRoom(RoomRequestMessage) returns (RoomResponseMessage);
+  rpc joinToRoom(RoomRequestMessage) returns (stream RoomChatMessage);
+  rpc exitRoom(RoomRequestMessage) returns (RoomResponseMessage);
+  rpc sendMessageToRoom(RoomChatMessage) returns (RoomResponseMessage);
+}
+

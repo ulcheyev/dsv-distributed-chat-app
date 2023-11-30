@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.util.Objects;
 
 // Todo  change impl
 public class ConsoleHandler implements Runnable {
@@ -24,22 +25,21 @@ public class ConsoleHandler implements Runnable {
 
     // todo implement some logic based on input
     private void parse_commandline(String commandline) {
-        if(commandline.charAt(0) == 'c' && commandline.charAt(1) == 'r') {
-            String roomName = commandline.substring(3);
-            myNode.createRoom(roomName);
-
-        }
-        else if(commandline.charAt(0) == 'j') {
-            String roomName = commandline.substring(2);
-            new Thread( () -> myNode.joinRoom(roomName)).start();
-        } else if(commandline.charAt(0) == 'r'){
-            String[] tokens = commandline.split(" ");
-            String roomName = tokens[1];
-            String msg = tokens[2];
-            new Thread( () -> myNode.sendMessageToRoom(roomName, msg)).start();
-        }
-        else {
-            new Thread( () -> myNode.sendMessage(commandline)).start();
+        if(!commandline.isEmpty()) {
+            if (commandline.charAt(0) == 'c' && commandline.charAt(1) == 'r') { // create room
+                String roomName = commandline.substring(3);
+                myNode.createRoom(roomName);
+            } else if (commandline.charAt(0) == 'j') { // join room
+                String roomName = commandline.substring(2);
+                myNode.joinRoom(roomName);
+            }else if(commandline.charAt(0) == 'e' && commandline.charAt(1) == 'x') { // exit room
+                if(!Objects.equals(myNode.getCurrentRoomName(), "global")){ // if it is not already global room
+                    myNode.joinRoom("global");
+                }
+            }
+            else {
+                myNode.sendMessageToRoom(myNode.getCurrentRoomName(), commandline);
+            }
         }
     }
 
@@ -49,7 +49,7 @@ public class ConsoleHandler implements Runnable {
         String commandline = "";
         while (reading) {
             commandline = "";
-            System.out.print(myNode.getUsername()+"> ");
+            System.out.print("["+myNode.getCurrentRoomName()+"] "+myNode.getUsername()+"> ");
             try {
                 commandline = reader.readLine();
                 parse_commandline(commandline);
@@ -62,6 +62,4 @@ public class ConsoleHandler implements Runnable {
         System.out.println("Closing ConsoleHandler.");
     }
 
-    public static void deleteCurrentLine() {
-    }
 }

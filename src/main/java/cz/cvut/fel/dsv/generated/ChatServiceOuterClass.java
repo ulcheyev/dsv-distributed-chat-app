@@ -16,6 +16,26 @@ public final class ChatServiceOuterClass {
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
   static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_generated_PermissionRequest_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_generated_PermissionRequest_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_generated_PermissionResponse_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_generated_PermissionResponse_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_generated_Remote_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_generated_Remote_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_generated_RemoteResponse_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_generated_RemoteResponse_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_generated_ChatMessage_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -44,46 +64,86 @@ public final class ChatServiceOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\021ChatService.proto\022\tgenerated\"6\n\013ChatMe" +
-      "ssage\022\026\n\016senderUsername\030\001 \001(\t\022\017\n\007message" +
-      "\030\002 \001(\t\">\n\022RoomRequestMessage\022\020\n\010roomName" +
-      "\030\001 \001(\t\022\026\n\016senderUsername\030\002 \001(\t\"\'\n\023RoomRe" +
-      "sponseMessage\022\020\n\010response\030\001 \001(\t\"D\n\017RoomC" +
-      "hatMessage\022#\n\003msg\030\001 \001(\0132\026.generated.Chat" +
-      "Message\022\014\n\004room\030\002 \001(\t2\262\002\n\013ChatService\022K\n" +
-      "\ncreateRoom\022\035.generated.RoomRequestMessa" +
-      "ge\032\036.generated.RoomResponseMessage\022I\n\njo" +
-      "inToRoom\022\035.generated.RoomRequestMessage\032" +
-      "\032.generated.RoomChatMessage0\001\022O\n\021sendMes" +
-      "sageToRoom\022\032.generated.RoomChatMessage\032\036" +
-      ".generated.RoomResponseMessage\022:\n\004chat\022\026" +
-      ".generated.ChatMessage\032\026.generated.ChatM" +
-      "essage(\0010\001B\002P\001b\006proto3"
+      "\n\021ChatService.proto\022\tgenerated\"6\n\021Permis" +
+      "sionRequest\022\016\n\006nodeId\030\001 \001(\003\022\021\n\ttimestamp" +
+      "\030\002 \001(\t\"]\n\022PermissionResponse\022\017\n\007granted\030" +
+      "\001 \001(\010\0226\n\020deferredRequests\030\002 \003(\0132\034.genera" +
+      "ted.PermissionRequest\"\030\n\006Remote\022\016\n\006nodeI" +
+      "d\030\001 \001(\003\"C\n\016RemoteResponse\022\r\n\005added\030\001 \001(\010" +
+      "\022\"\n\007remotes\030\002 \003(\0132\021.generated.Remote\"6\n\013" +
+      "ChatMessage\022\026\n\016senderUsername\030\001 \001(\t\022\017\n\007m" +
+      "essage\030\002 \001(\t\">\n\022RoomRequestMessage\022\020\n\010ro" +
+      "omName\030\001 \001(\t\022\026\n\016senderUsername\030\002 \001(\t\"\'\n\023" +
+      "RoomResponseMessage\022\020\n\010response\030\001 \001(\t\"D\n" +
+      "\017RoomChatMessage\022#\n\003msg\030\001 \001(\0132\026.generate" +
+      "d.ChatMessage\022\014\n\004room\030\002 \001(\t2\267\001\n\025ChatPerm" +
+      "issionService\022M\n\016receiveRequest\022\034.genera" +
+      "ted.PermissionRequest\032\035.generated.Permis" +
+      "sionResponse\022O\n\017receiveResponse\022\035.genera" +
+      "ted.PermissionResponse\032\035.generated.Permi" +
+      "ssionResponse2\314\001\n\020MyRemotesService\0229\n\tad" +
+      "dRemote\022\021.generated.Remote\032\031.generated.R" +
+      "emoteResponse\022<\n\014removeRemote\022\021.generate" +
+      "d.Remote\032\031.generated.RemoteResponse\022?\n\ru" +
+      "pdateRemotes\022\021.generated.Remote\032\031.genera" +
+      "ted.RemoteResponse(\0012\301\002\n\013ChatService\022K\n\n" +
+      "createRoom\022\035.generated.RoomRequestMessag" +
+      "e\032\036.generated.RoomResponseMessage\022I\n\njoi" +
+      "nToRoom\022\035.generated.RoomRequestMessage\032\032" +
+      ".generated.RoomChatMessage0\001\022I\n\010exitRoom" +
+      "\022\035.generated.RoomRequestMessage\032\036.genera" +
+      "ted.RoomResponseMessage\022O\n\021sendMessageTo" +
+      "Room\022\032.generated.RoomChatMessage\032\036.gener" +
+      "ated.RoomResponseMessageB\002P\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         });
-    internal_static_generated_ChatMessage_descriptor =
+    internal_static_generated_PermissionRequest_descriptor =
       getDescriptor().getMessageTypes().get(0);
+    internal_static_generated_PermissionRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_generated_PermissionRequest_descriptor,
+        new java.lang.String[] { "NodeId", "Timestamp", });
+    internal_static_generated_PermissionResponse_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_generated_PermissionResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_generated_PermissionResponse_descriptor,
+        new java.lang.String[] { "Granted", "DeferredRequests", });
+    internal_static_generated_Remote_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_generated_Remote_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_generated_Remote_descriptor,
+        new java.lang.String[] { "NodeId", });
+    internal_static_generated_RemoteResponse_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_generated_RemoteResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_generated_RemoteResponse_descriptor,
+        new java.lang.String[] { "Added", "Remotes", });
+    internal_static_generated_ChatMessage_descriptor =
+      getDescriptor().getMessageTypes().get(4);
     internal_static_generated_ChatMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_generated_ChatMessage_descriptor,
         new java.lang.String[] { "SenderUsername", "Message", });
     internal_static_generated_RoomRequestMessage_descriptor =
-      getDescriptor().getMessageTypes().get(1);
+      getDescriptor().getMessageTypes().get(5);
     internal_static_generated_RoomRequestMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_generated_RoomRequestMessage_descriptor,
         new java.lang.String[] { "RoomName", "SenderUsername", });
     internal_static_generated_RoomResponseMessage_descriptor =
-      getDescriptor().getMessageTypes().get(2);
+      getDescriptor().getMessageTypes().get(6);
     internal_static_generated_RoomResponseMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_generated_RoomResponseMessage_descriptor,
         new java.lang.String[] { "Response", });
     internal_static_generated_RoomChatMessage_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(7);
     internal_static_generated_RoomChatMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_generated_RoomChatMessage_descriptor,
