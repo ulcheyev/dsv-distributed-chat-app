@@ -16,7 +16,12 @@ public class MyRemotesServiceImpl extends generated.MyRemotesServiceGrpc.MyRemot
     @Override
     public void addRemote(Remote request, StreamObserver<RemoteResponse> responseObserver) {
         super.addRemote(request, responseObserver);
-
+        thisNode.addRemote(new cz.cvut.fel.dsv.core.Remote(request.getNodeId()));
+        RemoteResponse.Builder builder = RemoteResponse.newBuilder();
+        for(int i = 0; i < thisNode.getRemotes().size(); i++){
+            builder.setRemotes(i, Remote.newBuilder().setNodeId(thisNode.getRemotes().get(i).getRemoteId()).build());
+        }
+        responseObserver.onNext(builder.setAdded(true).build());
     }
 
     @Override

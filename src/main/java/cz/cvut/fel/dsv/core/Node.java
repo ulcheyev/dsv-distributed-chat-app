@@ -31,7 +31,7 @@ public class Node{ //todo handle error: unique name, unique room name, i td... h
     private ConsoleHandler consoleHandler; // todo change impl
     private Server server;
 
-    private List<Remote> remotes = new ArrayList<>(); // todo change to class
+    @Setter @Getter private List<Remote> remotes = new ArrayList<>(); // todo change to class
 
 
     // Todo implement client logic
@@ -201,4 +201,8 @@ public class Node{ //todo handle error: unique name, unique room name, i td... h
         node.handleArgs(args);
     }
 
+
+    public void addRemote(Remote remote){
+        this.remotes.add(remote);
+    }
 }

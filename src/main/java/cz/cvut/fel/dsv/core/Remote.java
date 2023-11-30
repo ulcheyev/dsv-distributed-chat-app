@@ -7,10 +7,10 @@ import lombok.Setter;
 @Setter
 public class Remote {
 
-    private String remoteId;
+    private Long remoteId;
     private Boolean isRequesting = false;
 
-    public Remote (String remoteId) {
+    public Remote (Long remoteId) {
         this.remoteId = remoteId;
     }
 
