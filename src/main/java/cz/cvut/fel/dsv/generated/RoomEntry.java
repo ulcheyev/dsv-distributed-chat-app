@@ -5,101 +5,101 @@
 package generated;
 
 /**
- * Protobuf type {@code generated.RoomChatMessage}
+ * Protobuf type {@code generated.RoomEntry}
  */
-public final class RoomChatMessage extends
+public final class RoomEntry extends
     com.google.protobuf.GeneratedMessageV3 implements
-    // @@protoc_insertion_point(message_implements:generated.RoomChatMessage)
-    RoomChatMessageOrBuilder {
+    // @@protoc_insertion_point(message_implements:generated.RoomEntry)
+    RoomEntryOrBuilder {
 private static final long serialVersionUID = 0L;
-  // Use RoomChatMessage.newBuilder() to construct.
-  private RoomChatMessage(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+  // Use RoomEntry.newBuilder() to construct.
+  private RoomEntry(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
     super(builder);
   }
-  private RoomChatMessage() {
-    room_ = "";
+  private RoomEntry() {
+    roomName_ = "";
   }
 
   @java.lang.Override
   @SuppressWarnings({"unused"})
   protected java.lang.Object newInstance(
       UnusedPrivateParameter unused) {
-    return new RoomChatMessage();
+    return new RoomEntry();
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return generated.ChatServiceOuterClass.internal_static_generated_RoomChatMessage_descriptor;
+    return generated.ChatService.internal_static_generated_RoomEntry_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return generated.ChatServiceOuterClass.internal_static_generated_RoomChatMessage_fieldAccessorTable
+    return generated.ChatService.internal_static_generated_RoomEntry_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            generated.RoomChatMessage.class, generated.RoomChatMessage.Builder.class);
+            generated.RoomEntry.class, generated.RoomEntry.Builder.class);
   }
 
   private int bitField0_;
-  public static final int MSG_FIELD_NUMBER = 1;
-  private generated.ChatMessage msg_;
+  public static final int ROOMOWNER_FIELD_NUMBER = 1;
+  private generated.Remote roomOwner_;
   /**
-   * <code>.generated.ChatMessage msg = 1;</code>
-   * @return Whether the msg field is set.
+   * <code>.generated.Remote roomOwner = 1;</code>
+   * @return Whether the roomOwner field is set.
    */
   @java.lang.Override
-  public boolean hasMsg() {
+  public boolean hasRoomOwner() {
     return ((bitField0_ & 0x00000001) != 0);
   }
   /**
-   * <code>.generated.ChatMessage msg = 1;</code>
-   * @return The msg.
+   * <code>.generated.Remote roomOwner = 1;</code>
+   * @return The roomOwner.
    */
   @java.lang.Override
-  public generated.ChatMessage getMsg() {
-    return msg_ == null ? generated.ChatMessage.getDefaultInstance() : msg_;
+  public generated.Remote getRoomOwner() {
+    return roomOwner_ == null ? generated.Remote.getDefaultInstance() : roomOwner_;
   }
   /**
-   * <code>.generated.ChatMessage msg = 1;</code>
+   * <code>.generated.Remote roomOwner = 1;</code>
    */
   @java.lang.Override
-  public generated.ChatMessageOrBuilder getMsgOrBuilder() {
-    return msg_ == null ? generated.ChatMessage.getDefaultInstance() : msg_;
+  public generated.RemoteOrBuilder getRoomOwnerOrBuilder() {
+    return roomOwner_ == null ? generated.Remote.getDefaultInstance() : roomOwner_;
   }
 
-  public static final int ROOM_FIELD_NUMBER = 2;
+  public static final int ROOMNAME_FIELD_NUMBER = 2;
   @SuppressWarnings("serial")
-  private volatile java.lang.Object room_ = "";
+  private volatile java.lang.Object roomName_ = "";
   /**
-   * <code>string room = 2;</code>
-   * @return The room.
+   * <code>string roomName = 2;</code>
+   * @return The roomName.
    */
   @java.lang.Override
-  public java.lang.String getRoom() {
-    java.lang.Object ref = room_;
+  public java.lang.String getRoomName() {
+    java.lang.Object ref = roomName_;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
       com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
-      room_ = s;
+      roomName_ = s;
       return s;
     }
   }
   /**
-   * <code>string room = 2;</code>
-   * @return The bytes for room.
+   * <code>string roomName = 2;</code>
+   * @return The bytes for roomName.
    */
   @java.lang.Override
   public com.google.protobuf.ByteString
-      getRoomBytes() {
-    java.lang.Object ref = room_;
+      getRoomNameBytes() {
+    java.lang.Object ref = roomName_;
     if (ref instanceof java.lang.String) {
       com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
-      room_ = b;
+      roomName_ = b;
       return b;
     } else {
       return (com.google.protobuf.ByteString) ref;
@@ -121,10 +121,10 @@ private static final long serialVersionUID = 0L;
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
     if (((bitField0_ & 0x00000001) != 0)) {
-      output.writeMessage(1, getMsg());
+      output.writeMessage(1, getRoomOwner());
     }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(room_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 2, room_);
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(roomName_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 2, roomName_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -137,10 +137,10 @@ private static final long serialVersionUID = 0L;
     size = 0;
     if (((bitField0_ & 0x00000001) != 0)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(1, getMsg());
+        .computeMessageSize(1, getRoomOwner());
     }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(room_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, room_);
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(roomName_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, roomName_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -152,18 +152,18 @@ private static final long serialVersionUID = 0L;
     if (obj == this) {
      return true;
     }
-    if (!(obj instanceof generated.RoomChatMessage)) {
+    if (!(obj instanceof generated.RoomEntry)) {
       return super.equals(obj);
     }
-    generated.RoomChatMessage other = (generated.RoomChatMessage) obj;
+    generated.RoomEntry other = (generated.RoomEntry) obj;
 
-    if (hasMsg() != other.hasMsg()) return false;
-    if (hasMsg()) {
-      if (!getMsg()
-          .equals(other.getMsg())) return false;
+    if (hasRoomOwner() != other.hasRoomOwner()) return false;
+    if (hasRoomOwner()) {
+      if (!getRoomOwner()
+          .equals(other.getRoomOwner())) return false;
     }
-    if (!getRoom()
-        .equals(other.getRoom())) return false;
+    if (!getRoomName()
+        .equals(other.getRoomName())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -175,55 +175,55 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    if (hasMsg()) {
-      hash = (37 * hash) + MSG_FIELD_NUMBER;
-      hash = (53 * hash) + getMsg().hashCode();
+    if (hasRoomOwner()) {
+      hash = (37 * hash) + ROOMOWNER_FIELD_NUMBER;
+      hash = (53 * hash) + getRoomOwner().hashCode();
     }
-    hash = (37 * hash) + ROOM_FIELD_NUMBER;
-    hash = (53 * hash) + getRoom().hashCode();
+    hash = (37 * hash) + ROOMNAME_FIELD_NUMBER;
+    hash = (53 * hash) + getRoomName().hashCode();
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
   }
 
-  public static generated.RoomChatMessage parseFrom(
+  public static generated.RoomEntry parseFrom(
       java.nio.ByteBuffer data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static generated.RoomChatMessage parseFrom(
+  public static generated.RoomEntry parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static generated.RoomChatMessage parseFrom(
+  public static generated.RoomEntry parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static generated.RoomChatMessage parseFrom(
+  public static generated.RoomEntry parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static generated.RoomChatMessage parseFrom(byte[] data)
+  public static generated.RoomEntry parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static generated.RoomChatMessage parseFrom(
+  public static generated.RoomEntry parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static generated.RoomChatMessage parseFrom(java.io.InputStream input)
+  public static generated.RoomEntry parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static generated.RoomChatMessage parseFrom(
+  public static generated.RoomEntry parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -231,26 +231,26 @@ private static final long serialVersionUID = 0L;
         .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
-  public static generated.RoomChatMessage parseDelimitedFrom(java.io.InputStream input)
+  public static generated.RoomEntry parseDelimitedFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input);
   }
 
-  public static generated.RoomChatMessage parseDelimitedFrom(
+  public static generated.RoomEntry parseDelimitedFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-  public static generated.RoomChatMessage parseFrom(
+  public static generated.RoomEntry parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static generated.RoomChatMessage parseFrom(
+  public static generated.RoomEntry parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -263,7 +263,7 @@ private static final long serialVersionUID = 0L;
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-  public static Builder newBuilder(generated.RoomChatMessage prototype) {
+  public static Builder newBuilder(generated.RoomEntry prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
   @java.lang.Override
@@ -279,26 +279,26 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
-   * Protobuf type {@code generated.RoomChatMessage}
+   * Protobuf type {@code generated.RoomEntry}
    */
   public static final class Builder extends
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:generated.RoomChatMessage)
-      generated.RoomChatMessageOrBuilder {
+      // @@protoc_insertion_point(builder_implements:generated.RoomEntry)
+      generated.RoomEntryOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return generated.ChatServiceOuterClass.internal_static_generated_RoomChatMessage_descriptor;
+      return generated.ChatService.internal_static_generated_RoomEntry_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return generated.ChatServiceOuterClass.internal_static_generated_RoomChatMessage_fieldAccessorTable
+      return generated.ChatService.internal_static_generated_RoomEntry_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              generated.RoomChatMessage.class, generated.RoomChatMessage.Builder.class);
+              generated.RoomEntry.class, generated.RoomEntry.Builder.class);
     }
 
-    // Construct using generated.RoomChatMessage.newBuilder()
+    // Construct using generated.RoomEntry.newBuilder()
     private Builder() {
       maybeForceBuilderInitialization();
     }
@@ -311,36 +311,36 @@ private static final long serialVersionUID = 0L;
     private void maybeForceBuilderInitialization() {
       if (com.google.protobuf.GeneratedMessageV3
               .alwaysUseFieldBuilders) {
-        getMsgFieldBuilder();
+        getRoomOwnerFieldBuilder();
       }
     }
     @java.lang.Override
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      msg_ = null;
-      if (msgBuilder_ != null) {
-        msgBuilder_.dispose();
-        msgBuilder_ = null;
+      roomOwner_ = null;
+      if (roomOwnerBuilder_ != null) {
+        roomOwnerBuilder_.dispose();
+        roomOwnerBuilder_ = null;
       }
-      room_ = "";
+      roomName_ = "";
       return this;
     }
 
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return generated.ChatServiceOuterClass.internal_static_generated_RoomChatMessage_descriptor;
+      return generated.ChatService.internal_static_generated_RoomEntry_descriptor;
     }
 
     @java.lang.Override
-    public generated.RoomChatMessage getDefaultInstanceForType() {
-      return generated.RoomChatMessage.getDefaultInstance();
+    public generated.RoomEntry getDefaultInstanceForType() {
+      return generated.RoomEntry.getDefaultInstance();
     }
 
     @java.lang.Override
-    public generated.RoomChatMessage build() {
-      generated.RoomChatMessage result = buildPartial();
+    public generated.RoomEntry build() {
+      generated.RoomEntry result = buildPartial();
       if (!result.isInitialized()) {
         throw newUninitializedMessageException(result);
       }
@@ -348,24 +348,24 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public generated.RoomChatMessage buildPartial() {
-      generated.RoomChatMessage result = new generated.RoomChatMessage(this);
+    public generated.RoomEntry buildPartial() {
+      generated.RoomEntry result = new generated.RoomEntry(this);
       if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
     }
 
-    private void buildPartial0(generated.RoomChatMessage result) {
+    private void buildPartial0(generated.RoomEntry result) {
       int from_bitField0_ = bitField0_;
       int to_bitField0_ = 0;
       if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.msg_ = msgBuilder_ == null
-            ? msg_
-            : msgBuilder_.build();
+        result.roomOwner_ = roomOwnerBuilder_ == null
+            ? roomOwner_
+            : roomOwnerBuilder_.build();
         to_bitField0_ |= 0x00000001;
       }
       if (((from_bitField0_ & 0x00000002) != 0)) {
-        result.room_ = room_;
+        result.roomName_ = roomName_;
       }
       result.bitField0_ |= to_bitField0_;
     }
@@ -404,21 +404,21 @@ private static final long serialVersionUID = 0L;
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof generated.RoomChatMessage) {
-        return mergeFrom((generated.RoomChatMessage)other);
+      if (other instanceof generated.RoomEntry) {
+        return mergeFrom((generated.RoomEntry)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
 
-    public Builder mergeFrom(generated.RoomChatMessage other) {
-      if (other == generated.RoomChatMessage.getDefaultInstance()) return this;
-      if (other.hasMsg()) {
-        mergeMsg(other.getMsg());
+    public Builder mergeFrom(generated.RoomEntry other) {
+      if (other == generated.RoomEntry.getDefaultInstance()) return this;
+      if (other.hasRoomOwner()) {
+        mergeRoomOwner(other.getRoomOwner());
       }
-      if (!other.getRoom().isEmpty()) {
-        room_ = other.room_;
+      if (!other.getRoomName().isEmpty()) {
+        roomName_ = other.roomName_;
         bitField0_ |= 0x00000002;
         onChanged();
       }
@@ -450,13 +450,13 @@ private static final long serialVersionUID = 0L;
               break;
             case 10: {
               input.readMessage(
-                  getMsgFieldBuilder().getBuilder(),
+                  getRoomOwnerFieldBuilder().getBuilder(),
                   extensionRegistry);
               bitField0_ |= 0x00000001;
               break;
             } // case 10
             case 18: {
-              room_ = input.readStringRequireUtf8();
+              roomName_ = input.readStringRequireUtf8();
               bitField0_ |= 0x00000002;
               break;
             } // case 18
@@ -477,194 +477,194 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private generated.ChatMessage msg_;
+    private generated.Remote roomOwner_;
     private com.google.protobuf.SingleFieldBuilderV3<
-        generated.ChatMessage, generated.ChatMessage.Builder, generated.ChatMessageOrBuilder> msgBuilder_;
+        generated.Remote, generated.Remote.Builder, generated.RemoteOrBuilder> roomOwnerBuilder_;
     /**
-     * <code>.generated.ChatMessage msg = 1;</code>
-     * @return Whether the msg field is set.
+     * <code>.generated.Remote roomOwner = 1;</code>
+     * @return Whether the roomOwner field is set.
      */
-    public boolean hasMsg() {
+    public boolean hasRoomOwner() {
       return ((bitField0_ & 0x00000001) != 0);
     }
     /**
-     * <code>.generated.ChatMessage msg = 1;</code>
-     * @return The msg.
+     * <code>.generated.Remote roomOwner = 1;</code>
+     * @return The roomOwner.
      */
-    public generated.ChatMessage getMsg() {
-      if (msgBuilder_ == null) {
-        return msg_ == null ? generated.ChatMessage.getDefaultInstance() : msg_;
+    public generated.Remote getRoomOwner() {
+      if (roomOwnerBuilder_ == null) {
+        return roomOwner_ == null ? generated.Remote.getDefaultInstance() : roomOwner_;
       } else {
-        return msgBuilder_.getMessage();
+        return roomOwnerBuilder_.getMessage();
       }
     }
     /**
-     * <code>.generated.ChatMessage msg = 1;</code>
+     * <code>.generated.Remote roomOwner = 1;</code>
      */
-    public Builder setMsg(generated.ChatMessage value) {
-      if (msgBuilder_ == null) {
+    public Builder setRoomOwner(generated.Remote value) {
+      if (roomOwnerBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        msg_ = value;
+        roomOwner_ = value;
       } else {
-        msgBuilder_.setMessage(value);
+        roomOwnerBuilder_.setMessage(value);
       }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>.generated.ChatMessage msg = 1;</code>
+     * <code>.generated.Remote roomOwner = 1;</code>
      */
-    public Builder setMsg(
-        generated.ChatMessage.Builder builderForValue) {
-      if (msgBuilder_ == null) {
-        msg_ = builderForValue.build();
+    public Builder setRoomOwner(
+        generated.Remote.Builder builderForValue) {
+      if (roomOwnerBuilder_ == null) {
+        roomOwner_ = builderForValue.build();
       } else {
-        msgBuilder_.setMessage(builderForValue.build());
+        roomOwnerBuilder_.setMessage(builderForValue.build());
       }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>.generated.ChatMessage msg = 1;</code>
+     * <code>.generated.Remote roomOwner = 1;</code>
      */
-    public Builder mergeMsg(generated.ChatMessage value) {
-      if (msgBuilder_ == null) {
+    public Builder mergeRoomOwner(generated.Remote value) {
+      if (roomOwnerBuilder_ == null) {
         if (((bitField0_ & 0x00000001) != 0) &&
-          msg_ != null &&
-          msg_ != generated.ChatMessage.getDefaultInstance()) {
-          getMsgBuilder().mergeFrom(value);
+          roomOwner_ != null &&
+          roomOwner_ != generated.Remote.getDefaultInstance()) {
+          getRoomOwnerBuilder().mergeFrom(value);
         } else {
-          msg_ = value;
+          roomOwner_ = value;
         }
       } else {
-        msgBuilder_.mergeFrom(value);
+        roomOwnerBuilder_.mergeFrom(value);
       }
-      if (msg_ != null) {
+      if (roomOwner_ != null) {
         bitField0_ |= 0x00000001;
         onChanged();
       }
       return this;
     }
     /**
-     * <code>.generated.ChatMessage msg = 1;</code>
+     * <code>.generated.Remote roomOwner = 1;</code>
      */
-    public Builder clearMsg() {
+    public Builder clearRoomOwner() {
       bitField0_ = (bitField0_ & ~0x00000001);
-      msg_ = null;
-      if (msgBuilder_ != null) {
-        msgBuilder_.dispose();
-        msgBuilder_ = null;
+      roomOwner_ = null;
+      if (roomOwnerBuilder_ != null) {
+        roomOwnerBuilder_.dispose();
+        roomOwnerBuilder_ = null;
       }
       onChanged();
       return this;
     }
     /**
-     * <code>.generated.ChatMessage msg = 1;</code>
+     * <code>.generated.Remote roomOwner = 1;</code>
      */
-    public generated.ChatMessage.Builder getMsgBuilder() {
+    public generated.Remote.Builder getRoomOwnerBuilder() {
       bitField0_ |= 0x00000001;
       onChanged();
-      return getMsgFieldBuilder().getBuilder();
+      return getRoomOwnerFieldBuilder().getBuilder();
     }
     /**
-     * <code>.generated.ChatMessage msg = 1;</code>
+     * <code>.generated.Remote roomOwner = 1;</code>
      */
-    public generated.ChatMessageOrBuilder getMsgOrBuilder() {
-      if (msgBuilder_ != null) {
-        return msgBuilder_.getMessageOrBuilder();
+    public generated.RemoteOrBuilder getRoomOwnerOrBuilder() {
+      if (roomOwnerBuilder_ != null) {
+        return roomOwnerBuilder_.getMessageOrBuilder();
       } else {
-        return msg_ == null ?
-            generated.ChatMessage.getDefaultInstance() : msg_;
+        return roomOwner_ == null ?
+            generated.Remote.getDefaultInstance() : roomOwner_;
       }
     }
     /**
-     * <code>.generated.ChatMessage msg = 1;</code>
+     * <code>.generated.Remote roomOwner = 1;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        generated.ChatMessage, generated.ChatMessage.Builder, generated.ChatMessageOrBuilder> 
-        getMsgFieldBuilder() {
-      if (msgBuilder_ == null) {
-        msgBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            generated.ChatMessage, generated.ChatMessage.Builder, generated.ChatMessageOrBuilder>(
-                getMsg(),
+        generated.Remote, generated.Remote.Builder, generated.RemoteOrBuilder> 
+        getRoomOwnerFieldBuilder() {
+      if (roomOwnerBuilder_ == null) {
+        roomOwnerBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            generated.Remote, generated.Remote.Builder, generated.RemoteOrBuilder>(
+                getRoomOwner(),
                 getParentForChildren(),
                 isClean());
-        msg_ = null;
+        roomOwner_ = null;
       }
-      return msgBuilder_;
+      return roomOwnerBuilder_;
     }
 
-    private java.lang.Object room_ = "";
+    private java.lang.Object roomName_ = "";
     /**
-     * <code>string room = 2;</code>
-     * @return The room.
+     * <code>string roomName = 2;</code>
+     * @return The roomName.
      */
-    public java.lang.String getRoom() {
-      java.lang.Object ref = room_;
+    public java.lang.String getRoomName() {
+      java.lang.Object ref = roomName_;
       if (!(ref instanceof java.lang.String)) {
         com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        room_ = s;
+        roomName_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
       }
     }
     /**
-     * <code>string room = 2;</code>
-     * @return The bytes for room.
+     * <code>string roomName = 2;</code>
+     * @return The bytes for roomName.
      */
     public com.google.protobuf.ByteString
-        getRoomBytes() {
-      java.lang.Object ref = room_;
+        getRoomNameBytes() {
+      java.lang.Object ref = roomName_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        room_ = b;
+        roomName_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
     /**
-     * <code>string room = 2;</code>
-     * @param value The room to set.
+     * <code>string roomName = 2;</code>
+     * @param value The roomName to set.
      * @return This builder for chaining.
      */
-    public Builder setRoom(
+    public Builder setRoomName(
         java.lang.String value) {
       if (value == null) { throw new NullPointerException(); }
-      room_ = value;
+      roomName_ = value;
       bitField0_ |= 0x00000002;
       onChanged();
       return this;
     }
     /**
-     * <code>string room = 2;</code>
+     * <code>string roomName = 2;</code>
      * @return This builder for chaining.
      */
-    public Builder clearRoom() {
-      room_ = getDefaultInstance().getRoom();
+    public Builder clearRoomName() {
+      roomName_ = getDefaultInstance().getRoomName();
       bitField0_ = (bitField0_ & ~0x00000002);
       onChanged();
       return this;
     }
     /**
-     * <code>string room = 2;</code>
-     * @param value The bytes for room to set.
+     * <code>string roomName = 2;</code>
+     * @param value The bytes for roomName to set.
      * @return This builder for chaining.
      */
-    public Builder setRoomBytes(
+    public Builder setRoomNameBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) { throw new NullPointerException(); }
       checkByteStringIsUtf8(value);
-      room_ = value;
+      roomName_ = value;
       bitField0_ |= 0x00000002;
       onChanged();
       return this;
@@ -682,23 +682,23 @@ private static final long serialVersionUID = 0L;
     }
 
 
-    // @@protoc_insertion_point(builder_scope:generated.RoomChatMessage)
+    // @@protoc_insertion_point(builder_scope:generated.RoomEntry)
   }
 
-  // @@protoc_insertion_point(class_scope:generated.RoomChatMessage)
-  private static final generated.RoomChatMessage DEFAULT_INSTANCE;
+  // @@protoc_insertion_point(class_scope:generated.RoomEntry)
+  private static final generated.RoomEntry DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new generated.RoomChatMessage();
+    DEFAULT_INSTANCE = new generated.RoomEntry();
   }
 
-  public static generated.RoomChatMessage getDefaultInstance() {
+  public static generated.RoomEntry getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
-  private static final com.google.protobuf.Parser<RoomChatMessage>
-      PARSER = new com.google.protobuf.AbstractParser<RoomChatMessage>() {
+  private static final com.google.protobuf.Parser<RoomEntry>
+      PARSER = new com.google.protobuf.AbstractParser<RoomEntry>() {
     @java.lang.Override
-    public RoomChatMessage parsePartialFrom(
+    public RoomEntry parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -717,17 +717,17 @@ private static final long serialVersionUID = 0L;
     }
   };
 
-  public static com.google.protobuf.Parser<RoomChatMessage> parser() {
+  public static com.google.protobuf.Parser<RoomEntry> parser() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.google.protobuf.Parser<RoomChatMessage> getParserForType() {
+  public com.google.protobuf.Parser<RoomEntry> getParserForType() {
     return PARSER;
   }
 
   @java.lang.Override
-  public generated.RoomChatMessage getDefaultInstanceForType() {
+  public generated.RoomEntry getDefaultInstanceForType() {
     return DEFAULT_INSTANCE;
   }
 

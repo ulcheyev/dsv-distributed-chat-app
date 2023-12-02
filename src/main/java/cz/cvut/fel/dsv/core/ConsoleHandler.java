@@ -6,56 +6,50 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.Objects;
 
-// Todo  change impl
-public class ConsoleHandler implements Runnable {
+public class ConsoleHandler implements Runnable{
 
     private boolean reading = true;
-    private BufferedReader reader = null;
-    private PrintStream out = System.out;
-    private PrintStream err = System.err;
-    private Node myNode;
+    private final BufferedReader reader;
+    private final PrintStream out = System.out;
+    private final PrintStream err = System.err;
+    private final NodeImpl myNode;
 
 
-    public ConsoleHandler(Node myNode) {
+
+    public ConsoleHandler(NodeImpl myNode) {
         this.myNode = myNode;
         reader = new BufferedReader(new InputStreamReader(System.in));
     }
 
-
-
-    // todo implement some logic based on input
-    private void parse_commandline(String commandline) {
+    private void parseCommandLine(String commandline) {
         if(!commandline.isEmpty()) {
-            if (commandline.charAt(0) == 'c' && commandline.charAt(1) == 'r') { // create room
-                String roomName = commandline.substring(3);
-                myNode.createRoom(roomName);
-            } else if (commandline.charAt(0) == 'j') { // join room
+             if (commandline.charAt(0) == 'j') { // join room
                 String roomName = commandline.substring(2);
-                myNode.joinRoom(roomName);
-            }else if(commandline.charAt(0) == 'e' && commandline.charAt(1) == 'x') { // exit room
-                if(!Objects.equals(myNode.getCurrentRoomName(), "global")){ // if it is not already global room
-                    myNode.joinRoom("global");
-                }
-            }
+                myNode.joinRoomViaLeader(roomName);
+             }
+             else if (Objects.equals(commandline, "info")){
+                 System.out.println(myNode.toString());
+             }
+//             else if(commandline.charAt(0) == 'e' && commandline.charAt(1) == 'x') { // exit room
+//
+//             }
             else {
-                myNode.sendMessageToRoom(myNode.getCurrentRoomName(), commandline);
+                myNode.sendMessage(commandline);
             }
         }
     }
-
 
     @Override
     public void run() {
         String commandline = "";
         while (reading) {
             commandline = "";
-            System.out.print("["+myNode.getCurrentRoomName()+"] "+myNode.getUsername()+"> ");
+            System.out.print("["+myNode.getCurrentRoom()+"] "+myNode.getUsername()+"> ");
             try {
                 commandline = reader.readLine();
-                parse_commandline(commandline);
+                parseCommandLine(commandline);
             } catch (IOException e) {
-                err.println("ConsoleHandler - error in rading console input.");
-                e.printStackTrace();
+                err.println("ConsoleHandler - error while reading console input.\n" + e.getMessage());
                 reading = false;
             }
         }

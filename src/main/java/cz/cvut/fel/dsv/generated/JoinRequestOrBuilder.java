@@ -4,8 +4,8 @@
 // Protobuf Java Version: 3.25.0
 package generated;
 
-public interface RoomRequestMessageOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:generated.RoomRequestMessage)
+public interface JoinRequestOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:generated.JoinRequest)
     com.google.protobuf.MessageOrBuilder {
 
   /**
@@ -21,14 +21,17 @@ public interface RoomRequestMessageOrBuilder extends
       getRoomNameBytes();
 
   /**
-   * <code>string senderUsername = 2;</code>
-   * @return The senderUsername.
+   * <code>.generated.Remote remote = 2;</code>
+   * @return Whether the remote field is set.
    */
-  java.lang.String getSenderUsername();
+  boolean hasRemote();
   /**
-   * <code>string senderUsername = 2;</code>
-   * @return The bytes for senderUsername.
+   * <code>.generated.Remote remote = 2;</code>
+   * @return The remote.
    */
-  com.google.protobuf.ByteString
-      getSenderUsernameBytes();
+  generated.Remote getRemote();
+  /**
+   * <code>.generated.Remote remote = 2;</code>
+   */
+  generated.RemoteOrBuilder getRemoteOrBuilder();
 }

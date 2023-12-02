@@ -13,4 +13,34 @@ public interface RemoteOrBuilder extends
    * @return The nodeId.
    */
   long getNodeId();
+
+  /**
+   * <code>string hostname = 2;</code>
+   * @return The hostname.
+   */
+  java.lang.String getHostname();
+  /**
+   * <code>string hostname = 2;</code>
+   * @return The bytes for hostname.
+   */
+  com.google.protobuf.ByteString
+      getHostnameBytes();
+
+  /**
+   * <code>int32 port = 3;</code>
+   * @return The port.
+   */
+  int getPort();
+
+  /**
+   * <code>string username = 4;</code>
+   * @return The username.
+   */
+  java.lang.String getUsername();
+  /**
+   * <code>string username = 4;</code>
+   * @return The bytes for username.
+   */
+  com.google.protobuf.ByteString
+      getUsernameBytes();
 }

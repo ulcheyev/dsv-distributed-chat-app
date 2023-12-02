@@ -17,7 +17,6 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private PermissionRequest() {
-    timestamp_ = "";
   }
 
   @java.lang.Override
@@ -29,65 +28,53 @@ private static final long serialVersionUID = 0L;
 
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return generated.ChatServiceOuterClass.internal_static_generated_PermissionRequest_descriptor;
+    return generated.ChatService.internal_static_generated_PermissionRequest_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return generated.ChatServiceOuterClass.internal_static_generated_PermissionRequest_fieldAccessorTable
+    return generated.ChatService.internal_static_generated_PermissionRequest_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             generated.PermissionRequest.class, generated.PermissionRequest.Builder.class);
   }
 
-  public static final int NODEID_FIELD_NUMBER = 1;
-  private long nodeId_ = 0L;
+  private int bitField0_;
+  public static final int REMOTE_FIELD_NUMBER = 1;
+  private generated.Remote remote_;
   /**
-   * <code>int64 nodeId = 1;</code>
-   * @return The nodeId.
+   * <code>.generated.Remote remote = 1;</code>
+   * @return Whether the remote field is set.
    */
   @java.lang.Override
-  public long getNodeId() {
-    return nodeId_;
+  public boolean hasRemote() {
+    return ((bitField0_ & 0x00000001) != 0);
+  }
+  /**
+   * <code>.generated.Remote remote = 1;</code>
+   * @return The remote.
+   */
+  @java.lang.Override
+  public generated.Remote getRemote() {
+    return remote_ == null ? generated.Remote.getDefaultInstance() : remote_;
+  }
+  /**
+   * <code>.generated.Remote remote = 1;</code>
+   */
+  @java.lang.Override
+  public generated.RemoteOrBuilder getRemoteOrBuilder() {
+    return remote_ == null ? generated.Remote.getDefaultInstance() : remote_;
   }
 
-  public static final int TIMESTAMP_FIELD_NUMBER = 2;
-  @SuppressWarnings("serial")
-  private volatile java.lang.Object timestamp_ = "";
+  public static final int CLOCK_FIELD_NUMBER = 2;
+  private int clock_ = 0;
   /**
-   * <code>string timestamp = 2;</code>
-   * @return The timestamp.
+   * <code>int32 clock = 2;</code>
+   * @return The clock.
    */
   @java.lang.Override
-  public java.lang.String getTimestamp() {
-    java.lang.Object ref = timestamp_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      timestamp_ = s;
-      return s;
-    }
-  }
-  /**
-   * <code>string timestamp = 2;</code>
-   * @return The bytes for timestamp.
-   */
-  @java.lang.Override
-  public com.google.protobuf.ByteString
-      getTimestampBytes() {
-    java.lang.Object ref = timestamp_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      timestamp_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
+  public int getClock() {
+    return clock_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -104,11 +91,11 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (nodeId_ != 0L) {
-      output.writeInt64(1, nodeId_);
+    if (((bitField0_ & 0x00000001) != 0)) {
+      output.writeMessage(1, getRemote());
     }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(timestamp_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 2, timestamp_);
+    if (clock_ != 0) {
+      output.writeInt32(2, clock_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -119,12 +106,13 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (nodeId_ != 0L) {
+    if (((bitField0_ & 0x00000001) != 0)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt64Size(1, nodeId_);
+        .computeMessageSize(1, getRemote());
     }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(timestamp_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, timestamp_);
+    if (clock_ != 0) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(2, clock_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -141,10 +129,13 @@ private static final long serialVersionUID = 0L;
     }
     generated.PermissionRequest other = (generated.PermissionRequest) obj;
 
-    if (getNodeId()
-        != other.getNodeId()) return false;
-    if (!getTimestamp()
-        .equals(other.getTimestamp())) return false;
+    if (hasRemote() != other.hasRemote()) return false;
+    if (hasRemote()) {
+      if (!getRemote()
+          .equals(other.getRemote())) return false;
+    }
+    if (getClock()
+        != other.getClock()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -156,11 +147,12 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + NODEID_FIELD_NUMBER;
-    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-        getNodeId());
-    hash = (37 * hash) + TIMESTAMP_FIELD_NUMBER;
-    hash = (53 * hash) + getTimestamp().hashCode();
+    if (hasRemote()) {
+      hash = (37 * hash) + REMOTE_FIELD_NUMBER;
+      hash = (53 * hash) + getRemote().hashCode();
+    }
+    hash = (37 * hash) + CLOCK_FIELD_NUMBER;
+    hash = (53 * hash) + getClock();
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -267,40 +259,50 @@ private static final long serialVersionUID = 0L;
       generated.PermissionRequestOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return generated.ChatServiceOuterClass.internal_static_generated_PermissionRequest_descriptor;
+      return generated.ChatService.internal_static_generated_PermissionRequest_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return generated.ChatServiceOuterClass.internal_static_generated_PermissionRequest_fieldAccessorTable
+      return generated.ChatService.internal_static_generated_PermissionRequest_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               generated.PermissionRequest.class, generated.PermissionRequest.Builder.class);
     }
 
     // Construct using generated.PermissionRequest.newBuilder()
     private Builder() {
-
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
-
+      maybeForceBuilderInitialization();
+    }
+    private void maybeForceBuilderInitialization() {
+      if (com.google.protobuf.GeneratedMessageV3
+              .alwaysUseFieldBuilders) {
+        getRemoteFieldBuilder();
+      }
     }
     @java.lang.Override
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      nodeId_ = 0L;
-      timestamp_ = "";
+      remote_ = null;
+      if (remoteBuilder_ != null) {
+        remoteBuilder_.dispose();
+        remoteBuilder_ = null;
+      }
+      clock_ = 0;
       return this;
     }
 
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return generated.ChatServiceOuterClass.internal_static_generated_PermissionRequest_descriptor;
+      return generated.ChatService.internal_static_generated_PermissionRequest_descriptor;
     }
 
     @java.lang.Override
@@ -327,12 +329,17 @@ private static final long serialVersionUID = 0L;
 
     private void buildPartial0(generated.PermissionRequest result) {
       int from_bitField0_ = bitField0_;
+      int to_bitField0_ = 0;
       if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.nodeId_ = nodeId_;
+        result.remote_ = remoteBuilder_ == null
+            ? remote_
+            : remoteBuilder_.build();
+        to_bitField0_ |= 0x00000001;
       }
       if (((from_bitField0_ & 0x00000002) != 0)) {
-        result.timestamp_ = timestamp_;
+        result.clock_ = clock_;
       }
+      result.bitField0_ |= to_bitField0_;
     }
 
     @java.lang.Override
@@ -379,13 +386,11 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(generated.PermissionRequest other) {
       if (other == generated.PermissionRequest.getDefaultInstance()) return this;
-      if (other.getNodeId() != 0L) {
-        setNodeId(other.getNodeId());
+      if (other.hasRemote()) {
+        mergeRemote(other.getRemote());
       }
-      if (!other.getTimestamp().isEmpty()) {
-        timestamp_ = other.timestamp_;
-        bitField0_ |= 0x00000002;
-        onChanged();
+      if (other.getClock() != 0) {
+        setClock(other.getClock());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -413,16 +418,18 @@ private static final long serialVersionUID = 0L;
             case 0:
               done = true;
               break;
-            case 8: {
-              nodeId_ = input.readInt64();
+            case 10: {
+              input.readMessage(
+                  getRemoteFieldBuilder().getBuilder(),
+                  extensionRegistry);
               bitField0_ |= 0x00000001;
               break;
-            } // case 8
-            case 18: {
-              timestamp_ = input.readStringRequireUtf8();
+            } // case 10
+            case 16: {
+              clock_ = input.readInt32();
               bitField0_ |= 0x00000002;
               break;
-            } // case 18
+            } // case 16
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -440,106 +447,155 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private long nodeId_ ;
+    private generated.Remote remote_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        generated.Remote, generated.Remote.Builder, generated.RemoteOrBuilder> remoteBuilder_;
     /**
-     * <code>int64 nodeId = 1;</code>
-     * @return The nodeId.
+     * <code>.generated.Remote remote = 1;</code>
+     * @return Whether the remote field is set.
      */
-    @java.lang.Override
-    public long getNodeId() {
-      return nodeId_;
+    public boolean hasRemote() {
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
-     * <code>int64 nodeId = 1;</code>
-     * @param value The nodeId to set.
-     * @return This builder for chaining.
+     * <code>.generated.Remote remote = 1;</code>
+     * @return The remote.
      */
-    public Builder setNodeId(long value) {
-
-      nodeId_ = value;
+    public generated.Remote getRemote() {
+      if (remoteBuilder_ == null) {
+        return remote_ == null ? generated.Remote.getDefaultInstance() : remote_;
+      } else {
+        return remoteBuilder_.getMessage();
+      }
+    }
+    /**
+     * <code>.generated.Remote remote = 1;</code>
+     */
+    public Builder setRemote(generated.Remote value) {
+      if (remoteBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        remote_ = value;
+      } else {
+        remoteBuilder_.setMessage(value);
+      }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>int64 nodeId = 1;</code>
-     * @return This builder for chaining.
+     * <code>.generated.Remote remote = 1;</code>
      */
-    public Builder clearNodeId() {
-      bitField0_ = (bitField0_ & ~0x00000001);
-      nodeId_ = 0L;
+    public Builder setRemote(
+        generated.Remote.Builder builderForValue) {
+      if (remoteBuilder_ == null) {
+        remote_ = builderForValue.build();
+      } else {
+        remoteBuilder_.setMessage(builderForValue.build());
+      }
+      bitField0_ |= 0x00000001;
       onChanged();
       return this;
+    }
+    /**
+     * <code>.generated.Remote remote = 1;</code>
+     */
+    public Builder mergeRemote(generated.Remote value) {
+      if (remoteBuilder_ == null) {
+        if (((bitField0_ & 0x00000001) != 0) &&
+          remote_ != null &&
+          remote_ != generated.Remote.getDefaultInstance()) {
+          getRemoteBuilder().mergeFrom(value);
+        } else {
+          remote_ = value;
+        }
+      } else {
+        remoteBuilder_.mergeFrom(value);
+      }
+      if (remote_ != null) {
+        bitField0_ |= 0x00000001;
+        onChanged();
+      }
+      return this;
+    }
+    /**
+     * <code>.generated.Remote remote = 1;</code>
+     */
+    public Builder clearRemote() {
+      bitField0_ = (bitField0_ & ~0x00000001);
+      remote_ = null;
+      if (remoteBuilder_ != null) {
+        remoteBuilder_.dispose();
+        remoteBuilder_ = null;
+      }
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.generated.Remote remote = 1;</code>
+     */
+    public generated.Remote.Builder getRemoteBuilder() {
+      bitField0_ |= 0x00000001;
+      onChanged();
+      return getRemoteFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.generated.Remote remote = 1;</code>
+     */
+    public generated.RemoteOrBuilder getRemoteOrBuilder() {
+      if (remoteBuilder_ != null) {
+        return remoteBuilder_.getMessageOrBuilder();
+      } else {
+        return remote_ == null ?
+            generated.Remote.getDefaultInstance() : remote_;
+      }
+    }
+    /**
+     * <code>.generated.Remote remote = 1;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        generated.Remote, generated.Remote.Builder, generated.RemoteOrBuilder> 
+        getRemoteFieldBuilder() {
+      if (remoteBuilder_ == null) {
+        remoteBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            generated.Remote, generated.Remote.Builder, generated.RemoteOrBuilder>(
+                getRemote(),
+                getParentForChildren(),
+                isClean());
+        remote_ = null;
+      }
+      return remoteBuilder_;
     }
 
-    private java.lang.Object timestamp_ = "";
+    private int clock_ ;
     /**
-     * <code>string timestamp = 2;</code>
-     * @return The timestamp.
+     * <code>int32 clock = 2;</code>
+     * @return The clock.
      */
-    public java.lang.String getTimestamp() {
-      java.lang.Object ref = timestamp_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        timestamp_ = s;
-        return s;
-      } else {
-        return (java.lang.String) ref;
-      }
+    @java.lang.Override
+    public int getClock() {
+      return clock_;
     }
     /**
-     * <code>string timestamp = 2;</code>
-     * @return The bytes for timestamp.
-     */
-    public com.google.protobuf.ByteString
-        getTimestampBytes() {
-      java.lang.Object ref = timestamp_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        timestamp_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    /**
-     * <code>string timestamp = 2;</code>
-     * @param value The timestamp to set.
+     * <code>int32 clock = 2;</code>
+     * @param value The clock to set.
      * @return This builder for chaining.
      */
-    public Builder setTimestamp(
-        java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
-      timestamp_ = value;
+    public Builder setClock(int value) {
+
+      clock_ = value;
       bitField0_ |= 0x00000002;
       onChanged();
       return this;
     }
     /**
-     * <code>string timestamp = 2;</code>
+     * <code>int32 clock = 2;</code>
      * @return This builder for chaining.
      */
-    public Builder clearTimestamp() {
-      timestamp_ = getDefaultInstance().getTimestamp();
+    public Builder clearClock() {
       bitField0_ = (bitField0_ & ~0x00000002);
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string timestamp = 2;</code>
-     * @param value The bytes for timestamp to set.
-     * @return This builder for chaining.
-     */
-    public Builder setTimestampBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
-      timestamp_ = value;
-      bitField0_ |= 0x00000002;
+      clock_ = 0;
       onChanged();
       return this;
     }

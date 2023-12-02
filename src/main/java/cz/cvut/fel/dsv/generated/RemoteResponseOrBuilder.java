@@ -9,32 +9,32 @@ public interface RemoteResponseOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
+   * <pre>
+   * Indicator of adding or not
+   * </pre>
+   *
    * <code>bool added = 1;</code>
    * @return The added.
    */
   boolean getAdded();
 
   /**
-   * <code>repeated .generated.Remote remotes = 2;</code>
+   * <pre>
+   * Connected node room
+   * </pre>
+   *
+   * <code>string room = 2;</code>
+   * @return The room.
    */
-  java.util.List<generated.Remote> 
-      getRemotesList();
+  java.lang.String getRoom();
   /**
-   * <code>repeated .generated.Remote remotes = 2;</code>
+   * <pre>
+   * Connected node room
+   * </pre>
+   *
+   * <code>string room = 2;</code>
+   * @return The bytes for room.
    */
-  generated.Remote getRemotes(int index);
-  /**
-   * <code>repeated .generated.Remote remotes = 2;</code>
-   */
-  int getRemotesCount();
-  /**
-   * <code>repeated .generated.Remote remotes = 2;</code>
-   */
-  java.util.List<? extends generated.RemoteOrBuilder> 
-      getRemotesOrBuilderList();
-  /**
-   * <code>repeated .generated.Remote remotes = 2;</code>
-   */
-  generated.RemoteOrBuilder getRemotesOrBuilder(
-      int index);
+  com.google.protobuf.ByteString
+      getRoomBytes();
 }

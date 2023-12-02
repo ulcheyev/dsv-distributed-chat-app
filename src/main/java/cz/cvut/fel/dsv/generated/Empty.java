@@ -5,78 +5,38 @@
 package generated;
 
 /**
- * Protobuf type {@code generated.RoomResponseMessage}
+ * Protobuf type {@code generated.Empty}
  */
-public final class RoomResponseMessage extends
+public final class Empty extends
     com.google.protobuf.GeneratedMessageV3 implements
-    // @@protoc_insertion_point(message_implements:generated.RoomResponseMessage)
-    RoomResponseMessageOrBuilder {
+    // @@protoc_insertion_point(message_implements:generated.Empty)
+    EmptyOrBuilder {
 private static final long serialVersionUID = 0L;
-  // Use RoomResponseMessage.newBuilder() to construct.
-  private RoomResponseMessage(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+  // Use Empty.newBuilder() to construct.
+  private Empty(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
     super(builder);
   }
-  private RoomResponseMessage() {
-    response_ = "";
+  private Empty() {
   }
 
   @java.lang.Override
   @SuppressWarnings({"unused"})
   protected java.lang.Object newInstance(
       UnusedPrivateParameter unused) {
-    return new RoomResponseMessage();
+    return new Empty();
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return generated.ChatServiceOuterClass.internal_static_generated_RoomResponseMessage_descriptor;
+    return generated.ChatService.internal_static_generated_Empty_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return generated.ChatServiceOuterClass.internal_static_generated_RoomResponseMessage_fieldAccessorTable
+    return generated.ChatService.internal_static_generated_Empty_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            generated.RoomResponseMessage.class, generated.RoomResponseMessage.Builder.class);
-  }
-
-  public static final int RESPONSE_FIELD_NUMBER = 1;
-  @SuppressWarnings("serial")
-  private volatile java.lang.Object response_ = "";
-  /**
-   * <code>string response = 1;</code>
-   * @return The response.
-   */
-  @java.lang.Override
-  public java.lang.String getResponse() {
-    java.lang.Object ref = response_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      response_ = s;
-      return s;
-    }
-  }
-  /**
-   * <code>string response = 1;</code>
-   * @return The bytes for response.
-   */
-  @java.lang.Override
-  public com.google.protobuf.ByteString
-      getResponseBytes() {
-    java.lang.Object ref = response_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      response_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
+            generated.Empty.class, generated.Empty.Builder.class);
   }
 
   private byte memoizedIsInitialized = -1;
@@ -93,9 +53,6 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(response_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 1, response_);
-    }
     getUnknownFields().writeTo(output);
   }
 
@@ -105,9 +62,6 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(response_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, response_);
-    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -118,13 +72,11 @@ private static final long serialVersionUID = 0L;
     if (obj == this) {
      return true;
     }
-    if (!(obj instanceof generated.RoomResponseMessage)) {
+    if (!(obj instanceof generated.Empty)) {
       return super.equals(obj);
     }
-    generated.RoomResponseMessage other = (generated.RoomResponseMessage) obj;
+    generated.Empty other = (generated.Empty) obj;
 
-    if (!getResponse()
-        .equals(other.getResponse())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -136,51 +88,49 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + RESPONSE_FIELD_NUMBER;
-    hash = (53 * hash) + getResponse().hashCode();
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
   }
 
-  public static generated.RoomResponseMessage parseFrom(
+  public static generated.Empty parseFrom(
       java.nio.ByteBuffer data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static generated.RoomResponseMessage parseFrom(
+  public static generated.Empty parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static generated.RoomResponseMessage parseFrom(
+  public static generated.Empty parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static generated.RoomResponseMessage parseFrom(
+  public static generated.Empty parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static generated.RoomResponseMessage parseFrom(byte[] data)
+  public static generated.Empty parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static generated.RoomResponseMessage parseFrom(
+  public static generated.Empty parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static generated.RoomResponseMessage parseFrom(java.io.InputStream input)
+  public static generated.Empty parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static generated.RoomResponseMessage parseFrom(
+  public static generated.Empty parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -188,26 +138,26 @@ private static final long serialVersionUID = 0L;
         .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
-  public static generated.RoomResponseMessage parseDelimitedFrom(java.io.InputStream input)
+  public static generated.Empty parseDelimitedFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input);
   }
 
-  public static generated.RoomResponseMessage parseDelimitedFrom(
+  public static generated.Empty parseDelimitedFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-  public static generated.RoomResponseMessage parseFrom(
+  public static generated.Empty parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static generated.RoomResponseMessage parseFrom(
+  public static generated.Empty parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -220,7 +170,7 @@ private static final long serialVersionUID = 0L;
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-  public static Builder newBuilder(generated.RoomResponseMessage prototype) {
+  public static Builder newBuilder(generated.Empty prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
   @java.lang.Override
@@ -236,26 +186,26 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
-   * Protobuf type {@code generated.RoomResponseMessage}
+   * Protobuf type {@code generated.Empty}
    */
   public static final class Builder extends
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:generated.RoomResponseMessage)
-      generated.RoomResponseMessageOrBuilder {
+      // @@protoc_insertion_point(builder_implements:generated.Empty)
+      generated.EmptyOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return generated.ChatServiceOuterClass.internal_static_generated_RoomResponseMessage_descriptor;
+      return generated.ChatService.internal_static_generated_Empty_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return generated.ChatServiceOuterClass.internal_static_generated_RoomResponseMessage_fieldAccessorTable
+      return generated.ChatService.internal_static_generated_Empty_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              generated.RoomResponseMessage.class, generated.RoomResponseMessage.Builder.class);
+              generated.Empty.class, generated.Empty.Builder.class);
     }
 
-    // Construct using generated.RoomResponseMessage.newBuilder()
+    // Construct using generated.Empty.newBuilder()
     private Builder() {
 
     }
@@ -268,25 +218,23 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      bitField0_ = 0;
-      response_ = "";
       return this;
     }
 
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return generated.ChatServiceOuterClass.internal_static_generated_RoomResponseMessage_descriptor;
+      return generated.ChatService.internal_static_generated_Empty_descriptor;
     }
 
     @java.lang.Override
-    public generated.RoomResponseMessage getDefaultInstanceForType() {
-      return generated.RoomResponseMessage.getDefaultInstance();
+    public generated.Empty getDefaultInstanceForType() {
+      return generated.Empty.getDefaultInstance();
     }
 
     @java.lang.Override
-    public generated.RoomResponseMessage build() {
-      generated.RoomResponseMessage result = buildPartial();
+    public generated.Empty build() {
+      generated.Empty result = buildPartial();
       if (!result.isInitialized()) {
         throw newUninitializedMessageException(result);
       }
@@ -294,18 +242,10 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public generated.RoomResponseMessage buildPartial() {
-      generated.RoomResponseMessage result = new generated.RoomResponseMessage(this);
-      if (bitField0_ != 0) { buildPartial0(result); }
+    public generated.Empty buildPartial() {
+      generated.Empty result = new generated.Empty(this);
       onBuilt();
       return result;
-    }
-
-    private void buildPartial0(generated.RoomResponseMessage result) {
-      int from_bitField0_ = bitField0_;
-      if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.response_ = response_;
-      }
     }
 
     @java.lang.Override
@@ -342,21 +282,16 @@ private static final long serialVersionUID = 0L;
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof generated.RoomResponseMessage) {
-        return mergeFrom((generated.RoomResponseMessage)other);
+      if (other instanceof generated.Empty) {
+        return mergeFrom((generated.Empty)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
 
-    public Builder mergeFrom(generated.RoomResponseMessage other) {
-      if (other == generated.RoomResponseMessage.getDefaultInstance()) return this;
-      if (!other.getResponse().isEmpty()) {
-        response_ = other.response_;
-        bitField0_ |= 0x00000001;
-        onChanged();
-      }
+    public Builder mergeFrom(generated.Empty other) {
+      if (other == generated.Empty.getDefaultInstance()) return this;
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -383,11 +318,6 @@ private static final long serialVersionUID = 0L;
             case 0:
               done = true;
               break;
-            case 10: {
-              response_ = input.readStringRequireUtf8();
-              bitField0_ |= 0x00000001;
-              break;
-            } // case 10
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -403,79 +333,6 @@ private static final long serialVersionUID = 0L;
       } // finally
       return this;
     }
-    private int bitField0_;
-
-    private java.lang.Object response_ = "";
-    /**
-     * <code>string response = 1;</code>
-     * @return The response.
-     */
-    public java.lang.String getResponse() {
-      java.lang.Object ref = response_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        response_ = s;
-        return s;
-      } else {
-        return (java.lang.String) ref;
-      }
-    }
-    /**
-     * <code>string response = 1;</code>
-     * @return The bytes for response.
-     */
-    public com.google.protobuf.ByteString
-        getResponseBytes() {
-      java.lang.Object ref = response_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        response_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    /**
-     * <code>string response = 1;</code>
-     * @param value The response to set.
-     * @return This builder for chaining.
-     */
-    public Builder setResponse(
-        java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
-      response_ = value;
-      bitField0_ |= 0x00000001;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string response = 1;</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearResponse() {
-      response_ = getDefaultInstance().getResponse();
-      bitField0_ = (bitField0_ & ~0x00000001);
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string response = 1;</code>
-     * @param value The bytes for response to set.
-     * @return This builder for chaining.
-     */
-    public Builder setResponseBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
-      response_ = value;
-      bitField0_ |= 0x00000001;
-      onChanged();
-      return this;
-    }
     @java.lang.Override
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -489,23 +346,23 @@ private static final long serialVersionUID = 0L;
     }
 
 
-    // @@protoc_insertion_point(builder_scope:generated.RoomResponseMessage)
+    // @@protoc_insertion_point(builder_scope:generated.Empty)
   }
 
-  // @@protoc_insertion_point(class_scope:generated.RoomResponseMessage)
-  private static final generated.RoomResponseMessage DEFAULT_INSTANCE;
+  // @@protoc_insertion_point(class_scope:generated.Empty)
+  private static final generated.Empty DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new generated.RoomResponseMessage();
+    DEFAULT_INSTANCE = new generated.Empty();
   }
 
-  public static generated.RoomResponseMessage getDefaultInstance() {
+  public static generated.Empty getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
-  private static final com.google.protobuf.Parser<RoomResponseMessage>
-      PARSER = new com.google.protobuf.AbstractParser<RoomResponseMessage>() {
+  private static final com.google.protobuf.Parser<Empty>
+      PARSER = new com.google.protobuf.AbstractParser<Empty>() {
     @java.lang.Override
-    public RoomResponseMessage parsePartialFrom(
+    public Empty parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -524,17 +381,17 @@ private static final long serialVersionUID = 0L;
     }
   };
 
-  public static com.google.protobuf.Parser<RoomResponseMessage> parser() {
+  public static com.google.protobuf.Parser<Empty> parser() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.google.protobuf.Parser<RoomResponseMessage> getParserForType() {
+  public com.google.protobuf.Parser<Empty> getParserForType() {
     return PARSER;
   }
 
   @java.lang.Override
-  public generated.RoomResponseMessage getDefaultInstanceForType() {
+  public generated.Empty getDefaultInstanceForType() {
     return DEFAULT_INSTANCE;
   }
 

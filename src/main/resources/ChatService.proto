@@ -2,10 +2,53 @@ syntax ="proto3";
 option java_multiple_files = true;
 package generated;
 
+message Empty {}
+
+message Message {
+  string username = 1;
+  string msg = 2;
+}
+
+message Rooms {
+  repeated RoomEntry rooms = 1;
+}
+
+message RoomEntry {
+  Remote roomOwner = 1;
+  string roomName = 2;
+}
+
+message Remote {
+  int64 nodeId = 1;
+  string hostname = 2;
+  int32 port = 3;
+  string username = 4;
+}
+
+message RemoteResponse {
+  // Indicator of adding or not
+  bool added = 1;
+  // Connected node room
+  string room = 2;
+}
+
+message JoinRequest {
+  string roomName = 1;
+  Remote remote = 2;
+}
+
+message JoinResponse {
+  bool isLeader = 1;
+  // 1. If isLeader == false => it is not leader, sends leader address to request to join
+
+  // 2. If isLeader == true => it is leader, sends requested room leader
+  //    a) maybe leader will be current node (when room does not exist)
+  Remote leader = 2;
+}
 
 message PermissionRequest {
-  int64 nodeId = 1;
-  string timestamp = 2;
+  Remote remote = 1;
+  int32 clock = 2;
 }
 
 message PermissionResponse {
@@ -13,50 +56,20 @@ message PermissionResponse {
   repeated PermissionRequest deferredRequests = 2;
 }
 
-message Remote {
-  int64 nodeId = 1;
+service RemotesService {
+
+  // Connecting methods
+  rpc joinRoom(JoinRequest) returns (JoinResponse); // To connect to room
+  rpc exitRoom(Remote) returns(Empty);
+  rpc preflight(Remote) returns(stream Message); // To get message streamobserver
+  rpc receiveRooms(Rooms) returns(Empty);
+
+  // Methods to control CS when non existing rooms are creating
+  rpc receivePermissionRequest(PermissionRequest) returns (Empty);
+  rpc receivePermissionResponse(PermissionResponse) returns (Empty);
+
+  // Chat methods
+  rpc receiveMessage(Message) returns (Empty);
 }
 
-message RemoteResponse {
-  bool added = 1;
-  repeated Remote remotes = 2;
-}
-
-message ChatMessage {
-  string senderUsername = 1;
-  string message = 2;
-}
-
-message RoomRequestMessage {
-  string roomName = 1;
-  string senderUsername = 2;
-}
-
-message RoomResponseMessage{
-  string response = 1;
-}
-
-message RoomChatMessage {
-    ChatMessage msg = 1;
-    string room = 2;
-}
-
-service ChatPermissionService {
-  rpc receiveRequest(PermissionRequest) returns (PermissionResponse);
-  rpc receiveResponse(PermissionResponse) returns (PermissionResponse);
-}
-
-
-service MyRemotesService {
-  rpc addRemote(Remote) returns (RemoteResponse);
-  rpc removeRemote(Remote) returns (RemoteResponse);
-  rpc updateRemotes(stream Remote) returns (RemoteResponse);
-}
-
-service ChatService {
-  rpc createRoom(RoomRequestMessage) returns (RoomResponseMessage);
-  rpc joinToRoom(RoomRequestMessage) returns (stream RoomChatMessage);
-  rpc exitRoom(RoomRequestMessage) returns (RoomResponseMessage);
-  rpc sendMessageToRoom(RoomChatMessage) returns (RoomResponseMessage);
-}
 

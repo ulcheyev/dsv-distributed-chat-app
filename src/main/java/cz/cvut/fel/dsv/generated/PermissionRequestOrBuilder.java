@@ -9,20 +9,23 @@ public interface PermissionRequestOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>int64 nodeId = 1;</code>
-   * @return The nodeId.
+   * <code>.generated.Remote remote = 1;</code>
+   * @return Whether the remote field is set.
    */
-  long getNodeId();
+  boolean hasRemote();
+  /**
+   * <code>.generated.Remote remote = 1;</code>
+   * @return The remote.
+   */
+  generated.Remote getRemote();
+  /**
+   * <code>.generated.Remote remote = 1;</code>
+   */
+  generated.RemoteOrBuilder getRemoteOrBuilder();
 
   /**
-   * <code>string timestamp = 2;</code>
-   * @return The timestamp.
+   * <code>int32 clock = 2;</code>
+   * @return The clock.
    */
-  java.lang.String getTimestamp();
-  /**
-   * <code>string timestamp = 2;</code>
-   * @return The bytes for timestamp.
-   */
-  com.google.protobuf.ByteString
-      getTimestampBytes();
+  int getClock();
 }

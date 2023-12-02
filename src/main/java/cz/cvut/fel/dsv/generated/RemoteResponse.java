@@ -17,7 +17,7 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private RemoteResponse() {
-    remotes_ = java.util.Collections.emptyList();
+    room_ = "";
   }
 
   @java.lang.Override
@@ -29,13 +29,13 @@ private static final long serialVersionUID = 0L;
 
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return generated.ChatServiceOuterClass.internal_static_generated_RemoteResponse_descriptor;
+    return generated.ChatService.internal_static_generated_RemoteResponse_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return generated.ChatServiceOuterClass.internal_static_generated_RemoteResponse_fieldAccessorTable
+    return generated.ChatService.internal_static_generated_RemoteResponse_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             generated.RemoteResponse.class, generated.RemoteResponse.Builder.class);
   }
@@ -43,6 +43,10 @@ private static final long serialVersionUID = 0L;
   public static final int ADDED_FIELD_NUMBER = 1;
   private boolean added_ = false;
   /**
+   * <pre>
+   * Indicator of adding or not
+   * </pre>
+   *
    * <code>bool added = 1;</code>
    * @return The added.
    */
@@ -51,45 +55,51 @@ private static final long serialVersionUID = 0L;
     return added_;
   }
 
-  public static final int REMOTES_FIELD_NUMBER = 2;
+  public static final int ROOM_FIELD_NUMBER = 2;
   @SuppressWarnings("serial")
-  private java.util.List<generated.Remote> remotes_;
+  private volatile java.lang.Object room_ = "";
   /**
-   * <code>repeated .generated.Remote remotes = 2;</code>
+   * <pre>
+   * Connected node room
+   * </pre>
+   *
+   * <code>string room = 2;</code>
+   * @return The room.
    */
   @java.lang.Override
-  public java.util.List<generated.Remote> getRemotesList() {
-    return remotes_;
+  public java.lang.String getRoom() {
+    java.lang.Object ref = room_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      room_ = s;
+      return s;
+    }
   }
   /**
-   * <code>repeated .generated.Remote remotes = 2;</code>
+   * <pre>
+   * Connected node room
+   * </pre>
+   *
+   * <code>string room = 2;</code>
+   * @return The bytes for room.
    */
   @java.lang.Override
-  public java.util.List<? extends generated.RemoteOrBuilder> 
-      getRemotesOrBuilderList() {
-    return remotes_;
-  }
-  /**
-   * <code>repeated .generated.Remote remotes = 2;</code>
-   */
-  @java.lang.Override
-  public int getRemotesCount() {
-    return remotes_.size();
-  }
-  /**
-   * <code>repeated .generated.Remote remotes = 2;</code>
-   */
-  @java.lang.Override
-  public generated.Remote getRemotes(int index) {
-    return remotes_.get(index);
-  }
-  /**
-   * <code>repeated .generated.Remote remotes = 2;</code>
-   */
-  @java.lang.Override
-  public generated.RemoteOrBuilder getRemotesOrBuilder(
-      int index) {
-    return remotes_.get(index);
+  public com.google.protobuf.ByteString
+      getRoomBytes() {
+    java.lang.Object ref = room_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      room_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
   }
 
   private byte memoizedIsInitialized = -1;
@@ -109,8 +119,8 @@ private static final long serialVersionUID = 0L;
     if (added_ != false) {
       output.writeBool(1, added_);
     }
-    for (int i = 0; i < remotes_.size(); i++) {
-      output.writeMessage(2, remotes_.get(i));
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(room_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 2, room_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -125,9 +135,8 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(1, added_);
     }
-    for (int i = 0; i < remotes_.size(); i++) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(2, remotes_.get(i));
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(room_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, room_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -146,8 +155,8 @@ private static final long serialVersionUID = 0L;
 
     if (getAdded()
         != other.getAdded()) return false;
-    if (!getRemotesList()
-        .equals(other.getRemotesList())) return false;
+    if (!getRoom()
+        .equals(other.getRoom())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -162,10 +171,8 @@ private static final long serialVersionUID = 0L;
     hash = (37 * hash) + ADDED_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
         getAdded());
-    if (getRemotesCount() > 0) {
-      hash = (37 * hash) + REMOTES_FIELD_NUMBER;
-      hash = (53 * hash) + getRemotesList().hashCode();
-    }
+    hash = (37 * hash) + ROOM_FIELD_NUMBER;
+    hash = (53 * hash) + getRoom().hashCode();
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -272,13 +279,13 @@ private static final long serialVersionUID = 0L;
       generated.RemoteResponseOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return generated.ChatServiceOuterClass.internal_static_generated_RemoteResponse_descriptor;
+      return generated.ChatService.internal_static_generated_RemoteResponse_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return generated.ChatServiceOuterClass.internal_static_generated_RemoteResponse_fieldAccessorTable
+      return generated.ChatService.internal_static_generated_RemoteResponse_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               generated.RemoteResponse.class, generated.RemoteResponse.Builder.class);
     }
@@ -298,20 +305,14 @@ private static final long serialVersionUID = 0L;
       super.clear();
       bitField0_ = 0;
       added_ = false;
-      if (remotesBuilder_ == null) {
-        remotes_ = java.util.Collections.emptyList();
-      } else {
-        remotes_ = null;
-        remotesBuilder_.clear();
-      }
-      bitField0_ = (bitField0_ & ~0x00000002);
+      room_ = "";
       return this;
     }
 
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return generated.ChatServiceOuterClass.internal_static_generated_RemoteResponse_descriptor;
+      return generated.ChatService.internal_static_generated_RemoteResponse_descriptor;
     }
 
     @java.lang.Override
@@ -331,28 +332,18 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public generated.RemoteResponse buildPartial() {
       generated.RemoteResponse result = new generated.RemoteResponse(this);
-      buildPartialRepeatedFields(result);
       if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
-    }
-
-    private void buildPartialRepeatedFields(generated.RemoteResponse result) {
-      if (remotesBuilder_ == null) {
-        if (((bitField0_ & 0x00000002) != 0)) {
-          remotes_ = java.util.Collections.unmodifiableList(remotes_);
-          bitField0_ = (bitField0_ & ~0x00000002);
-        }
-        result.remotes_ = remotes_;
-      } else {
-        result.remotes_ = remotesBuilder_.build();
-      }
     }
 
     private void buildPartial0(generated.RemoteResponse result) {
       int from_bitField0_ = bitField0_;
       if (((from_bitField0_ & 0x00000001) != 0)) {
         result.added_ = added_;
+      }
+      if (((from_bitField0_ & 0x00000002) != 0)) {
+        result.room_ = room_;
       }
     }
 
@@ -403,31 +394,10 @@ private static final long serialVersionUID = 0L;
       if (other.getAdded() != false) {
         setAdded(other.getAdded());
       }
-      if (remotesBuilder_ == null) {
-        if (!other.remotes_.isEmpty()) {
-          if (remotes_.isEmpty()) {
-            remotes_ = other.remotes_;
-            bitField0_ = (bitField0_ & ~0x00000002);
-          } else {
-            ensureRemotesIsMutable();
-            remotes_.addAll(other.remotes_);
-          }
-          onChanged();
-        }
-      } else {
-        if (!other.remotes_.isEmpty()) {
-          if (remotesBuilder_.isEmpty()) {
-            remotesBuilder_.dispose();
-            remotesBuilder_ = null;
-            remotes_ = other.remotes_;
-            bitField0_ = (bitField0_ & ~0x00000002);
-            remotesBuilder_ = 
-              com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
-                 getRemotesFieldBuilder() : null;
-          } else {
-            remotesBuilder_.addAllMessages(other.remotes_);
-          }
-        }
+      if (!other.getRoom().isEmpty()) {
+        room_ = other.room_;
+        bitField0_ |= 0x00000002;
+        onChanged();
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -461,16 +431,8 @@ private static final long serialVersionUID = 0L;
               break;
             } // case 8
             case 18: {
-              generated.Remote m =
-                  input.readMessage(
-                      generated.Remote.parser(),
-                      extensionRegistry);
-              if (remotesBuilder_ == null) {
-                ensureRemotesIsMutable();
-                remotes_.add(m);
-              } else {
-                remotesBuilder_.addMessage(m);
-              }
+              room_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000002;
               break;
             } // case 18
             default: {
@@ -492,6 +454,10 @@ private static final long serialVersionUID = 0L;
 
     private boolean added_ ;
     /**
+     * <pre>
+     * Indicator of adding or not
+     * </pre>
+     *
      * <code>bool added = 1;</code>
      * @return The added.
      */
@@ -500,6 +466,10 @@ private static final long serialVersionUID = 0L;
       return added_;
     }
     /**
+     * <pre>
+     * Indicator of adding or not
+     * </pre>
+     *
      * <code>bool added = 1;</code>
      * @param value The added to set.
      * @return This builder for chaining.
@@ -512,6 +482,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     * Indicator of adding or not
+     * </pre>
+     *
      * <code>bool added = 1;</code>
      * @return This builder for chaining.
      */
@@ -522,244 +496,96 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private java.util.List<generated.Remote> remotes_ =
-      java.util.Collections.emptyList();
-    private void ensureRemotesIsMutable() {
-      if (!((bitField0_ & 0x00000002) != 0)) {
-        remotes_ = new java.util.ArrayList<generated.Remote>(remotes_);
-        bitField0_ |= 0x00000002;
-       }
-    }
-
-    private com.google.protobuf.RepeatedFieldBuilderV3<
-        generated.Remote, generated.Remote.Builder, generated.RemoteOrBuilder> remotesBuilder_;
-
+    private java.lang.Object room_ = "";
     /**
-     * <code>repeated .generated.Remote remotes = 2;</code>
+     * <pre>
+     * Connected node room
+     * </pre>
+     *
+     * <code>string room = 2;</code>
+     * @return The room.
      */
-    public java.util.List<generated.Remote> getRemotesList() {
-      if (remotesBuilder_ == null) {
-        return java.util.Collections.unmodifiableList(remotes_);
+    public java.lang.String getRoom() {
+      java.lang.Object ref = room_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        room_ = s;
+        return s;
       } else {
-        return remotesBuilder_.getMessageList();
+        return (java.lang.String) ref;
       }
     }
     /**
-     * <code>repeated .generated.Remote remotes = 2;</code>
+     * <pre>
+     * Connected node room
+     * </pre>
+     *
+     * <code>string room = 2;</code>
+     * @return The bytes for room.
      */
-    public int getRemotesCount() {
-      if (remotesBuilder_ == null) {
-        return remotes_.size();
+    public com.google.protobuf.ByteString
+        getRoomBytes() {
+      java.lang.Object ref = room_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        room_ = b;
+        return b;
       } else {
-        return remotesBuilder_.getCount();
+        return (com.google.protobuf.ByteString) ref;
       }
     }
     /**
-     * <code>repeated .generated.Remote remotes = 2;</code>
+     * <pre>
+     * Connected node room
+     * </pre>
+     *
+     * <code>string room = 2;</code>
+     * @param value The room to set.
+     * @return This builder for chaining.
      */
-    public generated.Remote getRemotes(int index) {
-      if (remotesBuilder_ == null) {
-        return remotes_.get(index);
-      } else {
-        return remotesBuilder_.getMessage(index);
-      }
-    }
-    /**
-     * <code>repeated .generated.Remote remotes = 2;</code>
-     */
-    public Builder setRemotes(
-        int index, generated.Remote value) {
-      if (remotesBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        ensureRemotesIsMutable();
-        remotes_.set(index, value);
-        onChanged();
-      } else {
-        remotesBuilder_.setMessage(index, value);
-      }
+    public Builder setRoom(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      room_ = value;
+      bitField0_ |= 0x00000002;
+      onChanged();
       return this;
     }
     /**
-     * <code>repeated .generated.Remote remotes = 2;</code>
+     * <pre>
+     * Connected node room
+     * </pre>
+     *
+     * <code>string room = 2;</code>
+     * @return This builder for chaining.
      */
-    public Builder setRemotes(
-        int index, generated.Remote.Builder builderForValue) {
-      if (remotesBuilder_ == null) {
-        ensureRemotesIsMutable();
-        remotes_.set(index, builderForValue.build());
-        onChanged();
-      } else {
-        remotesBuilder_.setMessage(index, builderForValue.build());
-      }
+    public Builder clearRoom() {
+      room_ = getDefaultInstance().getRoom();
+      bitField0_ = (bitField0_ & ~0x00000002);
+      onChanged();
       return this;
     }
     /**
-     * <code>repeated .generated.Remote remotes = 2;</code>
+     * <pre>
+     * Connected node room
+     * </pre>
+     *
+     * <code>string room = 2;</code>
+     * @param value The bytes for room to set.
+     * @return This builder for chaining.
      */
-    public Builder addRemotes(generated.Remote value) {
-      if (remotesBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        ensureRemotesIsMutable();
-        remotes_.add(value);
-        onChanged();
-      } else {
-        remotesBuilder_.addMessage(value);
-      }
+    public Builder setRoomBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      room_ = value;
+      bitField0_ |= 0x00000002;
+      onChanged();
       return this;
-    }
-    /**
-     * <code>repeated .generated.Remote remotes = 2;</code>
-     */
-    public Builder addRemotes(
-        int index, generated.Remote value) {
-      if (remotesBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        ensureRemotesIsMutable();
-        remotes_.add(index, value);
-        onChanged();
-      } else {
-        remotesBuilder_.addMessage(index, value);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .generated.Remote remotes = 2;</code>
-     */
-    public Builder addRemotes(
-        generated.Remote.Builder builderForValue) {
-      if (remotesBuilder_ == null) {
-        ensureRemotesIsMutable();
-        remotes_.add(builderForValue.build());
-        onChanged();
-      } else {
-        remotesBuilder_.addMessage(builderForValue.build());
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .generated.Remote remotes = 2;</code>
-     */
-    public Builder addRemotes(
-        int index, generated.Remote.Builder builderForValue) {
-      if (remotesBuilder_ == null) {
-        ensureRemotesIsMutable();
-        remotes_.add(index, builderForValue.build());
-        onChanged();
-      } else {
-        remotesBuilder_.addMessage(index, builderForValue.build());
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .generated.Remote remotes = 2;</code>
-     */
-    public Builder addAllRemotes(
-        java.lang.Iterable<? extends generated.Remote> values) {
-      if (remotesBuilder_ == null) {
-        ensureRemotesIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, remotes_);
-        onChanged();
-      } else {
-        remotesBuilder_.addAllMessages(values);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .generated.Remote remotes = 2;</code>
-     */
-    public Builder clearRemotes() {
-      if (remotesBuilder_ == null) {
-        remotes_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000002);
-        onChanged();
-      } else {
-        remotesBuilder_.clear();
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .generated.Remote remotes = 2;</code>
-     */
-    public Builder removeRemotes(int index) {
-      if (remotesBuilder_ == null) {
-        ensureRemotesIsMutable();
-        remotes_.remove(index);
-        onChanged();
-      } else {
-        remotesBuilder_.remove(index);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .generated.Remote remotes = 2;</code>
-     */
-    public generated.Remote.Builder getRemotesBuilder(
-        int index) {
-      return getRemotesFieldBuilder().getBuilder(index);
-    }
-    /**
-     * <code>repeated .generated.Remote remotes = 2;</code>
-     */
-    public generated.RemoteOrBuilder getRemotesOrBuilder(
-        int index) {
-      if (remotesBuilder_ == null) {
-        return remotes_.get(index);  } else {
-        return remotesBuilder_.getMessageOrBuilder(index);
-      }
-    }
-    /**
-     * <code>repeated .generated.Remote remotes = 2;</code>
-     */
-    public java.util.List<? extends generated.RemoteOrBuilder> 
-         getRemotesOrBuilderList() {
-      if (remotesBuilder_ != null) {
-        return remotesBuilder_.getMessageOrBuilderList();
-      } else {
-        return java.util.Collections.unmodifiableList(remotes_);
-      }
-    }
-    /**
-     * <code>repeated .generated.Remote remotes = 2;</code>
-     */
-    public generated.Remote.Builder addRemotesBuilder() {
-      return getRemotesFieldBuilder().addBuilder(
-          generated.Remote.getDefaultInstance());
-    }
-    /**
-     * <code>repeated .generated.Remote remotes = 2;</code>
-     */
-    public generated.Remote.Builder addRemotesBuilder(
-        int index) {
-      return getRemotesFieldBuilder().addBuilder(
-          index, generated.Remote.getDefaultInstance());
-    }
-    /**
-     * <code>repeated .generated.Remote remotes = 2;</code>
-     */
-    public java.util.List<generated.Remote.Builder> 
-         getRemotesBuilderList() {
-      return getRemotesFieldBuilder().getBuilderList();
-    }
-    private com.google.protobuf.RepeatedFieldBuilderV3<
-        generated.Remote, generated.Remote.Builder, generated.RemoteOrBuilder> 
-        getRemotesFieldBuilder() {
-      if (remotesBuilder_ == null) {
-        remotesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
-            generated.Remote, generated.Remote.Builder, generated.RemoteOrBuilder>(
-                remotes_,
-                ((bitField0_ & 0x00000002) != 0),
-                getParentForChildren(),
-                isClean());
-        remotes_ = null;
-      }
-      return remotesBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

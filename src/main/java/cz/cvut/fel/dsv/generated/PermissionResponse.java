@@ -29,13 +29,13 @@ private static final long serialVersionUID = 0L;
 
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return generated.ChatServiceOuterClass.internal_static_generated_PermissionResponse_descriptor;
+    return generated.ChatService.internal_static_generated_PermissionResponse_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return generated.ChatServiceOuterClass.internal_static_generated_PermissionResponse_fieldAccessorTable
+    return generated.ChatService.internal_static_generated_PermissionResponse_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             generated.PermissionResponse.class, generated.PermissionResponse.Builder.class);
   }
@@ -272,13 +272,13 @@ private static final long serialVersionUID = 0L;
       generated.PermissionResponseOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return generated.ChatServiceOuterClass.internal_static_generated_PermissionResponse_descriptor;
+      return generated.ChatService.internal_static_generated_PermissionResponse_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return generated.ChatServiceOuterClass.internal_static_generated_PermissionResponse_fieldAccessorTable
+      return generated.ChatService.internal_static_generated_PermissionResponse_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               generated.PermissionResponse.class, generated.PermissionResponse.Builder.class);
     }
@@ -311,7 +311,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return generated.ChatServiceOuterClass.internal_static_generated_PermissionResponse_descriptor;
+      return generated.ChatService.internal_static_generated_PermissionResponse_descriptor;
     }
 
     @java.lang.Override
