@@ -12,11 +12,11 @@ public class ConsoleHandler implements Runnable{
     private final BufferedReader reader;
     private final PrintStream out = System.out;
     private final PrintStream err = System.err;
-    private final NodeImpl myNode;
+    private final Node myNode;
 
 
 
-    public ConsoleHandler(NodeImpl myNode) {
+    public ConsoleHandler(Node myNode) {
         this.myNode = myNode;
         reader = new BufferedReader(new InputStreamReader(System.in));
     }

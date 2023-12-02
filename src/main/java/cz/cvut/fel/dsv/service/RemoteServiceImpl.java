@@ -20,9 +20,9 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
     private int myClock = 0;
     private int maxClock = 0;
 
-    private final NodeImpl node;
+    private final Node node;
 
-    public RemoteServiceImpl (NodeImpl node) {
+    public RemoteServiceImpl (Node node) {
         this.node = node;
     }
 
@@ -30,7 +30,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
     public void receiveRooms(generated.Rooms request, StreamObserver<Empty> responseObserver) {
         for(var room: request.getRoomsList()) {
             node.getRoomsAndLeaders()
-                    .putIfAbsent(room.getRoomName(), Mapper.remoteToAddress(room.getRoomOwner()));
+                    .putIfAbsent(room.getRoomName(), Utils.Mapper.remoteToAddress(room.getRoomOwner()));
         }
         responseObserver.onNext(Empty.getDefaultInstance());
         responseObserver.onCompleted();
@@ -39,7 +39,9 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
     @Override
     public void exitRoom(Remote request, StreamObserver<Empty> responseObserver) {
         logger.info(request.getUsername() + " exited room " + node.getCurrentRoom());
-        node.getRoomLeader().removeFromRoom(request.getUsername());
+        node.getIsLeader()
+                .getValue()
+                .removeFromRoom(request.getNodeId());
         responseObserver.onNext(Empty.getDefaultInstance());
         responseObserver.onCompleted();
     }
@@ -51,11 +53,11 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
         if(node.getIsLeader().getKey())
         {
             // Leader of requested room
-            if(Objects.equals(node.getIsLeader().getValue(), request.getRoomName())){
+            if(Objects.equals(node.getIsLeader().getValue().getRoomName(), request.getRoomName())){
                 logger.info("Node "+request.getRemote().getUsername()+" -> popal do leadera");
                 responseObserver.onNext(generated.JoinResponse.newBuilder()
                         .setIsLeader(true)
-                        .setLeader(Mapper.nodeToRemote(node))
+                        .setLeader(Utils.Mapper.nodeToRemote(node))
                         .build());
             }
             // Not a leader of requested room
@@ -66,7 +68,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
                 try {
                     responseObserver.onNext(generated.JoinResponse.newBuilder()
                             .setIsLeader(true)
-                            .setLeader(Mapper.addressToRemote(
+                            .setLeader(Utils.Mapper.addressToRemote(
                                     node
                                     .getRoomsAndLeaders()
                                     .get(request.getRoomName())))
@@ -85,18 +87,18 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
 
                     // Send to leaders new room table
                     // TODO CS
-                    node.getRoomsAndLeaders().put(request.getRoomName(), Mapper.remoteToAddress(request.getRemote()));
+                    node.getRoomsAndLeaders().put(request.getRoomName(), Utils.Mapper.remoteToAddress(request.getRemote()));
                     node.setState(NodeState.REQUESTING);
                     myClock = maxClock + 1;
                     logger.info("CS -> send requests to leaders, maxClock: " + maxClock + " nodeClock: " + myClock);
                     for(var leader: node.getRoomsAndLeaders().values()) {
-                        Utils.getSyncSkeleton(leader.getHostname(), leader.getPort())
+                        Utils.Skeleton.getSyncSkeleton(leader.getHostname(), leader.getPort())
                                 .receivePermissionRequest(PermissionRequest.newBuilder()
-                                        .setRemote(Mapper.nodeToRemote(node))
+                                        .setRemote(Utils.Mapper.nodeToRemote(node))
                                         .setClock(myClock)
                                         .build());
                     }
-                    Utils.shutdown();
+                    Utils.Skeleton.shutdown();
                 }
 
             }
@@ -109,7 +111,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
             logger.info("Node "+request.getRemote().getUsername()+" -> not a leader");
             responseObserver.onNext(generated.JoinResponse.newBuilder()
                     .setIsLeader(false)
-                    .setLeader(Mapper.addressToRemote(node.getLeaderAddress()))
+                    .setLeader(Utils.Mapper.addressToRemote(node.getLeaderAddress()))
                     .build());
         }
 
@@ -120,25 +122,32 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
     public void receiveMessage(Message request, StreamObserver<Empty> responseObserver) {
         responseObserver.onNext(Empty.newBuilder().build());
         responseObserver.onCompleted();
-        node.getRoomLeader().sendMessageToRoom(request.getUsername(), request.getMsg());
+        node.getIsLeader()
+                .getValue()
+                .sendMessageToRoom(request);
     }
 
     @Override
     public void preflight(Remote request, StreamObserver<Message> responseObserver) {
-        node.getRoomLeader().addToRoom(new DsvPair<>(request.getUsername(), responseObserver));
+        node.getIsLeader()
+                .getValue()
+                .addToRoom(new DsvPair<>(Utils.Mapper.remoteToDsvRemote(request), responseObserver));
     }
 
     @Override
     public void receivePermissionRequest(generated.PermissionRequest request, StreamObserver<generated.Empty> responseObserver) {
         maxClock = Math.max(maxClock, request.getClock());
         maxClock++;
-
         if (isDelay(request)) {
             logger.info("CS -> request is delayed, maxClock: " + maxClock + " nodeClock: " + myClock);
-            dsvRemotes.add(DsvRemote.builder().username(request.getRemote().getUsername()).isRequesting(true).build());
+            dsvRemotes.add(DsvRemote.builder()
+                    .address(Utils.Mapper.remoteToAddress(request.getRemote()))
+                    .username(request.getRemote().getUsername())
+                    .isRequesting(true)
+                    .build());
         } else {
             logger.info("CS -> request is granted, maxClock: " + maxClock + " nodeClock: " + myClock);
-            Utils.getSyncSkeleton(request.getRemote().getHostname(), request.getRemote().getPort())
+            Utils.Skeleton.getSyncSkeleton(request.getRemote().getHostname(), request.getRemote().getPort())
                     .receivePermissionResponse(generated.PermissionResponse.newBuilder()
                             .setGranted(true)
                             .build());
@@ -155,19 +164,19 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
                 logger.info("CS -> response count is similar to leaders size, enter to CS. maxClock: " + maxClock + " nodeClock: " + myClock);
                  block();
                 for(var leader: node.getRoomsAndLeaders().values()) {
-                    Utils.getSyncSkeleton(leader.getHostname(), leader.getPort())
-                            .receiveRooms(Mapper.leaderRoomsToRemoteRooms(node.getRoomsAndLeaders()));
+                    Utils.Skeleton.getSyncSkeleton(leader.getHostname(), leader.getPort())
+                            .receiveRooms(Utils.Mapper.leaderRoomsToRemoteRooms(node.getRoomsAndLeaders()));
                 }
                  unblock();
                 responseCount = 0;
                 for(var rem: dsvRemotes) {
                     logger.info("CS -> permit requesting nodes. maxClock: " + maxClock + " nodeClock: " + myClock);
                     if(rem.getIsRequesting()) {
-                        // TODO by id or change impl
                         Address address = node.getRoomsAndLeaders().get(rem.getUsername());
-                        Utils.getSyncSkeleton(address.getHostname(), address.getPort()).receivePermissionResponse(
+                        Utils.Skeleton.getSyncSkeleton(address.getHostname(), address.getPort()).receivePermissionResponse(
                                 generated.PermissionResponse.newBuilder().setGranted(true).build()
                         );
+                        rem.setIsRequesting(false);
                     }
                 }
             }

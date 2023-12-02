@@ -5,7 +5,7 @@ package generated;
 message Empty {}
 
 message Message {
-  string username = 1;
+  Remote remote = 1;
   string msg = 2;
 }
 

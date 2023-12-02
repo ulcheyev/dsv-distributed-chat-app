@@ -75,32 +75,33 @@ public final class ChatService {
   static {
     java.lang.String[] descriptorData = {
       "\n\021ChatService.proto\022\tgenerated\"\007\n\005Empty\"" +
-      "(\n\007Message\022\020\n\010username\030\001 \001(\t\022\013\n\003msg\030\002 \001(" +
-      "\t\",\n\005Rooms\022#\n\005rooms\030\001 \003(\0132\024.generated.Ro" +
-      "omEntry\"C\n\tRoomEntry\022$\n\troomOwner\030\001 \001(\0132" +
-      "\021.generated.Remote\022\020\n\010roomName\030\002 \001(\t\"J\n\006" +
-      "Remote\022\016\n\006nodeId\030\001 \001(\003\022\020\n\010hostname\030\002 \001(\t" +
-      "\022\014\n\004port\030\003 \001(\005\022\020\n\010username\030\004 \001(\t\"-\n\016Remo" +
-      "teResponse\022\r\n\005added\030\001 \001(\010\022\014\n\004room\030\002 \001(\t\"" +
-      "B\n\013JoinRequest\022\020\n\010roomName\030\001 \001(\t\022!\n\006remo" +
-      "te\030\002 \001(\0132\021.generated.Remote\"C\n\014JoinRespo" +
-      "nse\022\020\n\010isLeader\030\001 \001(\010\022!\n\006leader\030\002 \001(\0132\021." +
-      "generated.Remote\"E\n\021PermissionRequest\022!\n" +
-      "\006remote\030\001 \001(\0132\021.generated.Remote\022\r\n\005cloc" +
-      "k\030\002 \001(\005\"]\n\022PermissionResponse\022\017\n\007granted" +
-      "\030\001 \001(\010\0226\n\020deferredRequests\030\002 \003(\0132\034.gener" +
-      "ated.PermissionRequest2\272\003\n\016RemotesServic" +
-      "e\022;\n\010joinRoom\022\026.generated.JoinRequest\032\027." +
-      "generated.JoinResponse\022/\n\010exitRoom\022\021.gen" +
-      "erated.Remote\032\020.generated.Empty\0224\n\tprefl" +
-      "ight\022\021.generated.Remote\032\022.generated.Mess" +
-      "age0\001\0222\n\014receiveRooms\022\020.generated.Rooms\032" +
-      "\020.generated.Empty\022J\n\030receivePermissionRe" +
-      "quest\022\034.generated.PermissionRequest\032\020.ge" +
-      "nerated.Empty\022L\n\031receivePermissionRespon" +
-      "se\022\035.generated.PermissionResponse\032\020.gene" +
-      "rated.Empty\0226\n\016receiveMessage\022\022.generate" +
-      "d.Message\032\020.generated.EmptyB\002P\001b\006proto3"
+      "9\n\007Message\022!\n\006remote\030\001 \001(\0132\021.generated.R" +
+      "emote\022\013\n\003msg\030\002 \001(\t\",\n\005Rooms\022#\n\005rooms\030\001 \003" +
+      "(\0132\024.generated.RoomEntry\"C\n\tRoomEntry\022$\n" +
+      "\troomOwner\030\001 \001(\0132\021.generated.Remote\022\020\n\010r" +
+      "oomName\030\002 \001(\t\"J\n\006Remote\022\016\n\006nodeId\030\001 \001(\003\022" +
+      "\020\n\010hostname\030\002 \001(\t\022\014\n\004port\030\003 \001(\005\022\020\n\010usern" +
+      "ame\030\004 \001(\t\"-\n\016RemoteResponse\022\r\n\005added\030\001 \001" +
+      "(\010\022\014\n\004room\030\002 \001(\t\"B\n\013JoinRequest\022\020\n\010roomN" +
+      "ame\030\001 \001(\t\022!\n\006remote\030\002 \001(\0132\021.generated.Re" +
+      "mote\"C\n\014JoinResponse\022\020\n\010isLeader\030\001 \001(\010\022!" +
+      "\n\006leader\030\002 \001(\0132\021.generated.Remote\"E\n\021Per" +
+      "missionRequest\022!\n\006remote\030\001 \001(\0132\021.generat" +
+      "ed.Remote\022\r\n\005clock\030\002 \001(\005\"]\n\022PermissionRe" +
+      "sponse\022\017\n\007granted\030\001 \001(\010\0226\n\020deferredReque" +
+      "sts\030\002 \003(\0132\034.generated.PermissionRequest2" +
+      "\272\003\n\016RemotesService\022;\n\010joinRoom\022\026.generat" +
+      "ed.JoinRequest\032\027.generated.JoinResponse\022" +
+      "/\n\010exitRoom\022\021.generated.Remote\032\020.generat" +
+      "ed.Empty\0224\n\tpreflight\022\021.generated.Remote" +
+      "\032\022.generated.Message0\001\0222\n\014receiveRooms\022\020" +
+      ".generated.Rooms\032\020.generated.Empty\022J\n\030re" +
+      "ceivePermissionRequest\022\034.generated.Permi" +
+      "ssionRequest\032\020.generated.Empty\022L\n\031receiv" +
+      "ePermissionResponse\022\035.generated.Permissi" +
+      "onResponse\032\020.generated.Empty\0226\n\016receiveM" +
+      "essage\022\022.generated.Message\032\020.generated.E" +
+      "mptyB\002P\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -117,7 +118,7 @@ public final class ChatService {
     internal_static_generated_Message_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_generated_Message_descriptor,
-        new java.lang.String[] { "Username", "Msg", });
+        new java.lang.String[] { "Remote", "Msg", });
     internal_static_generated_Rooms_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_generated_Rooms_fieldAccessorTable = new

@@ -4,7 +4,6 @@ import cz.cvut.fel.dsv.service.RemoteServiceImpl;
 import cz.cvut.fel.dsv.service.ServerInterceptorImpl;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
-import lombok.Builder;
 
 import java.util.logging.Logger;
 
@@ -12,7 +11,7 @@ public class ServerWrapper {
 
     private static final Logger logger = Logger.getLogger(ServerWrapper.class.getName());
     private Server server;
-    private NodeImpl node;
+    private Node node;
 
     public void startServer(int port)  {
         new Thread(() -> {
@@ -41,7 +40,7 @@ public class ServerWrapper {
         server.shutdown();
     }
 
-    public ServerWrapper(NodeImpl node) {
+    public ServerWrapper(Node node) {
         this.node = node;
     }
 }

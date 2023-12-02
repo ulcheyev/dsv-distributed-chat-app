@@ -9,16 +9,19 @@ public interface MessageOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>string username = 1;</code>
-   * @return The username.
+   * <code>.generated.Remote remote = 1;</code>
+   * @return Whether the remote field is set.
    */
-  java.lang.String getUsername();
+  boolean hasRemote();
   /**
-   * <code>string username = 1;</code>
-   * @return The bytes for username.
+   * <code>.generated.Remote remote = 1;</code>
+   * @return The remote.
    */
-  com.google.protobuf.ByteString
-      getUsernameBytes();
+  generated.Remote getRemote();
+  /**
+   * <code>.generated.Remote remote = 1;</code>
+   */
+  generated.RemoteOrBuilder getRemoteOrBuilder();
 
   /**
    * <code>string msg = 2;</code>

@@ -14,104 +14,105 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 
-public class NodeImpl {
-    private static final Logger logger = Logger.getLogger(NodeImpl.class.getName());
+public class Node {
+    private static final Logger logger = Logger.getLogger(Node.class.getName());
     @Getter @Setter private String username;
     @Getter @Setter private String currentRoom;
-    @Getter @Setter private DsvPair<Boolean, String> isLeader = new DsvPair<>(false, "");
-    @Getter @Setter private Room roomLeader;
+    // Flag, which represents the knowledge:
+    //      key == true => node is leader and in value is room which that node leads.
+    //      key == false => node is not leader in value is null.
+    @Getter @Setter private DsvPair<Boolean, Room> isLeader;
     @Getter @Setter private Address address;
     @Getter @Setter private Address leaderAddress;
     @Getter @Setter private Map<String, Address> roomsAndLeaders;
-    @Getter @Setter private NodeState state = NodeState.RELEASED;
+    @Getter @Setter private NodeState state;
     private final ConsoleHandler consoleHandler;
     private final ServerWrapper server;
     private ManagedChannel managedChannelToLeader;
     private StreamObserver<generated.Message> receiveMessagesObserver;
 
-    public NodeImpl() {
+    public Node() {
         server = new ServerWrapper(this);
         consoleHandler = new ConsoleHandler(this);
         roomsAndLeaders = new HashMap<>();
+        isLeader = new DsvPair<>(false, null);
+        state = NodeState.RELEASED;
+        init();
     }
 
     private void init() {
-        managedChannelToLeader = ManagedChannelBuilder
-                .forAddress(leaderAddress.getHostname(), leaderAddress.getPort())
-                .usePlaintext()
-                .build();
         receiveMessagesObserver = new StreamObserver<Message>() {
             @Override
             public void onNext(Message message) {
-                System.out.println("\r["+currentRoom+"] "+ message.getUsername() + ": " + message.getMsg());
+                System.out.println("\r["+currentRoom+"] "+ message.getRemote().getUsername() + ": " + message.getMsg());
             }
 
             @Override
             public void onError(Throwable throwable) {
-
+                // todo
             }
 
             @Override
             public void onCompleted() {
-
+                // todo
             }
         };
     }
 
-    public void joinRoom(Address address, String roomName) {
-
-        ManagedChannel managedChannel = ManagedChannelBuilder
-                .forAddress(address.getHostname(), address.getPort())
+    private void updateChannelToLeader() {
+        managedChannelToLeader = ManagedChannelBuilder
+                .forAddress(leaderAddress.getHostname(), leaderAddress.getPort())
                 .usePlaintext()
                 .build();
+    }
 
-        RemotesServiceGrpc.RemotesServiceBlockingStub stub =
-                RemotesServiceGrpc.newBlockingStub(managedChannel);
+    public void joinRoom(Address address, String roomName) {
+
+        var stub = Utils.Skeleton.getSyncSkeleton(address.getHostname(), address.getPort());
 
         generated.JoinRequest req = generated.JoinRequest.newBuilder()
                 .setRoomName(roomName)
-                .setRemote(Mapper.nodeToRemote(this))
+                .setRemote(Utils.Mapper.nodeToRemote(this))
                 .build();
 
         generated.JoinResponse joinResponse = stub.joinRoom(req);
 
         if(!joinResponse.getIsLeader()) {
-            managedChannel = ManagedChannelBuilder
-                    .forAddress(joinResponse.getLeader().getHostname(), joinResponse.getLeader().getPort())
-                    .usePlaintext()
-                    .build();
-            stub = RemotesServiceGrpc.newBlockingStub(managedChannel);
+            Utils.Skeleton.shutdown();
+            stub = Utils.Skeleton.getSyncSkeleton(joinResponse.getLeader().getHostname(), joinResponse.getLeader().getPort());
             joinResponse = stub.joinRoom(req);
         }
-        leaderAddress = new Address(joinResponse.getLeader().getHostname(), joinResponse.getLeader().getPort());
+
+        leaderAddress = new Address(joinResponse.getLeader().getHostname(),
+                joinResponse.getLeader().getPort(),
+                joinResponse.getLeader().getNodeId());
 
         // Node created a room. Set properties
-        // TODO CS
         if (leaderAddress.equals(this.address)) {
-            isLeader = new DsvPair<>(true, roomName);
-            roomLeader = new Room(roomName);
+            isLeader = new DsvPair<>(true, new Room(roomName));
         }
 
         currentRoom = roomName;
-        init();
+        updateChannelToLeader();
         preflight();
     }
 
     public void joinRoomViaLeader(String roomName) {
+        assert leaderAddress != null;
         if(!Objects.equals(roomName, currentRoom))
                 exitRoom();
         joinRoom(leaderAddress, roomName);
     }
 
     private void exitRoom() {
-        Utils.getSyncSkeleton(leaderAddress.getHostname(), leaderAddress.getPort())
-                .exitRoom(Mapper.nodeToRemote(this));
+        Utils.Skeleton.getSyncSkeleton(leaderAddress.getHostname(), leaderAddress.getPort())
+                .exitRoom(Utils.Mapper.nodeToRemote(this));
     }
 
     public void sendMessage(String msg) {
         RemotesServiceGrpc.RemotesServiceBlockingStub leaderStub =
                 RemotesServiceGrpc.newBlockingStub(managedChannelToLeader);
-        leaderStub.receiveMessage(Mapper.stringToMessage(username, msg));
+        leaderStub.receiveMessage(Utils.Mapper.stringToMessage(Utils.Mapper.nodeToRemote(this), msg));
     }
 
     private void listen(){
@@ -129,12 +130,12 @@ public class NodeImpl {
 
                 // The first node in topology. Creates the global room and is its leader.
                 if(args.length == 2){
-                    isLeader = new DsvPair<>(true, "global"); // 1. true/false = leader/not leader, 2. if leader->roomName
+                    isLeader = new DsvPair<>(true, new Room("global"));
                     currentRoom = "global";
                     roomsAndLeaders.put("global", address);
                     leaderAddress = address;
-                    roomLeader = new Room("global");
-                    init();
+                    updateChannelToLeader();
+                    preflight();
                 }
                 // The "user" node which wants to connect with some other node.
                 else if (args.length == 4) {
@@ -153,15 +154,14 @@ public class NodeImpl {
     }
 
     public static void main(String[] args) {
-        final NodeImpl node = new NodeImpl();
+        final Node node = new Node();
         node.handleArgs(args);
         node.listen();
     }
 
     private void preflight() {
-        RemotesServiceGrpc.RemotesServiceStub leaderStub =
-                RemotesServiceGrpc.newStub(managedChannelToLeader);
-        leaderStub.preflight(Mapper.nodeToRemote(this), receiveMessagesObserver);
+        Utils.Skeleton.getAsyncSkeleton(leaderAddress.getHostname(), leaderAddress.getPort())
+                .preflight(Utils.Mapper.nodeToRemote(this), receiveMessagesObserver);
     }
 
     // Todo
@@ -169,4 +169,5 @@ public class NodeImpl {
     public String toString() {
         return new StringBuilder().append("").toString();
     }
+
 }

@@ -17,7 +17,6 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private Message() {
-    username_ = "";
     msg_ = "";
   }
 
@@ -41,43 +40,31 @@ private static final long serialVersionUID = 0L;
             generated.Message.class, generated.Message.Builder.class);
   }
 
-  public static final int USERNAME_FIELD_NUMBER = 1;
-  @SuppressWarnings("serial")
-  private volatile java.lang.Object username_ = "";
+  private int bitField0_;
+  public static final int REMOTE_FIELD_NUMBER = 1;
+  private generated.Remote remote_;
   /**
-   * <code>string username = 1;</code>
-   * @return The username.
+   * <code>.generated.Remote remote = 1;</code>
+   * @return Whether the remote field is set.
    */
   @java.lang.Override
-  public java.lang.String getUsername() {
-    java.lang.Object ref = username_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      username_ = s;
-      return s;
-    }
+  public boolean hasRemote() {
+    return ((bitField0_ & 0x00000001) != 0);
   }
   /**
-   * <code>string username = 1;</code>
-   * @return The bytes for username.
+   * <code>.generated.Remote remote = 1;</code>
+   * @return The remote.
    */
   @java.lang.Override
-  public com.google.protobuf.ByteString
-      getUsernameBytes() {
-    java.lang.Object ref = username_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      username_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
+  public generated.Remote getRemote() {
+    return remote_ == null ? generated.Remote.getDefaultInstance() : remote_;
+  }
+  /**
+   * <code>.generated.Remote remote = 1;</code>
+   */
+  @java.lang.Override
+  public generated.RemoteOrBuilder getRemoteOrBuilder() {
+    return remote_ == null ? generated.Remote.getDefaultInstance() : remote_;
   }
 
   public static final int MSG_FIELD_NUMBER = 2;
@@ -133,8 +120,8 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(username_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 1, username_);
+    if (((bitField0_ & 0x00000001) != 0)) {
+      output.writeMessage(1, getRemote());
     }
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(msg_)) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 2, msg_);
@@ -148,8 +135,9 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(username_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, username_);
+    if (((bitField0_ & 0x00000001) != 0)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(1, getRemote());
     }
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(msg_)) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, msg_);
@@ -169,8 +157,11 @@ private static final long serialVersionUID = 0L;
     }
     generated.Message other = (generated.Message) obj;
 
-    if (!getUsername()
-        .equals(other.getUsername())) return false;
+    if (hasRemote() != other.hasRemote()) return false;
+    if (hasRemote()) {
+      if (!getRemote()
+          .equals(other.getRemote())) return false;
+    }
     if (!getMsg()
         .equals(other.getMsg())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
@@ -184,8 +175,10 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + USERNAME_FIELD_NUMBER;
-    hash = (53 * hash) + getUsername().hashCode();
+    if (hasRemote()) {
+      hash = (37 * hash) + REMOTE_FIELD_NUMBER;
+      hash = (53 * hash) + getRemote().hashCode();
+    }
     hash = (37 * hash) + MSG_FIELD_NUMBER;
     hash = (53 * hash) + getMsg().hashCode();
     hash = (29 * hash) + getUnknownFields().hashCode();
@@ -307,19 +300,29 @@ private static final long serialVersionUID = 0L;
 
     // Construct using generated.Message.newBuilder()
     private Builder() {
-
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
-
+      maybeForceBuilderInitialization();
+    }
+    private void maybeForceBuilderInitialization() {
+      if (com.google.protobuf.GeneratedMessageV3
+              .alwaysUseFieldBuilders) {
+        getRemoteFieldBuilder();
+      }
     }
     @java.lang.Override
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      username_ = "";
+      remote_ = null;
+      if (remoteBuilder_ != null) {
+        remoteBuilder_.dispose();
+        remoteBuilder_ = null;
+      }
       msg_ = "";
       return this;
     }
@@ -354,12 +357,17 @@ private static final long serialVersionUID = 0L;
 
     private void buildPartial0(generated.Message result) {
       int from_bitField0_ = bitField0_;
+      int to_bitField0_ = 0;
       if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.username_ = username_;
+        result.remote_ = remoteBuilder_ == null
+            ? remote_
+            : remoteBuilder_.build();
+        to_bitField0_ |= 0x00000001;
       }
       if (((from_bitField0_ & 0x00000002) != 0)) {
         result.msg_ = msg_;
       }
+      result.bitField0_ |= to_bitField0_;
     }
 
     @java.lang.Override
@@ -406,10 +414,8 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(generated.Message other) {
       if (other == generated.Message.getDefaultInstance()) return this;
-      if (!other.getUsername().isEmpty()) {
-        username_ = other.username_;
-        bitField0_ |= 0x00000001;
-        onChanged();
+      if (other.hasRemote()) {
+        mergeRemote(other.getRemote());
       }
       if (!other.getMsg().isEmpty()) {
         msg_ = other.msg_;
@@ -443,7 +449,9 @@ private static final long serialVersionUID = 0L;
               done = true;
               break;
             case 10: {
-              username_ = input.readStringRequireUtf8();
+              input.readMessage(
+                  getRemoteFieldBuilder().getBuilder(),
+                  extensionRegistry);
               bitField0_ |= 0x00000001;
               break;
             } // case 10
@@ -469,76 +477,125 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private java.lang.Object username_ = "";
+    private generated.Remote remote_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        generated.Remote, generated.Remote.Builder, generated.RemoteOrBuilder> remoteBuilder_;
     /**
-     * <code>string username = 1;</code>
-     * @return The username.
+     * <code>.generated.Remote remote = 1;</code>
+     * @return Whether the remote field is set.
      */
-    public java.lang.String getUsername() {
-      java.lang.Object ref = username_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        username_ = s;
-        return s;
+    public boolean hasRemote() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>.generated.Remote remote = 1;</code>
+     * @return The remote.
+     */
+    public generated.Remote getRemote() {
+      if (remoteBuilder_ == null) {
+        return remote_ == null ? generated.Remote.getDefaultInstance() : remote_;
       } else {
-        return (java.lang.String) ref;
+        return remoteBuilder_.getMessage();
       }
     }
     /**
-     * <code>string username = 1;</code>
-     * @return The bytes for username.
+     * <code>.generated.Remote remote = 1;</code>
      */
-    public com.google.protobuf.ByteString
-        getUsernameBytes() {
-      java.lang.Object ref = username_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        username_ = b;
-        return b;
+    public Builder setRemote(generated.Remote value) {
+      if (remoteBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        remote_ = value;
       } else {
-        return (com.google.protobuf.ByteString) ref;
+        remoteBuilder_.setMessage(value);
       }
-    }
-    /**
-     * <code>string username = 1;</code>
-     * @param value The username to set.
-     * @return This builder for chaining.
-     */
-    public Builder setUsername(
-        java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
-      username_ = value;
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>string username = 1;</code>
-     * @return This builder for chaining.
+     * <code>.generated.Remote remote = 1;</code>
      */
-    public Builder clearUsername() {
-      username_ = getDefaultInstance().getUsername();
+    public Builder setRemote(
+        generated.Remote.Builder builderForValue) {
+      if (remoteBuilder_ == null) {
+        remote_ = builderForValue.build();
+      } else {
+        remoteBuilder_.setMessage(builderForValue.build());
+      }
+      bitField0_ |= 0x00000001;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.generated.Remote remote = 1;</code>
+     */
+    public Builder mergeRemote(generated.Remote value) {
+      if (remoteBuilder_ == null) {
+        if (((bitField0_ & 0x00000001) != 0) &&
+          remote_ != null &&
+          remote_ != generated.Remote.getDefaultInstance()) {
+          getRemoteBuilder().mergeFrom(value);
+        } else {
+          remote_ = value;
+        }
+      } else {
+        remoteBuilder_.mergeFrom(value);
+      }
+      if (remote_ != null) {
+        bitField0_ |= 0x00000001;
+        onChanged();
+      }
+      return this;
+    }
+    /**
+     * <code>.generated.Remote remote = 1;</code>
+     */
+    public Builder clearRemote() {
       bitField0_ = (bitField0_ & ~0x00000001);
+      remote_ = null;
+      if (remoteBuilder_ != null) {
+        remoteBuilder_.dispose();
+        remoteBuilder_ = null;
+      }
       onChanged();
       return this;
     }
     /**
-     * <code>string username = 1;</code>
-     * @param value The bytes for username to set.
-     * @return This builder for chaining.
+     * <code>.generated.Remote remote = 1;</code>
      */
-    public Builder setUsernameBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
-      username_ = value;
+    public generated.Remote.Builder getRemoteBuilder() {
       bitField0_ |= 0x00000001;
       onChanged();
-      return this;
+      return getRemoteFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.generated.Remote remote = 1;</code>
+     */
+    public generated.RemoteOrBuilder getRemoteOrBuilder() {
+      if (remoteBuilder_ != null) {
+        return remoteBuilder_.getMessageOrBuilder();
+      } else {
+        return remote_ == null ?
+            generated.Remote.getDefaultInstance() : remote_;
+      }
+    }
+    /**
+     * <code>.generated.Remote remote = 1;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        generated.Remote, generated.Remote.Builder, generated.RemoteOrBuilder> 
+        getRemoteFieldBuilder() {
+      if (remoteBuilder_ == null) {
+        remoteBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            generated.Remote, generated.Remote.Builder, generated.RemoteOrBuilder>(
+                getRemote(),
+                getParentForChildren(),
+                isClean());
+        remote_ = null;
+      }
+      return remoteBuilder_;
     }
 
     private java.lang.Object msg_ = "";
