@@ -1,11 +1,8 @@
 package cz.cvut.fel.dsv.core;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.checkerframework.checker.units.qual.A;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Setter
@@ -35,7 +32,7 @@ public class Address {
 
     @Override
     public String toString() {
-        return("Address [host:'"+hostname+"', port:'"+port+"']");
+        return("[Address] host:'"+hostname+"', port:'"+port);
     }
 
     @Override

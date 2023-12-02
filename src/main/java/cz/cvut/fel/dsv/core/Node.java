@@ -22,9 +22,10 @@ public class Node {
     //      key == true => node is leader and in value is room which that node leads.
     //      key == false => node is not leader in value is null.
     @Getter @Setter private DsvPair<Boolean, Room> isLeader;
+    @Getter @Setter private Map<String, Address> roomsAndLeaders;
+
     @Getter @Setter private Address address;
     @Getter @Setter private Address leaderAddress;
-    @Getter @Setter private Map<String, Address> roomsAndLeaders;
     @Getter @Setter private NodeState state;
     private final ConsoleHandler consoleHandler;
     private final ServerWrapper server;
@@ -35,7 +36,7 @@ public class Node {
         server = new ServerWrapper(this);
         consoleHandler = new ConsoleHandler(this);
         roomsAndLeaders = new HashMap<>();
-        isLeader = new DsvPair<>(false, null);
+        isLeader = new DsvPair<>(false, new Room.NullableRoom());
         state = NodeState.RELEASED;
         init();
     }
@@ -167,7 +168,30 @@ public class Node {
     // Todo
     @Override
     public String toString() {
-        return new StringBuilder().append("").toString();
+        StringBuilder sb = new StringBuilder()
+                .append("[")
+                .append(username)
+                .append("]\n\t")
+                .append(address.toString())
+                .append("\n\t[Leader] ")
+                .append(leaderAddress.toString())
+                .append("\n\t[Current room] ")
+                .append(currentRoom)
+                .append("\n\t[State] ")
+                .append(state)
+                .append("\n\t[Is Leader] ")
+                .append(isLeader.getKey())
+                .append(":")
+                .append(isLeader.getValue().getRoomName())
+                .append("\n\t[Room and leaders table]: RoomName : Leader address");
+
+        for(var room: roomsAndLeaders.entrySet()){
+            sb.append("\n\t\t\t\t\t\t\t\t")
+            .append(room.getKey())
+                    .append(" : ")
+                    .append(room.getValue());
+        }
+        return sb.toString();
     }
 
 }

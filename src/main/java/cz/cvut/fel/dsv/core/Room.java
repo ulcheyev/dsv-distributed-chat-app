@@ -38,4 +38,11 @@ public class Room {
         }
     }
 
+    public static class NullableRoom extends Room {
+
+        public NullableRoom() {
+            super("NULLABLE ROOM IS NOT AN ACTUAL ROOM");
+        }
+    }
+
 }

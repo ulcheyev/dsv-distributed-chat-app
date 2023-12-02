@@ -1,6 +1,5 @@
 package cz.cvut.fel.dsv.core;
 
-import cz.cvut.fel.dsv.service.RemoteServiceImpl;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 

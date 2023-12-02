@@ -1,6 +1,6 @@
 package cz.cvut.fel.dsv.service;
-import cz.cvut.fel.dsv.core.*;
 
+import cz.cvut.fel.dsv.core.*;
 import generated.Empty;
 import generated.Message;
 import generated.PermissionRequest;
@@ -19,12 +19,12 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
     private List<DsvRemote> dsvRemotes = new ArrayList<>(); // TODO
     private int myClock = 0;
     private int maxClock = 0;
-
-    private final Node node;
+    private Node node;
 
     public RemoteServiceImpl (Node node) {
         this.node = node;
     }
+    private RemoteServiceImpl(){}
 
     @Override
     public void receiveRooms(generated.Rooms request, StreamObserver<Empty> responseObserver) {
@@ -48,13 +48,13 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
 
     @Override
     public void joinRoom(generated.JoinRequest request, StreamObserver<generated.JoinResponse> responseObserver) {
-        logger.info("Node "+request.getRemote().getUsername()+" was requested to join in " + request.getRoomName());
+        logger.info("[request by Node "+request.getRemote().getUsername()+"] requested to join in " + request.getRoomName());
         // If node is leader
         if(node.getIsLeader().getKey())
         {
             // Leader of requested room
             if(Objects.equals(node.getIsLeader().getValue().getRoomName(), request.getRoomName())){
-                logger.info("Node "+request.getRemote().getUsername()+" -> popal do leadera");
+                logger.info("[request by Node "+request.getRemote().getUsername()+"] requested node to connect is leader");
                 responseObserver.onNext(generated.JoinResponse.newBuilder()
                         .setIsLeader(true)
                         .setLeader(Utils.Mapper.nodeToRemote(node))
@@ -62,7 +62,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
             }
             // Not a leader of requested room
             else{
-                logger.info("Node "+request.getRemote().getUsername()+" -> popal do leadera, but not requested room");
+                logger.info("[request by Node "+request.getRemote().getUsername()+"] requested node to connect is leader, but not leader in requested room");
 
                 // Try to find specified room in leader
                 try {
@@ -73,12 +73,13 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
                                     .getRoomsAndLeaders()
                                     .get(request.getRoomName())))
                             .build());
-                    logger.info("Node "+request.getRemote().getUsername()+" -> requested room " + request.getRoomName()+ " exists. Find in leaders room table: "+request.getRoomName());
+                    logger.info("[request by Node "+request.getRemote().getUsername()+"] requested room is exists. Find in leaders table.");
+
                 }
                 // If not -> create the room and leader will be the sender
                 catch (NullPointerException e){
 
-                    logger.info("Node "+request.getRemote().getUsername()+" -> requested room " + request.getRoomName() + " does not exist. Set sender node as leader");
+                    logger.info("[request by Node "+request.getRemote().getUsername()+"] requested room does not exists. Requested node will be the leader.");
 
                     responseObserver.onNext(generated.JoinResponse.newBuilder()
                             .setIsLeader(true)
