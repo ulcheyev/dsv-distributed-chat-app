@@ -131,7 +131,7 @@ public class Node {
 
                 // The first node in topology. Creates the global room and is its leader.
                 if(args.length == 2){
-                    isLeader = new DsvPair<>(true, new Room("global"));
+                    isLeader = new DsvPair<>(true, new Room(Config.INITIAL_ROOM_NAME));
                     currentRoom = "global";
                     roomsAndLeaders.put("global", address);
                     leaderAddress = address;
