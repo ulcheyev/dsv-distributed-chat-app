@@ -1,6 +1,9 @@
 package cz.cvut.fel.dsv.service;
 
 import cz.cvut.fel.dsv.core.*;
+import generated.*;
+import generated.*;
+import generated.*;
 import generated.Empty;
 import generated.Message;
 import generated.PermissionRequest;
@@ -27,6 +30,28 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
     private RemoteServiceImpl(){}
 
     @Override
+    public void receiveGetNodeListInCurrentRoomRequest(Empty request, StreamObserver<generated.StringPayload> responseObserver) {
+        responseObserver.onNext(generated.StringPayload.newBuilder()
+                .setMsg(node.getIsLeader().getValue().toString())
+                .build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void receiveGetRoomListRequest(Empty request, StreamObserver<generated.StringPayload> responseObserver) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[ROOMS]");
+        for(var room: node.getRoomsAndLeaders().keySet()) {
+            sb.append("\n\t--").append(room);
+        }
+        responseObserver.onNext(generated.StringPayload.newBuilder()
+                .setMsg(sb.toString())
+                .build());
+        responseObserver.onCompleted();
+
+    }
+
+    @Override
     public void receiveRooms(generated.Rooms request, StreamObserver<Empty> responseObserver) {
         DsvThreadPool.execute(() -> {
             for(var room: request.getRoomsList()) {
@@ -38,6 +63,8 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
         });
 
     }
+
+
 
     // TODO delete room from table when nobody in there...
     @Override

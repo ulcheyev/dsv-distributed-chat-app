@@ -6,6 +6,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import generated.JoinResponse;
 import generated.Message;
 import generated.RemotesServiceGrpc;
+import generated.Rooms;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.netty.shaded.io.netty.handler.codec.http.FullHttpRequest;
@@ -216,4 +217,16 @@ public class Node {
         return sb.toString();
     }
 
+    public String getNodeListInCurrentRoom() {
+               return Utils.Skeleton.getSyncSkeleton(leaderAddress.getHostname(), leaderAddress.getPort())
+                .receiveGetNodeListInCurrentRoomRequest(generated.Empty.getDefaultInstance())
+                .getMsg();
+
+    }
+
+    public String getRoomListInNetwork() {
+        return Utils.Skeleton.getSyncSkeleton(leaderAddress.getHostname(), leaderAddress.getPort())
+                .receiveGetRoomListRequest(generated.Empty.getDefaultInstance())
+                .getMsg();
+    }
 }

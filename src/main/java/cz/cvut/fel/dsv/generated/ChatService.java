@@ -21,6 +21,11 @@ public final class ChatService {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_generated_Empty_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_generated_StringPayload_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_generated_StringPayload_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_generated_Message_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -75,33 +80,38 @@ public final class ChatService {
   static {
     java.lang.String[] descriptorData = {
       "\n\021ChatService.proto\022\tgenerated\"\007\n\005Empty\"" +
-      "9\n\007Message\022!\n\006remote\030\001 \001(\0132\021.generated.R" +
-      "emote\022\013\n\003msg\030\002 \001(\t\",\n\005Rooms\022#\n\005rooms\030\001 \003" +
-      "(\0132\024.generated.RoomEntry\"C\n\tRoomEntry\022$\n" +
-      "\troomOwner\030\001 \001(\0132\021.generated.Remote\022\020\n\010r" +
-      "oomName\030\002 \001(\t\"J\n\006Remote\022\016\n\006nodeId\030\001 \001(\003\022" +
-      "\020\n\010hostname\030\002 \001(\t\022\014\n\004port\030\003 \001(\005\022\020\n\010usern" +
-      "ame\030\004 \001(\t\"-\n\016RemoteResponse\022\r\n\005added\030\001 \001" +
-      "(\010\022\014\n\004room\030\002 \001(\t\"B\n\013JoinRequest\022\020\n\010roomN" +
-      "ame\030\001 \001(\t\022!\n\006remote\030\002 \001(\0132\021.generated.Re" +
-      "mote\"C\n\014JoinResponse\022\020\n\010isLeader\030\001 \001(\010\022!" +
-      "\n\006leader\030\002 \001(\0132\021.generated.Remote\"E\n\021Per" +
-      "missionRequest\022!\n\006remote\030\001 \001(\0132\021.generat" +
-      "ed.Remote\022\r\n\005clock\030\002 \001(\005\"]\n\022PermissionRe" +
-      "sponse\022\017\n\007granted\030\001 \001(\010\0226\n\020deferredReque" +
-      "sts\030\002 \003(\0132\034.generated.PermissionRequest2" +
-      "\272\003\n\016RemotesService\022;\n\010joinRoom\022\026.generat" +
-      "ed.JoinRequest\032\027.generated.JoinResponse\022" +
-      "/\n\010exitRoom\022\021.generated.Remote\032\020.generat" +
-      "ed.Empty\0224\n\tpreflight\022\021.generated.Remote" +
-      "\032\022.generated.Message0\001\0222\n\014receiveRooms\022\020" +
-      ".generated.Rooms\032\020.generated.Empty\022J\n\030re" +
-      "ceivePermissionRequest\022\034.generated.Permi" +
-      "ssionRequest\032\020.generated.Empty\022L\n\031receiv" +
-      "ePermissionResponse\022\035.generated.Permissi" +
-      "onResponse\032\020.generated.Empty\0226\n\016receiveM" +
-      "essage\022\022.generated.Message\032\020.generated.E" +
-      "mptyB\002P\001b\006proto3"
+      "\034\n\rStringPayload\022\013\n\003msg\030\001 \001(\t\"9\n\007Message" +
+      "\022!\n\006remote\030\001 \001(\0132\021.generated.Remote\022\013\n\003m" +
+      "sg\030\002 \001(\t\",\n\005Rooms\022#\n\005rooms\030\001 \003(\0132\024.gener" +
+      "ated.RoomEntry\"C\n\tRoomEntry\022$\n\troomOwner" +
+      "\030\001 \001(\0132\021.generated.Remote\022\020\n\010roomName\030\002 " +
+      "\001(\t\"J\n\006Remote\022\016\n\006nodeId\030\001 \001(\003\022\020\n\010hostnam" +
+      "e\030\002 \001(\t\022\014\n\004port\030\003 \001(\005\022\020\n\010username\030\004 \001(\t\"" +
+      "-\n\016RemoteResponse\022\r\n\005added\030\001 \001(\010\022\014\n\004room" +
+      "\030\002 \001(\t\"B\n\013JoinRequest\022\020\n\010roomName\030\001 \001(\t\022" +
+      "!\n\006remote\030\002 \001(\0132\021.generated.Remote\"C\n\014Jo" +
+      "inResponse\022\020\n\010isLeader\030\001 \001(\010\022!\n\006leader\030\002" +
+      " \001(\0132\021.generated.Remote\"E\n\021PermissionReq" +
+      "uest\022!\n\006remote\030\001 \001(\0132\021.generated.Remote\022" +
+      "\r\n\005clock\030\002 \001(\005\"]\n\022PermissionResponse\022\017\n\007" +
+      "granted\030\001 \001(\010\0226\n\020deferredRequests\030\002 \003(\0132" +
+      "\034.generated.PermissionRequest2\331\004\n\016Remote" +
+      "sService\022;\n\010joinRoom\022\026.generated.JoinReq" +
+      "uest\032\027.generated.JoinResponse\022/\n\010exitRoo" +
+      "m\022\021.generated.Remote\032\020.generated.Empty\0224" +
+      "\n\tpreflight\022\021.generated.Remote\032\022.generat" +
+      "ed.Message0\001\0222\n\014receiveRooms\022\020.generated" +
+      ".Rooms\032\020.generated.Empty\022J\n\030receivePermi" +
+      "ssionRequest\022\034.generated.PermissionReque" +
+      "st\032\020.generated.Empty\022L\n\031receivePermissio" +
+      "nResponse\022\035.generated.PermissionResponse" +
+      "\032\020.generated.Empty\0226\n\016receiveMessage\022\022.g" +
+      "enerated.Message\032\020.generated.Empty\022G\n\031re" +
+      "ceiveGetRoomListRequest\022\020.generated.Empt" +
+      "y\032\030.generated.StringPayload\022T\n&receiveGe" +
+      "tNodeListInCurrentRoomRequest\022\020.generate" +
+      "d.Empty\032\030.generated.StringPayloadB\002P\001b\006p" +
+      "roto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -113,56 +123,62 @@ public final class ChatService {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_generated_Empty_descriptor,
         new java.lang.String[] { });
-    internal_static_generated_Message_descriptor =
+    internal_static_generated_StringPayload_descriptor =
       getDescriptor().getMessageTypes().get(1);
+    internal_static_generated_StringPayload_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_generated_StringPayload_descriptor,
+        new java.lang.String[] { "Msg", });
+    internal_static_generated_Message_descriptor =
+      getDescriptor().getMessageTypes().get(2);
     internal_static_generated_Message_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_generated_Message_descriptor,
         new java.lang.String[] { "Remote", "Msg", });
     internal_static_generated_Rooms_descriptor =
-      getDescriptor().getMessageTypes().get(2);
+      getDescriptor().getMessageTypes().get(3);
     internal_static_generated_Rooms_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_generated_Rooms_descriptor,
         new java.lang.String[] { "Rooms", });
     internal_static_generated_RoomEntry_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(4);
     internal_static_generated_RoomEntry_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_generated_RoomEntry_descriptor,
         new java.lang.String[] { "RoomOwner", "RoomName", });
     internal_static_generated_Remote_descriptor =
-      getDescriptor().getMessageTypes().get(4);
+      getDescriptor().getMessageTypes().get(5);
     internal_static_generated_Remote_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_generated_Remote_descriptor,
         new java.lang.String[] { "NodeId", "Hostname", "Port", "Username", });
     internal_static_generated_RemoteResponse_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(6);
     internal_static_generated_RemoteResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_generated_RemoteResponse_descriptor,
         new java.lang.String[] { "Added", "Room", });
     internal_static_generated_JoinRequest_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(7);
     internal_static_generated_JoinRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_generated_JoinRequest_descriptor,
         new java.lang.String[] { "RoomName", "Remote", });
     internal_static_generated_JoinResponse_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(8);
     internal_static_generated_JoinResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_generated_JoinResponse_descriptor,
         new java.lang.String[] { "IsLeader", "Leader", });
     internal_static_generated_PermissionRequest_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_generated_PermissionRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_generated_PermissionRequest_descriptor,
         new java.lang.String[] { "Remote", "Clock", });
     internal_static_generated_PermissionResponse_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(10);
     internal_static_generated_PermissionResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_generated_PermissionResponse_descriptor,

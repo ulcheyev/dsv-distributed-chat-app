@@ -38,10 +38,25 @@ public class Room {
         }
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[ROOM ").append(roomName).append(" -- nodes]");
+        for(var user: users) {
+            sb.append("\n\t--").append(user.getKey());
+        }
+        return sb.toString();
+    }
+
     public static class NullableRoom extends Room {
 
         public NullableRoom() {
             super("NULLABLE ROOM IS NOT AN ACTUAL ROOM");
+        }
+
+        @Override
+        public String toString() {
+            return "NULLABLE ROOM IS NOT AN ACTUAL ROOM";
         }
     }
 

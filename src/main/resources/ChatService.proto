@@ -2,7 +2,13 @@ syntax ="proto3";
 option java_multiple_files = true;
 package generated;
 
+
 message Empty {}
+
+message StringPayload{
+  string msg = 1;
+}
+
 
 message Message {
   Remote remote = 1;
@@ -70,6 +76,8 @@ service RemotesService {
 
   // Chat methods
   rpc receiveMessage(Message) returns (Empty);
+  rpc receiveGetRoomListRequest(Empty) returns(StringPayload);
+  rpc receiveGetNodeListInCurrentRoomRequest(Empty) returns(StringPayload);
 }
 
 

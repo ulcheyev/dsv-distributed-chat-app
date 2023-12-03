@@ -232,6 +232,68 @@ public final class RemotesServiceGrpc {
     return getReceiveMessageMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<generated.Empty,
+      generated.StringPayload> getReceiveGetRoomListRequestMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "receiveGetRoomListRequest",
+      requestType = generated.Empty.class,
+      responseType = generated.StringPayload.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<generated.Empty,
+      generated.StringPayload> getReceiveGetRoomListRequestMethod() {
+    io.grpc.MethodDescriptor<generated.Empty, generated.StringPayload> getReceiveGetRoomListRequestMethod;
+    if ((getReceiveGetRoomListRequestMethod = RemotesServiceGrpc.getReceiveGetRoomListRequestMethod) == null) {
+      synchronized (RemotesServiceGrpc.class) {
+        if ((getReceiveGetRoomListRequestMethod = RemotesServiceGrpc.getReceiveGetRoomListRequestMethod) == null) {
+          RemotesServiceGrpc.getReceiveGetRoomListRequestMethod = getReceiveGetRoomListRequestMethod =
+              io.grpc.MethodDescriptor.<generated.Empty, generated.StringPayload>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "receiveGetRoomListRequest"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.Empty.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.StringPayload.getDefaultInstance()))
+              .setSchemaDescriptor(new RemotesServiceMethodDescriptorSupplier("receiveGetRoomListRequest"))
+              .build();
+        }
+      }
+    }
+    return getReceiveGetRoomListRequestMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<generated.Empty,
+      generated.StringPayload> getReceiveGetNodeListInCurrentRoomRequestMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "receiveGetNodeListInCurrentRoomRequest",
+      requestType = generated.Empty.class,
+      responseType = generated.StringPayload.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<generated.Empty,
+      generated.StringPayload> getReceiveGetNodeListInCurrentRoomRequestMethod() {
+    io.grpc.MethodDescriptor<generated.Empty, generated.StringPayload> getReceiveGetNodeListInCurrentRoomRequestMethod;
+    if ((getReceiveGetNodeListInCurrentRoomRequestMethod = RemotesServiceGrpc.getReceiveGetNodeListInCurrentRoomRequestMethod) == null) {
+      synchronized (RemotesServiceGrpc.class) {
+        if ((getReceiveGetNodeListInCurrentRoomRequestMethod = RemotesServiceGrpc.getReceiveGetNodeListInCurrentRoomRequestMethod) == null) {
+          RemotesServiceGrpc.getReceiveGetNodeListInCurrentRoomRequestMethod = getReceiveGetNodeListInCurrentRoomRequestMethod =
+              io.grpc.MethodDescriptor.<generated.Empty, generated.StringPayload>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "receiveGetNodeListInCurrentRoomRequest"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.Empty.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.StringPayload.getDefaultInstance()))
+              .setSchemaDescriptor(new RemotesServiceMethodDescriptorSupplier("receiveGetNodeListInCurrentRoomRequest"))
+              .build();
+        }
+      }
+    }
+    return getReceiveGetNodeListInCurrentRoomRequestMethod;
+  }
+
   /**
    * Creates a new async stub that supports all call types for the service
    */
@@ -340,6 +402,20 @@ public final class RemotesServiceGrpc {
         io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getReceiveMessageMethod(), responseObserver);
     }
+
+    /**
+     */
+    default void receiveGetRoomListRequest(generated.Empty request,
+        io.grpc.stub.StreamObserver<generated.StringPayload> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getReceiveGetRoomListRequestMethod(), responseObserver);
+    }
+
+    /**
+     */
+    default void receiveGetNodeListInCurrentRoomRequest(generated.Empty request,
+        io.grpc.stub.StreamObserver<generated.StringPayload> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getReceiveGetNodeListInCurrentRoomRequestMethod(), responseObserver);
+    }
   }
 
   /**
@@ -436,6 +512,22 @@ public final class RemotesServiceGrpc {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getReceiveMessageMethod(), getCallOptions()), request, responseObserver);
     }
+
+    /**
+     */
+    public void receiveGetRoomListRequest(generated.Empty request,
+        io.grpc.stub.StreamObserver<generated.StringPayload> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getReceiveGetRoomListRequestMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
+    public void receiveGetNodeListInCurrentRoomRequest(generated.Empty request,
+        io.grpc.stub.StreamObserver<generated.StringPayload> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getReceiveGetNodeListInCurrentRoomRequestMethod(), getCallOptions()), request, responseObserver);
+    }
   }
 
   /**
@@ -515,6 +607,20 @@ public final class RemotesServiceGrpc {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getReceiveMessageMethod(), getCallOptions(), request);
     }
+
+    /**
+     */
+    public generated.StringPayload receiveGetRoomListRequest(generated.Empty request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getReceiveGetRoomListRequestMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public generated.StringPayload receiveGetNodeListInCurrentRoomRequest(generated.Empty request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getReceiveGetNodeListInCurrentRoomRequestMethod(), getCallOptions(), request);
+    }
   }
 
   /**
@@ -589,6 +695,22 @@ public final class RemotesServiceGrpc {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
           getChannel().newCall(getReceiveMessageMethod(), getCallOptions()), request);
     }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<generated.StringPayload> receiveGetRoomListRequest(
+        generated.Empty request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getReceiveGetRoomListRequestMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<generated.StringPayload> receiveGetNodeListInCurrentRoomRequest(
+        generated.Empty request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getReceiveGetNodeListInCurrentRoomRequestMethod(), getCallOptions()), request);
+    }
   }
 
   private static final int METHODID_JOIN_ROOM = 0;
@@ -598,6 +720,8 @@ public final class RemotesServiceGrpc {
   private static final int METHODID_RECEIVE_PERMISSION_REQUEST = 4;
   private static final int METHODID_RECEIVE_PERMISSION_RESPONSE = 5;
   private static final int METHODID_RECEIVE_MESSAGE = 6;
+  private static final int METHODID_RECEIVE_GET_ROOM_LIST_REQUEST = 7;
+  private static final int METHODID_RECEIVE_GET_NODE_LIST_IN_CURRENT_ROOM_REQUEST = 8;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -643,6 +767,14 @@ public final class RemotesServiceGrpc {
         case METHODID_RECEIVE_MESSAGE:
           serviceImpl.receiveMessage((generated.Message) request,
               (io.grpc.stub.StreamObserver<generated.Empty>) responseObserver);
+          break;
+        case METHODID_RECEIVE_GET_ROOM_LIST_REQUEST:
+          serviceImpl.receiveGetRoomListRequest((generated.Empty) request,
+              (io.grpc.stub.StreamObserver<generated.StringPayload>) responseObserver);
+          break;
+        case METHODID_RECEIVE_GET_NODE_LIST_IN_CURRENT_ROOM_REQUEST:
+          serviceImpl.receiveGetNodeListInCurrentRoomRequest((generated.Empty) request,
+              (io.grpc.stub.StreamObserver<generated.StringPayload>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -711,6 +843,20 @@ public final class RemotesServiceGrpc {
               generated.Message,
               generated.Empty>(
                 service, METHODID_RECEIVE_MESSAGE)))
+        .addMethod(
+          getReceiveGetRoomListRequestMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              generated.Empty,
+              generated.StringPayload>(
+                service, METHODID_RECEIVE_GET_ROOM_LIST_REQUEST)))
+        .addMethod(
+          getReceiveGetNodeListInCurrentRoomRequestMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              generated.Empty,
+              generated.StringPayload>(
+                service, METHODID_RECEIVE_GET_NODE_LIST_IN_CURRENT_ROOM_REQUEST)))
         .build();
   }
 
@@ -766,6 +912,8 @@ public final class RemotesServiceGrpc {
               .addMethod(getReceivePermissionRequestMethod())
               .addMethod(getReceivePermissionResponseMethod())
               .addMethod(getReceiveMessageMethod())
+              .addMethod(getReceiveGetRoomListRequestMethod())
+              .addMethod(getReceiveGetNodeListInCurrentRoomRequestMethod())
               .build();
         }
       }

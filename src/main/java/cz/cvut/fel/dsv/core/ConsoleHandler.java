@@ -30,6 +30,12 @@ public class ConsoleHandler implements Runnable{
              else if (Objects.equals(commandline, "info")){
                  System.out.println(myNode.toString());
              }
+             else if (Objects.equals(commandline, "rlist")){
+                 System.out.println(myNode.getRoomListInNetwork());
+             }
+             else if (Objects.equals(commandline, "nlist")){
+                 System.out.println(myNode.getNodeListInCurrentRoom());
+             }
 //             else if(commandline.charAt(0) == 'e' && commandline.charAt(1) == 'x') { // exit room
 //
 //             }

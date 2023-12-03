@@ -9,7 +9,18 @@ import lombok.Setter;
 @Getter
 public class DsvRemote {
     // Flag which indicates that current node is requesting a permission to enter to CS
-    @Setter private Boolean isRequesting;
+    @Setter private Boolean isRequesting = false;
     private String username;
     private Address address;
+
+    @Override
+    public String toString() {
+        return "[username: " +
+                username +
+                ", address: [" +
+                address +
+                "], isRequesting: " +
+                isRequesting +
+                "]";
+    }
 }

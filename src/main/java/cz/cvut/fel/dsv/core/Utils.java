@@ -97,6 +97,5 @@ public class Utils {
                     .username(remote.getUsername())
                     .build();
         }
-
     }
 }
