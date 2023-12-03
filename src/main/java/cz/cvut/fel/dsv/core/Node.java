@@ -1,9 +1,14 @@
 package cz.cvut.fel.dsv.core;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import generated.JoinResponse;
 import generated.Message;
 import generated.RemotesServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.netty.shaded.io.netty.handler.codec.http.FullHttpRequest;
 import io.grpc.stub.StreamObserver;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,6 +17,9 @@ import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
 public class Node {
@@ -21,8 +29,8 @@ public class Node {
     // Flag, which represents the knowledge:
     //      key == true => node is leader and in value is room which that node leads.
     //      key == false => node is not leader in value is null.
-    @Getter @Setter private DsvPair<Boolean, Room> isLeader;
-    @Getter @Setter private Map<String, Address> roomsAndLeaders;
+    @Getter @Setter private volatile DsvPair<Boolean, Room> isLeader;
+    @Getter @Setter private volatile ConcurrentMap<String, Address> roomsAndLeaders;
 
     @Getter @Setter private Address address;
     @Getter @Setter private Address leaderAddress;
@@ -35,7 +43,7 @@ public class Node {
     public Node() {
         server = new ServerWrapper(this);
         consoleHandler = new ConsoleHandler(this);
-        roomsAndLeaders = new HashMap<>();
+        roomsAndLeaders = new ConcurrentHashMap<>();
         isLeader = new DsvPair<>(false, new Room.NullableRoom());
         state = NodeState.RELEASED;
         init();
@@ -67,35 +75,49 @@ public class Node {
                 .build();
     }
 
-    public void joinRoom(Address address, String roomName) {
+    public void joinRoom(Address joinAddress, String roomName) {
 
-        var stub = Utils.Skeleton.getSyncSkeleton(address.getHostname(), address.getPort());
+        var stub = Utils.Skeleton.getFutureStub(joinAddress.getHostname(), joinAddress.getPort());
 
         generated.JoinRequest req = generated.JoinRequest.newBuilder()
                 .setRoomName(roomName)
                 .setRemote(Utils.Mapper.nodeToRemote(this))
                 .build();
 
-        generated.JoinResponse joinResponse = stub.joinRoom(req);
+        ListenableFuture<JoinResponse> joinResponse = stub.joinRoom(req);
+        Futures.addCallback(joinResponse, new FutureCallback<JoinResponse>() {
+            @Override
+            public void onSuccess(JoinResponse response) {
+                ListenableFuture<JoinResponse> joinResponse;
+                if(!response.getIsLeader()) {
+                    Utils.Skeleton.shutdown();
+                    var stub = Utils.Skeleton.getFutureStub(response.getLeader().getHostname(), response.getLeader().getPort());
+                    var callBack = this;
+                    joinResponse = stub.joinRoom(req);
+                    Futures.addCallback(joinResponse, callBack, DsvThreadPool.getPool());
+                    return;
+                }
 
-        if(!joinResponse.getIsLeader()) {
-            Utils.Skeleton.shutdown();
-            stub = Utils.Skeleton.getSyncSkeleton(joinResponse.getLeader().getHostname(), joinResponse.getLeader().getPort());
-            joinResponse = stub.joinRoom(req);
-        }
+                leaderAddress = new Address(response.getLeader().getHostname(),
+                        response.getLeader().getPort(),
+                        response.getLeader().getNodeId());
 
-        leaderAddress = new Address(joinResponse.getLeader().getHostname(),
-                joinResponse.getLeader().getPort(),
-                joinResponse.getLeader().getNodeId());
+                // Node created a room. Set properties
+                if (leaderAddress.equals(address)) {
+                    isLeader = new DsvPair<>(true, new Room(roomName));
+                }
+                currentRoom = roomName;
+                updateChannelToLeader();
+                preflight();
 
-        // Node created a room. Set properties
-        if (leaderAddress.equals(this.address)) {
-            isLeader = new DsvPair<>(true, new Room(roomName));
-        }
+            }
 
-        currentRoom = roomName;
-        updateChannelToLeader();
-        preflight();
+            @Override
+            public void onFailure(Throwable t) {
+               logger.severe("Error while handling response in future in node. " +t.getMessage());
+            }
+        },
+       DsvThreadPool.getPool());
     }
 
     public void joinRoomViaLeader(String roomName) {
@@ -117,7 +139,7 @@ public class Node {
     }
 
     private void listen(){
-        consoleHandler.run();
+        DsvThreadPool.execute(consoleHandler);
     }
 
     private void handleArgs(String[] args){
@@ -183,7 +205,7 @@ public class Node {
                 .append(isLeader.getKey())
                 .append(":")
                 .append(isLeader.getValue().getRoomName())
-                .append("\n\t[Room and leaders table]: RoomName : Leader address");
+                .append("\n\t[Rooms and leaders table]: Room name : Leader address");
 
         for(var room: roomsAndLeaders.entrySet()){
             sb.append("\n\t\t\t\t\t\t\t\t")

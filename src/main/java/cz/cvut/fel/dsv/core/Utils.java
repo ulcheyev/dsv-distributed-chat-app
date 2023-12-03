@@ -1,11 +1,13 @@
 package cz.cvut.fel.dsv.core;
 
+import generated.RemotesServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
 import java.util.Map;
 
 public class Utils {
+
 
 
 
@@ -29,6 +31,14 @@ public class Utils {
                     .usePlaintext()
                     .build();
             return generated.RemotesServiceGrpc.newBlockingStub(managedChannel);
+        }
+
+        public static RemotesServiceGrpc.RemotesServiceFutureStub getFutureStub(String host, int port) {
+            managedChannel = ManagedChannelBuilder
+                    .forAddress(host, port)
+                    .usePlaintext()
+                    .build();
+            return generated.RemotesServiceGrpc.newFutureStub(managedChannel);
         }
 
         public static void shutdown() {
