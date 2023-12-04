@@ -38,6 +38,13 @@ message RemoteResponse {
   string room = 2;
 }
 
+message Neighbours {
+  Remote next = 1;
+  Remote nextNext = 2;
+  Remote prev = 3;
+  Remote leader = 4;
+}
+
 message JoinRequest {
   string roomName = 1;
   Remote remote = 2;
@@ -50,6 +57,7 @@ message JoinResponse {
   // 2. If isLeader == true => it is leader, sends requested room leader
   //    a) maybe leader will be current node (when room does not exist)
   Remote leader = 2;
+  Neighbours neighbours = 3;
 }
 
 message PermissionRequest {
@@ -78,6 +86,13 @@ service RemotesService {
   rpc receiveMessage(Message) returns (Empty);
   rpc receiveGetRoomListRequest(Empty) returns(StringPayload);
   rpc receiveGetNodeListInCurrentRoomRequest(Empty) returns(StringPayload);
+
+  //Leader election
+  rpc changeNextNext(Remote) returns (Empty);
+  rpc changePrev(Remote) returns (Remote);
+  rpc election(Remote) returns (Empty);
+  rpc elected(Remote) returns (Empty);
+  rpc repairTopology(Remote) returns (Empty);
 }
 
 

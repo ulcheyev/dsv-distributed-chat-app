@@ -8,34 +8,34 @@ import java.util.Map;
 
 public class Utils {
 
-
-
-
-
-
+    private Utils() {
+    }
 
     public static class Skeleton {
         private static ManagedChannel managedChannel;
 
-        public static generated.RemotesServiceGrpc.RemotesServiceStub getAsyncSkeleton(String host, int port) {
+        private Skeleton() {
+        }
+
+        public static generated.RemotesServiceGrpc.RemotesServiceStub getAsyncSkeleton(Address address) {
             managedChannel = ManagedChannelBuilder
-                    .forAddress(host, port)
+                    .forAddress(address.getHostname(), address.getPort())
                     .usePlaintext()
                     .build();
             return generated.RemotesServiceGrpc.newStub(managedChannel);
         }
 
-        public static generated.RemotesServiceGrpc.RemotesServiceBlockingStub getSyncSkeleton(String host, int port) {
+        public static generated.RemotesServiceGrpc.RemotesServiceBlockingStub getSyncSkeleton(Address address) {
             managedChannel = ManagedChannelBuilder
-                    .forAddress(host, port)
+                    .forAddress(address.getHostname(), address.getPort())
                     .usePlaintext()
                     .build();
             return generated.RemotesServiceGrpc.newBlockingStub(managedChannel);
         }
 
-        public static RemotesServiceGrpc.RemotesServiceFutureStub getFutureStub(String host, int port) {
+        public static RemotesServiceGrpc.RemotesServiceFutureStub getFutureStub(Address address) {
             managedChannel = ManagedChannelBuilder
-                    .forAddress(host, port)
+                    .forAddress(address.getHostname(), address.getPort())
                     .usePlaintext()
                     .build();
             return generated.RemotesServiceGrpc.newFutureStub(managedChannel);
@@ -47,9 +47,10 @@ public class Utils {
 
     }
 
-
-
     public static class Mapper {
+
+        private Mapper() {
+        }
 
         public static generated.Remote addressToRemote(Address address) {
             return generated.Remote.newBuilder()
@@ -95,6 +96,33 @@ public class Utils {
             return DsvRemote.builder()
                     .address(remoteToAddress(remote))
                     .username(remote.getUsername())
+                    .build();
+        }
+
+        public static generated.Neighbours remoteToNeighbours(generated.Remote remote) {
+            return generated.Neighbours.newBuilder()
+                    .setNext(remote)
+                    .setNextNext(remote)
+                    .setPrev(remote)
+                    .setLeader(remote)
+                    .build();
+        }
+
+        public static DsvNeighbours neighboursToDsvNeighbours(generated.Neighbours neighbours) {
+            return new DsvNeighbours(
+                    remoteToAddress(neighbours.getNext()),
+                    remoteToAddress(neighbours.getNextNext()),
+                    remoteToAddress(neighbours.getPrev()),
+                    remoteToAddress(neighbours.getLeader())
+            );
+        }
+
+        public static generated.Neighbours dsvNeighboursToNeighbours(DsvNeighbours dsvNeighbours) {
+            return generated.Neighbours.newBuilder()
+                    .setNext(addressToRemote(dsvNeighbours.getNext()))
+                    .setNextNext(addressToRemote(dsvNeighbours.getNextNext()))
+                    .setPrev(addressToRemote(dsvNeighbours.getPrev()))
+                    .setLeader(addressToRemote(dsvNeighbours.getLeader()))
                     .build();
         }
     }

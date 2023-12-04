@@ -294,6 +294,161 @@ public final class RemotesServiceGrpc {
     return getReceiveGetNodeListInCurrentRoomRequestMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<generated.Remote,
+      generated.Empty> getChangeNextNextMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "changeNextNext",
+      requestType = generated.Remote.class,
+      responseType = generated.Empty.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<generated.Remote,
+      generated.Empty> getChangeNextNextMethod() {
+    io.grpc.MethodDescriptor<generated.Remote, generated.Empty> getChangeNextNextMethod;
+    if ((getChangeNextNextMethod = RemotesServiceGrpc.getChangeNextNextMethod) == null) {
+      synchronized (RemotesServiceGrpc.class) {
+        if ((getChangeNextNextMethod = RemotesServiceGrpc.getChangeNextNextMethod) == null) {
+          RemotesServiceGrpc.getChangeNextNextMethod = getChangeNextNextMethod =
+              io.grpc.MethodDescriptor.<generated.Remote, generated.Empty>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "changeNextNext"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.Remote.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.Empty.getDefaultInstance()))
+              .setSchemaDescriptor(new RemotesServiceMethodDescriptorSupplier("changeNextNext"))
+              .build();
+        }
+      }
+    }
+    return getChangeNextNextMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<generated.Remote,
+      generated.Remote> getChangePrevMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "changePrev",
+      requestType = generated.Remote.class,
+      responseType = generated.Remote.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<generated.Remote,
+      generated.Remote> getChangePrevMethod() {
+    io.grpc.MethodDescriptor<generated.Remote, generated.Remote> getChangePrevMethod;
+    if ((getChangePrevMethod = RemotesServiceGrpc.getChangePrevMethod) == null) {
+      synchronized (RemotesServiceGrpc.class) {
+        if ((getChangePrevMethod = RemotesServiceGrpc.getChangePrevMethod) == null) {
+          RemotesServiceGrpc.getChangePrevMethod = getChangePrevMethod =
+              io.grpc.MethodDescriptor.<generated.Remote, generated.Remote>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "changePrev"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.Remote.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.Remote.getDefaultInstance()))
+              .setSchemaDescriptor(new RemotesServiceMethodDescriptorSupplier("changePrev"))
+              .build();
+        }
+      }
+    }
+    return getChangePrevMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<generated.Remote,
+      generated.Empty> getElectionMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "election",
+      requestType = generated.Remote.class,
+      responseType = generated.Empty.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<generated.Remote,
+      generated.Empty> getElectionMethod() {
+    io.grpc.MethodDescriptor<generated.Remote, generated.Empty> getElectionMethod;
+    if ((getElectionMethod = RemotesServiceGrpc.getElectionMethod) == null) {
+      synchronized (RemotesServiceGrpc.class) {
+        if ((getElectionMethod = RemotesServiceGrpc.getElectionMethod) == null) {
+          RemotesServiceGrpc.getElectionMethod = getElectionMethod =
+              io.grpc.MethodDescriptor.<generated.Remote, generated.Empty>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "election"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.Remote.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.Empty.getDefaultInstance()))
+              .setSchemaDescriptor(new RemotesServiceMethodDescriptorSupplier("election"))
+              .build();
+        }
+      }
+    }
+    return getElectionMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<generated.Remote,
+      generated.Empty> getElectedMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "elected",
+      requestType = generated.Remote.class,
+      responseType = generated.Empty.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<generated.Remote,
+      generated.Empty> getElectedMethod() {
+    io.grpc.MethodDescriptor<generated.Remote, generated.Empty> getElectedMethod;
+    if ((getElectedMethod = RemotesServiceGrpc.getElectedMethod) == null) {
+      synchronized (RemotesServiceGrpc.class) {
+        if ((getElectedMethod = RemotesServiceGrpc.getElectedMethod) == null) {
+          RemotesServiceGrpc.getElectedMethod = getElectedMethod =
+              io.grpc.MethodDescriptor.<generated.Remote, generated.Empty>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "elected"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.Remote.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.Empty.getDefaultInstance()))
+              .setSchemaDescriptor(new RemotesServiceMethodDescriptorSupplier("elected"))
+              .build();
+        }
+      }
+    }
+    return getElectedMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<generated.Remote,
+      generated.Empty> getRepairTopologyMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "repairTopology",
+      requestType = generated.Remote.class,
+      responseType = generated.Empty.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<generated.Remote,
+      generated.Empty> getRepairTopologyMethod() {
+    io.grpc.MethodDescriptor<generated.Remote, generated.Empty> getRepairTopologyMethod;
+    if ((getRepairTopologyMethod = RemotesServiceGrpc.getRepairTopologyMethod) == null) {
+      synchronized (RemotesServiceGrpc.class) {
+        if ((getRepairTopologyMethod = RemotesServiceGrpc.getRepairTopologyMethod) == null) {
+          RemotesServiceGrpc.getRepairTopologyMethod = getRepairTopologyMethod =
+              io.grpc.MethodDescriptor.<generated.Remote, generated.Empty>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "repairTopology"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.Remote.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.Empty.getDefaultInstance()))
+              .setSchemaDescriptor(new RemotesServiceMethodDescriptorSupplier("repairTopology"))
+              .build();
+        }
+      }
+    }
+    return getRepairTopologyMethod;
+  }
+
   /**
    * Creates a new async stub that supports all call types for the service
    */
@@ -416,6 +571,44 @@ public final class RemotesServiceGrpc {
         io.grpc.stub.StreamObserver<generated.StringPayload> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getReceiveGetNodeListInCurrentRoomRequestMethod(), responseObserver);
     }
+
+    /**
+     * <pre>
+     *Leader election
+     * </pre>
+     */
+    default void changeNextNext(generated.Remote request,
+        io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getChangeNextNextMethod(), responseObserver);
+    }
+
+    /**
+     */
+    default void changePrev(generated.Remote request,
+        io.grpc.stub.StreamObserver<generated.Remote> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getChangePrevMethod(), responseObserver);
+    }
+
+    /**
+     */
+    default void election(generated.Remote request,
+        io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getElectionMethod(), responseObserver);
+    }
+
+    /**
+     */
+    default void elected(generated.Remote request,
+        io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getElectedMethod(), responseObserver);
+    }
+
+    /**
+     */
+    default void repairTopology(generated.Remote request,
+        io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getRepairTopologyMethod(), responseObserver);
+    }
   }
 
   /**
@@ -528,6 +721,49 @@ public final class RemotesServiceGrpc {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getReceiveGetNodeListInCurrentRoomRequestMethod(), getCallOptions()), request, responseObserver);
     }
+
+    /**
+     * <pre>
+     *Leader election
+     * </pre>
+     */
+    public void changeNextNext(generated.Remote request,
+        io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getChangeNextNextMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
+    public void changePrev(generated.Remote request,
+        io.grpc.stub.StreamObserver<generated.Remote> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getChangePrevMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
+    public void election(generated.Remote request,
+        io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getElectionMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
+    public void elected(generated.Remote request,
+        io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getElectedMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
+    public void repairTopology(generated.Remote request,
+        io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getRepairTopologyMethod(), getCallOptions()), request, responseObserver);
+    }
   }
 
   /**
@@ -621,6 +857,44 @@ public final class RemotesServiceGrpc {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getReceiveGetNodeListInCurrentRoomRequestMethod(), getCallOptions(), request);
     }
+
+    /**
+     * <pre>
+     *Leader election
+     * </pre>
+     */
+    public generated.Empty changeNextNext(generated.Remote request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getChangeNextNextMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public generated.Remote changePrev(generated.Remote request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getChangePrevMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public generated.Empty election(generated.Remote request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getElectionMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public generated.Empty elected(generated.Remote request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getElectedMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public generated.Empty repairTopology(generated.Remote request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getRepairTopologyMethod(), getCallOptions(), request);
+    }
   }
 
   /**
@@ -711,6 +985,49 @@ public final class RemotesServiceGrpc {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
           getChannel().newCall(getReceiveGetNodeListInCurrentRoomRequestMethod(), getCallOptions()), request);
     }
+
+    /**
+     * <pre>
+     *Leader election
+     * </pre>
+     */
+    public com.google.common.util.concurrent.ListenableFuture<generated.Empty> changeNextNext(
+        generated.Remote request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getChangeNextNextMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<generated.Remote> changePrev(
+        generated.Remote request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getChangePrevMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<generated.Empty> election(
+        generated.Remote request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getElectionMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<generated.Empty> elected(
+        generated.Remote request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getElectedMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<generated.Empty> repairTopology(
+        generated.Remote request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getRepairTopologyMethod(), getCallOptions()), request);
+    }
   }
 
   private static final int METHODID_JOIN_ROOM = 0;
@@ -722,6 +1039,11 @@ public final class RemotesServiceGrpc {
   private static final int METHODID_RECEIVE_MESSAGE = 6;
   private static final int METHODID_RECEIVE_GET_ROOM_LIST_REQUEST = 7;
   private static final int METHODID_RECEIVE_GET_NODE_LIST_IN_CURRENT_ROOM_REQUEST = 8;
+  private static final int METHODID_CHANGE_NEXT_NEXT = 9;
+  private static final int METHODID_CHANGE_PREV = 10;
+  private static final int METHODID_ELECTION = 11;
+  private static final int METHODID_ELECTED = 12;
+  private static final int METHODID_REPAIR_TOPOLOGY = 13;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -775,6 +1097,26 @@ public final class RemotesServiceGrpc {
         case METHODID_RECEIVE_GET_NODE_LIST_IN_CURRENT_ROOM_REQUEST:
           serviceImpl.receiveGetNodeListInCurrentRoomRequest((generated.Empty) request,
               (io.grpc.stub.StreamObserver<generated.StringPayload>) responseObserver);
+          break;
+        case METHODID_CHANGE_NEXT_NEXT:
+          serviceImpl.changeNextNext((generated.Remote) request,
+              (io.grpc.stub.StreamObserver<generated.Empty>) responseObserver);
+          break;
+        case METHODID_CHANGE_PREV:
+          serviceImpl.changePrev((generated.Remote) request,
+              (io.grpc.stub.StreamObserver<generated.Remote>) responseObserver);
+          break;
+        case METHODID_ELECTION:
+          serviceImpl.election((generated.Remote) request,
+              (io.grpc.stub.StreamObserver<generated.Empty>) responseObserver);
+          break;
+        case METHODID_ELECTED:
+          serviceImpl.elected((generated.Remote) request,
+              (io.grpc.stub.StreamObserver<generated.Empty>) responseObserver);
+          break;
+        case METHODID_REPAIR_TOPOLOGY:
+          serviceImpl.repairTopology((generated.Remote) request,
+              (io.grpc.stub.StreamObserver<generated.Empty>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -857,6 +1199,41 @@ public final class RemotesServiceGrpc {
               generated.Empty,
               generated.StringPayload>(
                 service, METHODID_RECEIVE_GET_NODE_LIST_IN_CURRENT_ROOM_REQUEST)))
+        .addMethod(
+          getChangeNextNextMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              generated.Remote,
+              generated.Empty>(
+                service, METHODID_CHANGE_NEXT_NEXT)))
+        .addMethod(
+          getChangePrevMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              generated.Remote,
+              generated.Remote>(
+                service, METHODID_CHANGE_PREV)))
+        .addMethod(
+          getElectionMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              generated.Remote,
+              generated.Empty>(
+                service, METHODID_ELECTION)))
+        .addMethod(
+          getElectedMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              generated.Remote,
+              generated.Empty>(
+                service, METHODID_ELECTED)))
+        .addMethod(
+          getRepairTopologyMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              generated.Remote,
+              generated.Empty>(
+                service, METHODID_REPAIR_TOPOLOGY)))
         .build();
   }
 
@@ -914,6 +1291,11 @@ public final class RemotesServiceGrpc {
               .addMethod(getReceiveMessageMethod())
               .addMethod(getReceiveGetRoomListRequestMethod())
               .addMethod(getReceiveGetNodeListInCurrentRoomRequestMethod())
+              .addMethod(getChangeNextNextMethod())
+              .addMethod(getChangePrevMethod())
+              .addMethod(getElectionMethod())
+              .addMethod(getElectedMethod())
+              .addMethod(getRepairTopologyMethod())
               .build();
         }
       }

@@ -11,9 +11,9 @@ public class ServerWrapper {
 
     private static final Logger logger = Logger.getLogger(ServerWrapper.class.getName());
     private Server server;
-    private Node node;
+    private final Node node;
 
-    public void startServer(int port)  {
+    public void startServer(int port) {
         new Thread(() -> {
             this.server = ServerBuilder
                     .forPort(port)

@@ -13,15 +13,16 @@ public class Address {
     private int port;
     private Long id;
 
-    public Address (String hostname, int port) {
+    public Address(String hostname, int port) {
         this.hostname = hostname;
         this.port = port;
     }
 
-    private Address(){}
+    private Address() {
+    }
 
-    public Address (Address addr) {
-        this(addr.hostname, addr.port);
+    public Address(Address addr) {
+        this(addr.hostname, addr.port, addr.id);
     }
 
     public Address(String hostname, int port, long nodeId) {
@@ -32,14 +33,16 @@ public class Address {
 
     @Override
     public String toString() {
-        return("[Address] host:'"+hostname+"', port:'"+port);
+        return ("[Address] host:'" + hostname + "', port:'" + port + "'" + ", id:'" + id + "'");
     }
 
     @Override
     public boolean equals(Object obj) {
-        assert obj instanceof Address;
-        Address casted = (Address) obj;
-        return Objects.equals(casted.getHostname(), hostname) && casted.getPort() == port;
+        if (obj instanceof Address) {
+            Address casted = (Address) obj;
+            return Objects.equals(casted.getHostname(), hostname) && casted.getPort() == port;
+        }
+        return false;
     }
 
     public void generateId() {

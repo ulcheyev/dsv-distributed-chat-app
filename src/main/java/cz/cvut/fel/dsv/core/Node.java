@@ -6,21 +6,16 @@ import com.google.common.util.concurrent.ListenableFuture;
 import generated.JoinResponse;
 import generated.Message;
 import generated.RemotesServiceGrpc;
-import generated.Rooms;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import io.grpc.netty.shaded.io.netty.handler.codec.http.FullHttpRequest;
 import io.grpc.stub.StreamObserver;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.net.InetAddress;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
 public class Node {
@@ -34,8 +29,9 @@ public class Node {
     @Getter @Setter private volatile ConcurrentMap<String, Address> roomsAndLeaders;
 
     @Getter @Setter private Address address;
-    @Getter @Setter private Address leaderAddress;
+    //    @Getter @Setter private Address leaderAddress;
     @Getter @Setter private NodeState state;
+    @Getter @Setter private DsvNeighbours dsvNeighbours;
     private final ConsoleHandler consoleHandler;
     private final ServerWrapper server;
     private ManagedChannel managedChannelToLeader;
@@ -54,7 +50,7 @@ public class Node {
         receiveMessagesObserver = new StreamObserver<Message>() {
             @Override
             public void onNext(Message message) {
-                System.out.println("\r["+currentRoom+"] "+ message.getRemote().getUsername() + ": " + message.getMsg());
+                System.out.println("\r[" + currentRoom + "] " + message.getRemote().getUsername() + ": " + message.getMsg());
             }
 
             @Override
@@ -71,14 +67,14 @@ public class Node {
 
     private void updateChannelToLeader() {
         managedChannelToLeader = ManagedChannelBuilder
-                .forAddress(leaderAddress.getHostname(), leaderAddress.getPort())
+                .forAddress(dsvNeighbours.getLeader().getHostname(), dsvNeighbours.getLeader().getPort())
                 .usePlaintext()
                 .build();
     }
 
     public void joinRoom(Address joinAddress, String roomName) {
 
-        var stub = Utils.Skeleton.getFutureStub(joinAddress.getHostname(), joinAddress.getPort());
+        var stub = Utils.Skeleton.getFutureStub(joinAddress);
 
         generated.JoinRequest req = generated.JoinRequest.newBuilder()
                 .setRoomName(roomName)
@@ -87,50 +83,58 @@ public class Node {
 
         ListenableFuture<JoinResponse> joinResponse = stub.joinRoom(req);
         Futures.addCallback(joinResponse, new FutureCallback<JoinResponse>() {
-            @Override
-            public void onSuccess(JoinResponse response) {
-                ListenableFuture<JoinResponse> joinResponse;
-                if(!response.getIsLeader()) {
-                    Utils.Skeleton.shutdown();
-                    var stub = Utils.Skeleton.getFutureStub(response.getLeader().getHostname(), response.getLeader().getPort());
-                    var callBack = this;
-                    joinResponse = stub.joinRoom(req);
-                    Futures.addCallback(joinResponse, callBack, DsvThreadPool.getPool());
-                    return;
-                }
+                    @Override
+                    public void onSuccess(JoinResponse response) {
+                        ListenableFuture<JoinResponse> joinResponse;
+                        if (!response.getIsLeader()) {
+                            Utils.Skeleton.shutdown();
+                            var stub = Utils.Skeleton.getFutureStub(Utils.Mapper.remoteToAddress(response.getLeader()));
+                            var callBack = this;
+                            joinResponse = stub.joinRoom(req);
+                            Futures.addCallback(joinResponse, callBack, DsvThreadPool.getPool());
+                            return;
+                        }
 
-                leaderAddress = new Address(response.getLeader().getHostname(),
-                        response.getLeader().getPort(),
-                        response.getLeader().getNodeId());
+                        dsvNeighbours.setLeader(new Address(
+                                response.getLeader().getHostname(),
+                                response.getLeader().getPort(),
+                                response.getLeader().getNodeId()
+                        ));
+                        dsvNeighbours = Utils.Mapper.neighboursToDsvNeighbours(response.getNeighbours());
 
-                // Node created a room. Set properties
-                if (leaderAddress.equals(address)) {
-                    isLeader = new DsvPair<>(true, new Room(roomName));
-                }
-                currentRoom = roomName;
-                updateChannelToLeader();
-                preflight();
+                        // Node created a room. Set properties
+                        if (dsvNeighbours.getLeader().equals(address)) {
+                            isLeader = new DsvPair<>(true, new Room(roomName));
+                        }
+                        currentRoom = roomName;
+                        updateChannelToLeader();
+                        preflight();
 
-            }
+                    }
 
-            @Override
-            public void onFailure(Throwable t) {
-               logger.severe("Error while handling response in future in node. " +t.getMessage());
-            }
-        },
-       DsvThreadPool.getPool());
+                    @Override
+                    public void onFailure(Throwable t) {
+                        logger.severe("Error while handling response in future in node. " + t.getMessage());
+                    }
+                },
+                DsvThreadPool.getPool());
     }
 
     public void joinRoomViaLeader(String roomName) {
-        assert leaderAddress != null;
-        if(!Objects.equals(roomName, currentRoom))
-                exitRoom();
-        joinRoom(leaderAddress, roomName);
+        assert dsvNeighbours.getLeader() != null;
+        if (!Objects.equals(roomName, currentRoom))
+            exitRoom();
+        joinRoom(dsvNeighbours.getLeader(), roomName);
     }
 
     private void exitRoom() {
-        Utils.Skeleton.getSyncSkeleton(leaderAddress.getHostname(), leaderAddress.getPort())
+
+        Utils.Skeleton.getSyncSkeleton(dsvNeighbours.getLeader())
                 .exitRoom(Utils.Mapper.nodeToRemote(this));
+
+        // Repair topology.
+        Utils.Skeleton.getSyncSkeleton(dsvNeighbours.getPrev())
+                .repairTopology(Utils.Mapper.addressToRemote(this.address));
     }
 
     public void sendMessage(String msg) {
@@ -139,39 +143,39 @@ public class Node {
         leaderStub.receiveMessage(Utils.Mapper.stringToMessage(Utils.Mapper.nodeToRemote(this), msg));
     }
 
-    private void listen(){
+    private void listen() {
         DsvThreadPool.execute(consoleHandler);
     }
 
-    private void handleArgs(String[] args){
+    private void handleArgs(String[] args) {
         try {
-            if(args.length <= 4){
-
+            if (args.length <= 4) {
                 this.username = args[0];
-                this.address = new Address(InetAddress.getLocalHost().getHostName(), Integer.parseInt(args[1]));
+                this.address = new Address(InetAddress.getLocalHost().getHostAddress(), Integer.parseInt(args[1]));
                 this.address.generateId();
+                this.dsvNeighbours = new DsvNeighbours(this.address);
                 this.server.startServer(address.getPort());
 
                 // The first node in topology. Creates the global room and is its leader.
-                if(args.length == 2){
+                if (args.length == 2) {
                     isLeader = new DsvPair<>(true, new Room(Config.INITIAL_ROOM_NAME));
-                    currentRoom = "global";
-                    roomsAndLeaders.put("global", address);
-                    leaderAddress = address;
+                    currentRoom = Config.INITIAL_ROOM_NAME;
+                    roomsAndLeaders.put(Config.INITIAL_ROOM_NAME, address);
+                    dsvNeighbours.setLeader(address);
                     updateChannelToLeader();
                     preflight();
                 }
                 // The "user" node which wants to connect with some other node.
                 else if (args.length == 4) {
-                    joinRoom(new Address(args[2], Integer.parseInt(args[3])), "global");
+                    joinRoom(new Address(args[2], Integer.parseInt(args[3])), Config.INITIAL_ROOM_NAME);
                 }
 
-            }else{
+            } else {
                 System.err.println("Error while parsing args. Max number of args is 4.");
                 System.exit(1);
             }
 
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.severe("Error while handling input args. Max. quantity of parameters is 4, Min. is 2.");
             logger.severe(e.getMessage());
         }
@@ -184,7 +188,7 @@ public class Node {
     }
 
     private void preflight() {
-        Utils.Skeleton.getAsyncSkeleton(leaderAddress.getHostname(), leaderAddress.getPort())
+        Utils.Skeleton.getAsyncSkeleton(dsvNeighbours.getLeader())
                 .preflight(Utils.Mapper.nodeToRemote(this), receiveMessagesObserver);
     }
 
@@ -197,20 +201,21 @@ public class Node {
                 .append("]\n\t")
                 .append(address.toString())
                 .append("\n\t[Leader] ")
-                .append(leaderAddress.toString())
+                .append(dsvNeighbours.getLeader().toString())
                 .append("\n\t[Current room] ")
                 .append(currentRoom)
                 .append("\n\t[State] ")
                 .append(state)
+                .append("\n\t").append(dsvNeighbours.toString())
                 .append("\n\t[Is Leader] ")
                 .append(isLeader.getKey())
                 .append(":")
                 .append(isLeader.getValue().getRoomName())
                 .append("\n\t[Rooms and leaders table]: Room name : Leader address");
 
-        for(var room: roomsAndLeaders.entrySet()){
+        for (var room : roomsAndLeaders.entrySet()) {
             sb.append("\n\t\t\t\t\t\t\t\t")
-            .append(room.getKey())
+                    .append(room.getKey())
                     .append(" : ")
                     .append(room.getValue());
         }
@@ -218,14 +223,14 @@ public class Node {
     }
 
     public String getNodeListInCurrentRoom() {
-               return Utils.Skeleton.getSyncSkeleton(leaderAddress.getHostname(), leaderAddress.getPort())
+        return Utils.Skeleton.getSyncSkeleton(dsvNeighbours.getLeader())
                 .receiveGetNodeListInCurrentRoomRequest(generated.Empty.getDefaultInstance())
                 .getMsg();
 
     }
 
     public String getRoomListInNetwork() {
-        return Utils.Skeleton.getSyncSkeleton(leaderAddress.getHostname(), leaderAddress.getPort())
+        return Utils.Skeleton.getSyncSkeleton(dsvNeighbours.getLeader())
                 .receiveGetRoomListRequest(generated.Empty.getDefaultInstance())
                 .getMsg();
     }

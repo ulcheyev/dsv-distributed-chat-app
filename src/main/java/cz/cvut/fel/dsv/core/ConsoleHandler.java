@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.Objects;
 
-public class ConsoleHandler implements Runnable{
+public class ConsoleHandler implements Runnable {
 
     private boolean reading = true;
     private final BufferedReader reader;
@@ -15,27 +15,23 @@ public class ConsoleHandler implements Runnable{
     private final Node myNode;
 
 
-
     public ConsoleHandler(Node myNode) {
         this.myNode = myNode;
         reader = new BufferedReader(new InputStreamReader(System.in));
     }
 
     private void parseCommandLine(String commandline) {
-        if(!commandline.isEmpty()) {
-             if (commandline.charAt(0) == 'j') { // join room
-                String roomName = commandline.substring(2);
+        if (!commandline.isEmpty()) {
+            if (commandline.charAt(0) == '!' && commandline.charAt(1) == 'j') { // join room
+                String roomName = commandline.substring(3);
                 myNode.joinRoomViaLeader(roomName);
-             }
-             else if (Objects.equals(commandline, "info")){
-                 System.out.println(myNode.toString());
-             }
-             else if (Objects.equals(commandline, "rlist")){
-                 System.out.println(myNode.getRoomListInNetwork());
-             }
-             else if (Objects.equals(commandline, "nlist")){
-                 System.out.println(myNode.getNodeListInCurrentRoom());
-             }
+            } else if (Objects.equals(commandline, "!info")) {
+                System.out.println(myNode.toString());
+            } else if (Objects.equals(commandline, "!rooms")) {
+                System.out.println(myNode.getRoomListInNetwork());
+            } else if (Objects.equals(commandline, "!online")) {
+                System.out.println(myNode.getNodeListInCurrentRoom());
+            }
 //             else if(commandline.charAt(0) == 'e' && commandline.charAt(1) == 'x') { // exit room
 //
 //             }
@@ -50,7 +46,7 @@ public class ConsoleHandler implements Runnable{
         String commandline = "";
         while (reading) {
             commandline = "";
-            System.out.print("["+myNode.getCurrentRoom()+"] "+myNode.getUsername()+"> ");
+            System.out.print("[" + myNode.getCurrentRoom() + "] " + myNode.getUsername() + "> ");
             try {
                 commandline = reader.readLine();
                 parseCommandLine(commandline);

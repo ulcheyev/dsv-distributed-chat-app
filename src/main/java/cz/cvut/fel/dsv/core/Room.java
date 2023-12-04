@@ -10,19 +10,19 @@ import java.util.Objects;
 public class Room {
 
     @Getter private final String roomName;
-    private List<DsvPair<DsvRemote, StreamObserver<generated.Message>>> users;
+    private final List<DsvPair<DsvRemote, StreamObserver<generated.Message>>> users;
 
     public Room(String name) {
         this.roomName = name;
         users = new ArrayList<>();
     }
 
-    public void addToRoom(DsvPair<DsvRemote,StreamObserver<generated.Message>> user) {
+    public void addToRoom(DsvPair<DsvRemote, StreamObserver<generated.Message>> user) {
         users.add(user);
     }
 
     public void removeFromRoom(Long id) {
-        for(var user: users) {
+        for (var user : users) {
             if (Objects.equals(user.getKey().getAddress().getId(), id)) {
                 user.getValue().onCompleted();
                 users.remove(user);
@@ -32,8 +32,8 @@ public class Room {
     }
 
     public void sendMessageToRoom(generated.Message msg) {
-        for(var user: users) {
-            if(!Objects.equals(user.getKey().getAddress().getId(), msg.getRemote().getNodeId()))
+        for (var user : users) {
+            if (!Objects.equals(user.getKey().getAddress().getId(), msg.getRemote().getNodeId()))
                 user.getValue().onNext(msg);
         }
     }
@@ -42,7 +42,7 @@ public class Room {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("[ROOM ").append(roomName).append(" -- nodes]");
-        for(var user: users) {
+        for (var user : users) {
             sb.append("\n\t--").append(user.getKey());
         }
         return sb.toString();
