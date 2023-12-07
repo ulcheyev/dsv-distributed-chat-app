@@ -16,7 +16,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
 
     private static final Logger logger = Logger.getLogger(RemoteServiceImpl.class.getName());
     private Integer responseCount = 0;
-    private List<DsvRemote> dsvRemotes = new ArrayList<>(); // TODO
+    private final List<DsvRemote> dsvRemotes = new ArrayList<>(); // TODO
     private final Queue<DsvPair<generated.JoinRequest, StreamObserver<generated.JoinResponse>>> joinQueue = new LinkedList<>(); // TODO
     private int myClock = 0;
     private int maxClock = 0;
@@ -166,18 +166,19 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
     @Override
     public void receiveMessage(Message request, StreamObserver<Empty> responseObserver) {
         DsvThreadPool.execute(() -> {
-            responseObserver.onNext(Empty.newBuilder().build());
-            responseObserver.onCompleted();
             node.getIsLeader()
                     .getValue()
                     .sendMessageToRoom(request);
         });
 
+        responseObserver.onNext(Empty.newBuilder().build());
+        responseObserver.onCompleted();
     }
 
     @Override
     public void preflight(Remote request, StreamObserver<Message> responseObserver) {
         DsvThreadPool.execute(() -> {
+            logger.info("Added to room " + request.getUsername());
             node.getIsLeader()
                     .getValue()
                     .addToRoom(new DsvPair<>(Utils.Mapper.remoteToDsvRemote(request), responseObserver));
@@ -275,16 +276,47 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
 
     @Override
     public void election(Remote request, StreamObserver<Empty> responseObserver) {
-        super.election(request, responseObserver);
-        responseObserver.onNext(Empty.getDefaultInstance());
-        responseObserver.onCompleted();
+        DsvThreadPool.execute(() -> {
+            logger.info("Election is called with ID: " + request.getNodeId());
+            var nextSkeleton = Utils.Skeleton.getSyncSkeleton(node.getDsvNeighbours().getNext());
+
+            if (node.getAddress().getId() < request.getNodeId()) {
+                node.setVoting(true);
+                nextSkeleton.election(request);
+            } else if ((node.getAddress().getId() > request.getNodeId()) && !node.isVoting()) {
+                node.setVoting(true);
+                nextSkeleton.election(Utils.Mapper.addressToRemote(node.getAddress()));
+            } else if (node.getAddress().getId() == request.getNodeId())
+                electedCandidate();
+
+            responseObserver.onNext(Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        });
+    }
+
+    private void electedCandidate() {
+        node.setIsLeader(new DsvPair<>(true, new Room(node.getCurrentRoom())));
+        node.getRoomsAndLeaders().put(node.getCurrentRoom(), node.getAddress());
+
+        Utils.Skeleton.getSyncSkeleton(node.getDsvNeighbours().getNext())
+                .elected(Utils.Mapper.addressToRemote(node.getAddress()));
+
+        // TODO: Skeleton to leader. Send info about new leaders
     }
 
     @Override
     public void elected(Remote request, StreamObserver<Empty> responseObserver) {
-        super.elected(request, responseObserver);
-        responseObserver.onNext(Empty.getDefaultInstance());
-        responseObserver.onCompleted();
+        DsvThreadPool.execute(() -> {
+            logger.info("Elected is called with ID: " + request.getNodeId());
+
+            node.updateLeaderChannelAndObserver(Utils.Mapper.remoteToAddress(request));
+            if (node.getAddress().getId() != request.getNodeId())
+                Utils.Skeleton.getSyncSkeleton(node.getDsvNeighbours().getNext())
+                        .elected(request);
+
+            responseObserver.onNext(Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        });
     }
 
     @Override

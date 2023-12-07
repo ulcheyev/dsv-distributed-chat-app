@@ -32,6 +32,7 @@ public class Node {
     //    @Getter @Setter private Address leaderAddress;
     @Getter @Setter private NodeState state;
     @Getter @Setter private DsvNeighbours dsvNeighbours;
+    @Getter @Setter private boolean isVoting;
     private final ConsoleHandler consoleHandler;
     private final ServerWrapper server;
     private ManagedChannel managedChannelToLeader;
@@ -95,21 +96,16 @@ public class Node {
                             return;
                         }
 
-                        dsvNeighbours.setLeader(new Address(
-                                response.getLeader().getHostname(),
-                                response.getLeader().getPort(),
-                                response.getLeader().getNodeId()
-                        ));
                         dsvNeighbours = Utils.Mapper.neighboursToDsvNeighbours(response.getNeighbours());
 
                         // Node created a room. Set properties
                         if (dsvNeighbours.getLeader().equals(address)) {
                             isLeader = new DsvPair<>(true, new Room(roomName));
                         }
+
                         currentRoom = roomName;
                         updateChannelToLeader();
                         preflight();
-
                     }
 
                     @Override
@@ -128,13 +124,37 @@ public class Node {
     }
 
     private void exitRoom() {
-
         Utils.Skeleton.getSyncSkeleton(dsvNeighbours.getLeader())
                 .exitRoom(Utils.Mapper.nodeToRemote(this));
 
-        // Repair topology.
-        Utils.Skeleton.getSyncSkeleton(dsvNeighbours.getPrev())
-                .repairTopology(Utils.Mapper.addressToRemote(this.address));
+        startRepairTopology(dsvNeighbours.getPrev());
+        checkLeader();
+    }
+
+    private void startRepairTopology(Address onNode) {
+        Utils.Skeleton.getSyncSkeleton(onNode)
+                .repairTopology(Utils.Mapper.addressToRemote(address));
+    }
+
+    private void checkLeader() {
+        if (dsvNeighbours.getLeader().equals(address))
+            startElection(dsvNeighbours.getNext());
+
+        // TODO: supplement remaining cases
+    }
+
+    private void startElection(Address onNode) {
+        Utils.Skeleton.getSyncSkeleton(onNode)
+                .election(Utils.Mapper.addressToRemote(new Address(Config.STUB_STRING, 0, -1)));
+    }
+
+    public void updateLeaderChannelAndObserver(Address address) {
+        setVoting(false);
+        dsvNeighbours.setLeader(address);
+
+        updateChannelToLeader();
+        init();
+        preflight();
     }
 
     public void sendMessage(String msg) {
@@ -188,6 +208,7 @@ public class Node {
     }
 
     private void preflight() {
+        logger.info(username + " send preflight " + dsvNeighbours.getLeader());
         Utils.Skeleton.getAsyncSkeleton(dsvNeighbours.getLeader())
                 .preflight(Utils.Mapper.nodeToRemote(this), receiveMessagesObserver);
     }
@@ -198,16 +219,16 @@ public class Node {
         StringBuilder sb = new StringBuilder()
                 .append("[")
                 .append(username)
-                .append("]\n\t")
+                .append("]:\n\t")
                 .append(address.toString())
-                .append("\n\t[Leader] ")
+                .append("\n\t[Leader]: ")
                 .append(dsvNeighbours.getLeader().toString())
-                .append("\n\t[Current room] ")
+                .append("\n\t[Current room]: ")
                 .append(currentRoom)
-                .append("\n\t[State] ")
+                .append("\n\t[State]: ")
                 .append(state)
                 .append("\n\t").append(dsvNeighbours.toString())
-                .append("\n\t[Is Leader] ")
+                .append("\n\t[Is Leader]: ")
                 .append(isLeader.getKey())
                 .append(":")
                 .append(isLeader.getValue().getRoomName())

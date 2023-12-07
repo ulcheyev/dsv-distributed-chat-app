@@ -6,9 +6,10 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 public class Room {
-
+    private static final Logger logger = Logger.getLogger(Room.class.getName());
     @Getter private final String roomName;
     private final List<DsvPair<DsvRemote, StreamObserver<generated.Message>>> users;
 
@@ -33,6 +34,7 @@ public class Room {
 
     public void sendMessageToRoom(generated.Message msg) {
         for (var user : users) {
+            logger.info("Send message to " + user.getKey());
             if (!Objects.equals(user.getKey().getAddress().getId(), msg.getRemote().getNodeId()))
                 user.getValue().onNext(msg);
         }

@@ -5,7 +5,7 @@ package generated;
 
 message Empty {}
 
-message StringPayload{
+message StringPayload {
   string msg = 1;
 }
 
