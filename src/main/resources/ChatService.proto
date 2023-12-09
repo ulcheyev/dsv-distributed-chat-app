@@ -9,7 +9,6 @@ message StringPayload {
   string msg = 1;
 }
 
-
 message Message {
   Remote remote = 1;
   string msg = 2;
@@ -70,6 +69,10 @@ message PermissionResponse {
   repeated PermissionRequest deferredRequests = 2;
 }
 
+message Health {
+  bool isAlive = 1;
+}
+
 service RemotesService {
 
   // Connecting methods
@@ -93,6 +96,8 @@ service RemotesService {
   rpc election(Remote) returns (Empty);
   rpc elected(Remote) returns (Empty);
   rpc repairTopology(Remote) returns (Empty);
+
+  rpc beat(Empty) returns (Health);
 }
 
 

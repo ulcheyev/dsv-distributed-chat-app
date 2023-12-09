@@ -6,6 +6,7 @@ import generated.Empty;
 import generated.Message;
 import generated.PermissionRequest;
 import generated.Remote;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 
 import java.util.*;
@@ -135,12 +136,16 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
                             node.setState(NodeState.REQUESTING);
                             myClock = maxClock + 1;
                             logger.info("[CS] send requests to leaders, size = [" + refToTable.size() + "]; maxClock: " + maxClock + ", nodeClock: " + myClock);
-                            for (var leader : refToTable.values()) {
-                                Utils.Skeleton.getSyncSkeleton(leader)
-                                        .receivePermissionRequest(PermissionRequest.newBuilder()
-                                                .setRemote(Utils.Mapper.nodeToRemote(node))
-                                                .setClock(myClock)
-                                                .build());
+                            for (var leaderKey : refToTable.keySet()) {
+                                try {
+                                    Utils.Skeleton.getSyncSkeleton(refToTable.get(leaderKey))
+                                            .receivePermissionRequest(PermissionRequest.newBuilder()
+                                                    .setRemote(Utils.Mapper.nodeToRemote(node))
+                                                    .setClock(myClock)
+                                                    .build());
+                                } catch (StatusRuntimeException statusEx) {
+                                    refToTable.remove(leaderKey);
+                                }
                             }
                             Utils.Skeleton.shutdown();
                         }
@@ -151,6 +156,12 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
 
                 // Not a leader at all, send a leader address
                 else {
+                    try {
+                        Utils.Skeleton.getSyncSkeleton(node.getDsvNeighbours().getLeader()).beat(Empty.getDefaultInstance());
+                    } catch (StatusRuntimeException e) {
+                        node.repairAndElect(node.getAddress(), node.getDsvNeighbours().getLeader());
+                    }
+
                     logger.info("[request by Node " + request.getRemote().getUsername() + "] requested node is not a leader.");
                     responseObserver.onNext(generated.JoinResponse.newBuilder()
                             .setIsLeader(false)
@@ -161,6 +172,12 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
                 responseObserver.onCompleted();
             }
         });
+    }
+
+    @Override
+    public void beat(Empty request, StreamObserver<generated.Health> responseObserver) {
+        responseObserver.onNext(generated.Health.newBuilder().setIsAlive(true).build());
+        responseObserver.onCompleted();
     }
 
     @Override

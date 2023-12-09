@@ -449,6 +449,37 @@ public final class RemotesServiceGrpc {
     return getRepairTopologyMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<generated.Empty,
+      generated.Health> getBeatMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "beat",
+      requestType = generated.Empty.class,
+      responseType = generated.Health.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<generated.Empty,
+      generated.Health> getBeatMethod() {
+    io.grpc.MethodDescriptor<generated.Empty, generated.Health> getBeatMethod;
+    if ((getBeatMethod = RemotesServiceGrpc.getBeatMethod) == null) {
+      synchronized (RemotesServiceGrpc.class) {
+        if ((getBeatMethod = RemotesServiceGrpc.getBeatMethod) == null) {
+          RemotesServiceGrpc.getBeatMethod = getBeatMethod =
+              io.grpc.MethodDescriptor.<generated.Empty, generated.Health>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "beat"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.Empty.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.Health.getDefaultInstance()))
+              .setSchemaDescriptor(new RemotesServiceMethodDescriptorSupplier("beat"))
+              .build();
+        }
+      }
+    }
+    return getBeatMethod;
+  }
+
   /**
    * Creates a new async stub that supports all call types for the service
    */
@@ -609,6 +640,13 @@ public final class RemotesServiceGrpc {
         io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getRepairTopologyMethod(), responseObserver);
     }
+
+    /**
+     */
+    default void beat(generated.Empty request,
+        io.grpc.stub.StreamObserver<generated.Health> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getBeatMethod(), responseObserver);
+    }
   }
 
   /**
@@ -764,6 +802,14 @@ public final class RemotesServiceGrpc {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getRepairTopologyMethod(), getCallOptions()), request, responseObserver);
     }
+
+    /**
+     */
+    public void beat(generated.Empty request,
+        io.grpc.stub.StreamObserver<generated.Health> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getBeatMethod(), getCallOptions()), request, responseObserver);
+    }
   }
 
   /**
@@ -894,6 +940,13 @@ public final class RemotesServiceGrpc {
     public generated.Empty repairTopology(generated.Remote request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getRepairTopologyMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public generated.Health beat(generated.Empty request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getBeatMethod(), getCallOptions(), request);
     }
   }
 
@@ -1028,6 +1081,14 @@ public final class RemotesServiceGrpc {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
           getChannel().newCall(getRepairTopologyMethod(), getCallOptions()), request);
     }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<generated.Health> beat(
+        generated.Empty request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getBeatMethod(), getCallOptions()), request);
+    }
   }
 
   private static final int METHODID_JOIN_ROOM = 0;
@@ -1044,6 +1105,7 @@ public final class RemotesServiceGrpc {
   private static final int METHODID_ELECTION = 11;
   private static final int METHODID_ELECTED = 12;
   private static final int METHODID_REPAIR_TOPOLOGY = 13;
+  private static final int METHODID_BEAT = 14;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -1117,6 +1179,10 @@ public final class RemotesServiceGrpc {
         case METHODID_REPAIR_TOPOLOGY:
           serviceImpl.repairTopology((generated.Remote) request,
               (io.grpc.stub.StreamObserver<generated.Empty>) responseObserver);
+          break;
+        case METHODID_BEAT:
+          serviceImpl.beat((generated.Empty) request,
+              (io.grpc.stub.StreamObserver<generated.Health>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -1234,6 +1300,13 @@ public final class RemotesServiceGrpc {
               generated.Remote,
               generated.Empty>(
                 service, METHODID_REPAIR_TOPOLOGY)))
+        .addMethod(
+          getBeatMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              generated.Empty,
+              generated.Health>(
+                service, METHODID_BEAT)))
         .build();
   }
 
@@ -1296,6 +1369,7 @@ public final class RemotesServiceGrpc {
               .addMethod(getElectionMethod())
               .addMethod(getElectedMethod())
               .addMethod(getRepairTopologyMethod())
+              .addMethod(getBeatMethod())
               .build();
         }
       }

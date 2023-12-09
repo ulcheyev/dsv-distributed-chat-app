@@ -1,5 +1,6 @@
 package cz.cvut.fel.dsv.core;
 
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 import lombok.Getter;
 
@@ -35,8 +36,14 @@ public class Room {
     public void sendMessageToRoom(generated.Message msg) {
         for (var user : users) {
             logger.info("Send message to " + user.getKey());
-            if (!Objects.equals(user.getKey().getAddress().getId(), msg.getRemote().getNodeId()))
-                user.getValue().onNext(msg);
+            if (!Objects.equals(user.getKey().getAddress().getId(), msg.getRemote().getNodeId())) {
+                try {
+                    user.getValue().onNext(msg);    // TODO: status error when node is missing
+                } catch (StatusRuntimeException e) {
+                    Utils.Skeleton.getSyncSkeleton(Utils.Mapper.remoteToAddress(msg.getRemote()))
+                            .repairTopology(Utils.Mapper.addressToRemote(user.getKey().getAddress()));
+                }
+            }
         }
     }
 
