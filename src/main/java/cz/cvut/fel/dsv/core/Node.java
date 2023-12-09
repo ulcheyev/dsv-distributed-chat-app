@@ -8,6 +8,7 @@ import generated.Message;
 import generated.RemotesServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 import lombok.Getter;
 import lombok.Setter;
@@ -127,25 +128,24 @@ public class Node {
         Utils.Skeleton.getSyncSkeleton(dsvNeighbours.getLeader())
                 .exitRoom(Utils.Mapper.nodeToRemote(this));
 
-        startRepairTopology(dsvNeighbours.getPrev());
-        checkLeader();
-    }
-
-    private void startRepairTopology(Address onNode) {
-        Utils.Skeleton.getSyncSkeleton(onNode)
-                .repairTopology(Utils.Mapper.addressToRemote(address));
-    }
-
-    private void checkLeader() {
+        startRepairTopology(dsvNeighbours.getPrev(), address);
         if (dsvNeighbours.getLeader().equals(address))
             startElection(dsvNeighbours.getNext());
+    }
 
-        // TODO: supplement remaining cases
+    private void startRepairTopology(Address onNode, Address missing) {
+        Utils.Skeleton.getSyncSkeleton(onNode)
+                .repairTopology(Utils.Mapper.addressToRemote(missing));
     }
 
     private void startElection(Address onNode) {
         Utils.Skeleton.getSyncSkeleton(onNode)
                 .election(Utils.Mapper.addressToRemote(new Address(Config.STUB_STRING, 0, -1)));
+    }
+
+    public void repairAndElect(Address onNode, Address missing) {
+        startRepairTopology(onNode, missing);
+        startElection(onNode);
     }
 
     public void updateLeaderChannelAndObserver(Address address) {
@@ -160,7 +160,11 @@ public class Node {
     public void sendMessage(String msg) {
         RemotesServiceGrpc.RemotesServiceBlockingStub leaderStub =
                 RemotesServiceGrpc.newBlockingStub(managedChannelToLeader);
-        leaderStub.receiveMessage(Utils.Mapper.stringToMessage(Utils.Mapper.nodeToRemote(this), msg));
+        try {
+            leaderStub.receiveMessage(Utils.Mapper.stringToMessage(Utils.Mapper.nodeToRemote(this), msg));
+        } catch (StatusRuntimeException e) {
+            repairAndElect(address, dsvNeighbours.getLeader());
+        }
     }
 
     private void listen() {

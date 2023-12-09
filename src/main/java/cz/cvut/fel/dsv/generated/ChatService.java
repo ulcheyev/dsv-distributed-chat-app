@@ -74,6 +74,11 @@ public final class ChatService {
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_generated_PermissionResponse_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_generated_Health_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_generated_Health_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -104,29 +109,31 @@ public final class ChatService {
       "\022!\n\006remote\030\001 \001(\0132\021.generated.Remote\022\r\n\005c" +
       "lock\030\002 \001(\005\"]\n\022PermissionResponse\022\017\n\007gran" +
       "ted\030\001 \001(\010\0226\n\020deferredRequests\030\002 \003(\0132\034.ge" +
-      "nerated.PermissionRequest2\334\006\n\016RemotesSer" +
-      "vice\022;\n\010joinRoom\022\026.generated.JoinRequest" +
-      "\032\027.generated.JoinResponse\022/\n\010exitRoom\022\021." +
-      "generated.Remote\032\020.generated.Empty\0224\n\tpr" +
-      "eflight\022\021.generated.Remote\032\022.generated.M" +
-      "essage0\001\0222\n\014receiveRooms\022\020.generated.Roo" +
-      "ms\032\020.generated.Empty\022J\n\030receivePermissio" +
-      "nRequest\022\034.generated.PermissionRequest\032\020" +
-      ".generated.Empty\022L\n\031receivePermissionRes" +
-      "ponse\022\035.generated.PermissionResponse\032\020.g" +
-      "enerated.Empty\0226\n\016receiveMessage\022\022.gener" +
-      "ated.Message\032\020.generated.Empty\022G\n\031receiv" +
-      "eGetRoomListRequest\022\020.generated.Empty\032\030." +
-      "generated.StringPayload\022T\n&receiveGetNod" +
-      "eListInCurrentRoomRequest\022\020.generated.Em" +
-      "pty\032\030.generated.StringPayload\0225\n\016changeN" +
-      "extNext\022\021.generated.Remote\032\020.generated.E" +
-      "mpty\0222\n\nchangePrev\022\021.generated.Remote\032\021." +
-      "generated.Remote\022/\n\010election\022\021.generated" +
-      ".Remote\032\020.generated.Empty\022.\n\007elected\022\021.g" +
-      "enerated.Remote\032\020.generated.Empty\0225\n\016rep" +
-      "airTopology\022\021.generated.Remote\032\020.generat" +
-      "ed.EmptyB\002P\001b\006proto3"
+      "nerated.PermissionRequest\"\031\n\006Health\022\017\n\007i" +
+      "sAlive\030\001 \001(\0102\211\007\n\016RemotesService\022;\n\010joinR" +
+      "oom\022\026.generated.JoinRequest\032\027.generated." +
+      "JoinResponse\022/\n\010exitRoom\022\021.generated.Rem" +
+      "ote\032\020.generated.Empty\0224\n\tpreflight\022\021.gen" +
+      "erated.Remote\032\022.generated.Message0\001\0222\n\014r" +
+      "eceiveRooms\022\020.generated.Rooms\032\020.generate" +
+      "d.Empty\022J\n\030receivePermissionRequest\022\034.ge" +
+      "nerated.PermissionRequest\032\020.generated.Em" +
+      "pty\022L\n\031receivePermissionResponse\022\035.gener" +
+      "ated.PermissionResponse\032\020.generated.Empt" +
+      "y\0226\n\016receiveMessage\022\022.generated.Message\032" +
+      "\020.generated.Empty\022G\n\031receiveGetRoomListR" +
+      "equest\022\020.generated.Empty\032\030.generated.Str" +
+      "ingPayload\022T\n&receiveGetNodeListInCurren" +
+      "tRoomRequest\022\020.generated.Empty\032\030.generat" +
+      "ed.StringPayload\0225\n\016changeNextNext\022\021.gen" +
+      "erated.Remote\032\020.generated.Empty\0222\n\nchang" +
+      "ePrev\022\021.generated.Remote\032\021.generated.Rem" +
+      "ote\022/\n\010election\022\021.generated.Remote\032\020.gen" +
+      "erated.Empty\022.\n\007elected\022\021.generated.Remo" +
+      "te\032\020.generated.Empty\0225\n\016repairTopology\022\021" +
+      ".generated.Remote\032\020.generated.Empty\022+\n\004b" +
+      "eat\022\020.generated.Empty\032\021.generated.Health" +
+      "B\002P\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -204,6 +211,12 @@ public final class ChatService {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_generated_PermissionResponse_descriptor,
         new java.lang.String[] { "Granted", "DeferredRequests", });
+    internal_static_generated_Health_descriptor =
+      getDescriptor().getMessageTypes().get(12);
+    internal_static_generated_Health_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_generated_Health_descriptor,
+        new java.lang.String[] { "IsAlive", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
