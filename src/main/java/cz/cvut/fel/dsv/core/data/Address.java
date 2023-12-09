@@ -1,4 +1,4 @@
-package cz.cvut.fel.dsv.core;
+package cz.cvut.fel.dsv.core.data;
 
 import lombok.Getter;
 import lombok.Setter;

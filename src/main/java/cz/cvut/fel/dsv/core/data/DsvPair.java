@@ -1,4 +1,4 @@
-package cz.cvut.fel.dsv.core;
+package cz.cvut.fel.dsv.core.data;
 
 public class DsvPair<K, V> {
     private final K key;

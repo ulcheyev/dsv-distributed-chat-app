@@ -1,5 +1,6 @@
-package cz.cvut.fel.dsv.core;
+package cz.cvut.fel.dsv.core.data;
 
+import cz.cvut.fel.dsv.core.data.Address;
 import lombok.Getter;
 import lombok.Setter;
 

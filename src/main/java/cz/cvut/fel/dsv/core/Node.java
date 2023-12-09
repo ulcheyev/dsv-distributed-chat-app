@@ -3,6 +3,12 @@ package cz.cvut.fel.dsv.core;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import cz.cvut.fel.dsv.core.data.Address;
+import cz.cvut.fel.dsv.core.data.DsvNeighbours;
+import cz.cvut.fel.dsv.core.data.DsvPair;
+import cz.cvut.fel.dsv.core.data.NodeState;
+import cz.cvut.fel.dsv.utils.DsvLogger;
+import cz.cvut.fel.dsv.utils.Utils;
 import generated.JoinResponse;
 import generated.Message;
 import generated.RemotesServiceGrpc;
@@ -20,7 +26,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
 
 public class Node {
-    private static final Logger logger = Logger.getLogger(Node.class.getName());
+    private static final Logger logger = DsvLogger.getLogger(Node.class);
     @Getter @Setter private String username;
     @Getter @Setter private String currentRoom;
     // Flag, which represents the knowledge:
@@ -96,12 +102,18 @@ public class Node {
                             Futures.addCallback(joinResponse, callBack, DsvThreadPool.getPool());
                             return;
                         }
-
+                        
                         dsvNeighbours = Utils.Mapper.neighboursToDsvNeighbours(response.getNeighbours());
+                        dsvNeighbours.setLeader(Utils.Mapper.remoteToAddress(response.getLeader()));
+
 
                         // Node created a room. Set properties
-                        if (dsvNeighbours.getLeader().equals(address)) {
+                        if (Utils.Mapper.remoteToAddress(response.getLeader()).equals(address)) {
                             isLeader = new DsvPair<>(true, new Room(roomName));
+                        }
+                        // Node is not a leader in connecting room. Deletr data about rooms and leaders.
+                        else{
+                            roomsAndLeaders = new ConcurrentHashMap<>();
                         }
 
                         currentRoom = roomName;
@@ -129,8 +141,10 @@ public class Node {
                 .exitRoom(Utils.Mapper.nodeToRemote(this));
 
         startRepairTopology(dsvNeighbours.getPrev(), address);
-        if (dsvNeighbours.getLeader().equals(address))
+
+        if (dsvNeighbours.getLeader().equals(address) && isLeader.getValue().getSize() != 1) {
             startElection(dsvNeighbours.getNext());
+        }
     }
 
     private void startRepairTopology(Address onNode, Address missing) {
@@ -138,7 +152,7 @@ public class Node {
                 .repairTopology(Utils.Mapper.addressToRemote(missing));
     }
 
-    private void startElection(Address onNode) {
+     void startElection(Address onNode) {
         Utils.Skeleton.getSyncSkeleton(onNode)
                 .election(Utils.Mapper.addressToRemote(new Address(Config.STUB_STRING, 0, -1)));
     }
@@ -212,12 +226,11 @@ public class Node {
     }
 
     private void preflight() {
-        logger.info(username + " send preflight " + dsvNeighbours.getLeader());
+        logger.info(username + " send preflight to " + dsvNeighbours.getLeader());
         Utils.Skeleton.getAsyncSkeleton(dsvNeighbours.getLeader())
                 .preflight(Utils.Mapper.nodeToRemote(this), receiveMessagesObserver);
     }
 
-    // Todo
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder()

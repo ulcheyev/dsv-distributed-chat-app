@@ -1,10 +1,17 @@
-package cz.cvut.fel.dsv.core;
+package cz.cvut.fel.dsv.utils;
 
+import cz.cvut.fel.dsv.core.data.Address;
+import cz.cvut.fel.dsv.core.data.DsvNeighbours;
+import cz.cvut.fel.dsv.core.data.DsvRemote;
+import cz.cvut.fel.dsv.core.Node;
 import generated.RemotesServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class Utils {
 
@@ -90,6 +97,14 @@ public class Utils {
                         .build());
             }
             return builder.build();
+        }
+
+        public static ConcurrentMap<String, Address> remoteRoomsToLeaderRooms(generated.Rooms rooms){
+            var map = new ConcurrentHashMap<String, Address>();
+            for(var room : rooms.getRoomsList()){
+                map.put(room.getRoomName(), remoteToAddress(room.getRoomOwner()));
+            }
+            return map;
         }
 
         public static DsvRemote remoteToDsvRemote(generated.Remote remote) {

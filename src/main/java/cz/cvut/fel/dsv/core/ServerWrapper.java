@@ -2,6 +2,7 @@ package cz.cvut.fel.dsv.core;
 
 import cz.cvut.fel.dsv.service.RemoteServiceImpl;
 import cz.cvut.fel.dsv.service.ServerInterceptorImpl;
+import cz.cvut.fel.dsv.utils.DsvLogger;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 
@@ -9,7 +10,7 @@ import java.util.logging.Logger;
 
 public class ServerWrapper {
 
-    private static final Logger logger = Logger.getLogger(ServerWrapper.class.getName());
+    private static final Logger logger = DsvLogger.getLogger(ServerWrapper.class);
     private Server server;
     private final Node node;
 

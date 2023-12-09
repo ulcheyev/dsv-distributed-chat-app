@@ -1,5 +1,9 @@
 package cz.cvut.fel.dsv.core;
 
+import cz.cvut.fel.dsv.core.data.DsvPair;
+import cz.cvut.fel.dsv.core.data.DsvRemote;
+import cz.cvut.fel.dsv.utils.DsvLogger;
+import cz.cvut.fel.dsv.utils.Utils;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 import lombok.Getter;
@@ -10,9 +14,16 @@ import java.util.Objects;
 import java.util.logging.Logger;
 
 public class Room {
-    private static final Logger logger = Logger.getLogger(Room.class.getName());
+    private static final Logger logger = DsvLogger.getLogger(Room.class);
     @Getter private final String roomName;
     private final List<DsvPair<DsvRemote, StreamObserver<generated.Message>>> users;
+    private Node leader;
+
+    public Room(Node leader, String name) {
+        this.roomName = name;
+        users = new ArrayList<>();
+        this.leader = leader;
+    }
 
     public Room(String name) {
         this.roomName = name;
@@ -35,16 +46,27 @@ public class Room {
 
     public void sendMessageToRoom(generated.Message msg) {
         for (var user : users) {
-            logger.info("Send message to " + user.getKey());
-            if (!Objects.equals(user.getKey().getAddress().getId(), msg.getRemote().getNodeId())) {
+            if (!Objects.equals(user.getKey().getAddress().getId(), msg.getRemote().getNodeId()))
                 try {
                     user.getValue().onNext(msg);    // TODO: status error when node is missing
                 } catch (StatusRuntimeException e) {
                     Utils.Skeleton.getSyncSkeleton(Utils.Mapper.remoteToAddress(msg.getRemote()))
                             .repairTopology(Utils.Mapper.addressToRemote(user.getKey().getAddress()));
                 }
-            }
         }
+    }
+
+    public void disconnectAllUsers() {
+        for(var user: users){
+            user.getValue().onCompleted();
+        }
+    }
+
+    public boolean isEmpty() {
+        return users.isEmpty();
+    }
+    public int getSize() {
+        return users.size();
     }
 
     @Override

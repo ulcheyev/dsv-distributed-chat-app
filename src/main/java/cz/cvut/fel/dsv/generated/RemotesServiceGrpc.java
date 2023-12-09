@@ -139,6 +139,68 @@ public final class RemotesServiceGrpc {
     return getReceiveRoomsMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<generated.RoomEntry,
+      generated.Empty> getReceiveRoomMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "receiveRoom",
+      requestType = generated.RoomEntry.class,
+      responseType = generated.Empty.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<generated.RoomEntry,
+      generated.Empty> getReceiveRoomMethod() {
+    io.grpc.MethodDescriptor<generated.RoomEntry, generated.Empty> getReceiveRoomMethod;
+    if ((getReceiveRoomMethod = RemotesServiceGrpc.getReceiveRoomMethod) == null) {
+      synchronized (RemotesServiceGrpc.class) {
+        if ((getReceiveRoomMethod = RemotesServiceGrpc.getReceiveRoomMethod) == null) {
+          RemotesServiceGrpc.getReceiveRoomMethod = getReceiveRoomMethod =
+              io.grpc.MethodDescriptor.<generated.RoomEntry, generated.Empty>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "receiveRoom"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.RoomEntry.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.Empty.getDefaultInstance()))
+              .setSchemaDescriptor(new RemotesServiceMethodDescriptorSupplier("receiveRoom"))
+              .build();
+        }
+      }
+    }
+    return getReceiveRoomMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<generated.RoomEntry,
+      generated.Empty> getRemoveRoomMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "removeRoom",
+      requestType = generated.RoomEntry.class,
+      responseType = generated.Empty.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<generated.RoomEntry,
+      generated.Empty> getRemoveRoomMethod() {
+    io.grpc.MethodDescriptor<generated.RoomEntry, generated.Empty> getRemoveRoomMethod;
+    if ((getRemoveRoomMethod = RemotesServiceGrpc.getRemoveRoomMethod) == null) {
+      synchronized (RemotesServiceGrpc.class) {
+        if ((getRemoveRoomMethod = RemotesServiceGrpc.getRemoveRoomMethod) == null) {
+          RemotesServiceGrpc.getRemoveRoomMethod = getRemoveRoomMethod =
+              io.grpc.MethodDescriptor.<generated.RoomEntry, generated.Empty>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "removeRoom"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.RoomEntry.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.Empty.getDefaultInstance()))
+              .setSchemaDescriptor(new RemotesServiceMethodDescriptorSupplier("removeRoom"))
+              .build();
+        }
+      }
+    }
+    return getRemoveRoomMethod;
+  }
+
   private static volatile io.grpc.MethodDescriptor<generated.PermissionRequest,
       generated.Empty> getReceivePermissionRequestMethod;
 
@@ -563,6 +625,20 @@ public final class RemotesServiceGrpc {
     }
 
     /**
+     */
+    default void receiveRoom(generated.RoomEntry request,
+        io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getReceiveRoomMethod(), responseObserver);
+    }
+
+    /**
+     */
+    default void removeRoom(generated.RoomEntry request,
+        io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getRemoveRoomMethod(), responseObserver);
+    }
+
+    /**
      * <pre>
      * Methods to control CS when non existing rooms are creating
      * </pre>
@@ -715,6 +791,22 @@ public final class RemotesServiceGrpc {
     }
 
     /**
+     */
+    public void receiveRoom(generated.RoomEntry request,
+        io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getReceiveRoomMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
+    public void removeRoom(generated.RoomEntry request,
+        io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getRemoveRoomMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
      * <pre>
      * Methods to control CS when non existing rooms are creating
      * </pre>
@@ -864,6 +956,20 @@ public final class RemotesServiceGrpc {
     }
 
     /**
+     */
+    public generated.Empty receiveRoom(generated.RoomEntry request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getReceiveRoomMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public generated.Empty removeRoom(generated.RoomEntry request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getRemoveRoomMethod(), getCallOptions(), request);
+    }
+
+    /**
      * <pre>
      * Methods to control CS when non existing rooms are creating
      * </pre>
@@ -994,6 +1100,22 @@ public final class RemotesServiceGrpc {
     }
 
     /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<generated.Empty> receiveRoom(
+        generated.RoomEntry request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getReceiveRoomMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<generated.Empty> removeRoom(
+        generated.RoomEntry request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getRemoveRoomMethod(), getCallOptions()), request);
+    }
+
+    /**
      * <pre>
      * Methods to control CS when non existing rooms are creating
      * </pre>
@@ -1095,17 +1217,19 @@ public final class RemotesServiceGrpc {
   private static final int METHODID_EXIT_ROOM = 1;
   private static final int METHODID_PREFLIGHT = 2;
   private static final int METHODID_RECEIVE_ROOMS = 3;
-  private static final int METHODID_RECEIVE_PERMISSION_REQUEST = 4;
-  private static final int METHODID_RECEIVE_PERMISSION_RESPONSE = 5;
-  private static final int METHODID_RECEIVE_MESSAGE = 6;
-  private static final int METHODID_RECEIVE_GET_ROOM_LIST_REQUEST = 7;
-  private static final int METHODID_RECEIVE_GET_NODE_LIST_IN_CURRENT_ROOM_REQUEST = 8;
-  private static final int METHODID_CHANGE_NEXT_NEXT = 9;
-  private static final int METHODID_CHANGE_PREV = 10;
-  private static final int METHODID_ELECTION = 11;
-  private static final int METHODID_ELECTED = 12;
-  private static final int METHODID_REPAIR_TOPOLOGY = 13;
-  private static final int METHODID_BEAT = 14;
+  private static final int METHODID_RECEIVE_ROOM = 4;
+  private static final int METHODID_REMOVE_ROOM = 5;
+  private static final int METHODID_RECEIVE_PERMISSION_REQUEST = 6;
+  private static final int METHODID_RECEIVE_PERMISSION_RESPONSE = 7;
+  private static final int METHODID_RECEIVE_MESSAGE = 8;
+  private static final int METHODID_RECEIVE_GET_ROOM_LIST_REQUEST = 9;
+  private static final int METHODID_RECEIVE_GET_NODE_LIST_IN_CURRENT_ROOM_REQUEST = 10;
+  private static final int METHODID_CHANGE_NEXT_NEXT = 11;
+  private static final int METHODID_CHANGE_PREV = 12;
+  private static final int METHODID_ELECTION = 13;
+  private static final int METHODID_ELECTED = 14;
+  private static final int METHODID_REPAIR_TOPOLOGY = 15;
+  private static final int METHODID_BEAT = 16;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -1138,6 +1262,14 @@ public final class RemotesServiceGrpc {
           break;
         case METHODID_RECEIVE_ROOMS:
           serviceImpl.receiveRooms((generated.Rooms) request,
+              (io.grpc.stub.StreamObserver<generated.Empty>) responseObserver);
+          break;
+        case METHODID_RECEIVE_ROOM:
+          serviceImpl.receiveRoom((generated.RoomEntry) request,
+              (io.grpc.stub.StreamObserver<generated.Empty>) responseObserver);
+          break;
+        case METHODID_REMOVE_ROOM:
+          serviceImpl.removeRoom((generated.RoomEntry) request,
               (io.grpc.stub.StreamObserver<generated.Empty>) responseObserver);
           break;
         case METHODID_RECEIVE_PERMISSION_REQUEST:
@@ -1230,6 +1362,20 @@ public final class RemotesServiceGrpc {
               generated.Rooms,
               generated.Empty>(
                 service, METHODID_RECEIVE_ROOMS)))
+        .addMethod(
+          getReceiveRoomMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              generated.RoomEntry,
+              generated.Empty>(
+                service, METHODID_RECEIVE_ROOM)))
+        .addMethod(
+          getRemoveRoomMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              generated.RoomEntry,
+              generated.Empty>(
+                service, METHODID_REMOVE_ROOM)))
         .addMethod(
           getReceivePermissionRequestMethod(),
           io.grpc.stub.ServerCalls.asyncUnaryCall(
@@ -1359,6 +1505,8 @@ public final class RemotesServiceGrpc {
               .addMethod(getExitRoomMethod())
               .addMethod(getPreflightMethod())
               .addMethod(getReceiveRoomsMethod())
+              .addMethod(getReceiveRoomMethod())
+              .addMethod(getRemoveRoomMethod())
               .addMethod(getReceivePermissionRequestMethod())
               .addMethod(getReceivePermissionResponseMethod())
               .addMethod(getReceiveMessageMethod())

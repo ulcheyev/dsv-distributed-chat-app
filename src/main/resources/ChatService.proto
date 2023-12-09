@@ -60,13 +60,13 @@ message JoinResponse {
 }
 
 message PermissionRequest {
-  Remote remote = 1;
+  Remote requestByRemote = 1;
   int32 clock = 2;
 }
 
 message PermissionResponse {
   bool granted = 1;
-  repeated PermissionRequest deferredRequests = 2;
+  Remote responseByRemote = 2;
 }
 
 message Health {
@@ -80,6 +80,8 @@ service RemotesService {
   rpc exitRoom(Remote) returns(Empty);
   rpc preflight(Remote) returns(stream Message); // To get message streamobserver
   rpc receiveRooms(Rooms) returns(Empty);
+  rpc receiveRoom(RoomEntry) returns(Empty);
+  rpc removeRoom(RoomEntry) returns(Empty);
 
   // Methods to control CS when non existing rooms are creating
   rpc receivePermissionRequest(PermissionRequest) returns (Empty);
