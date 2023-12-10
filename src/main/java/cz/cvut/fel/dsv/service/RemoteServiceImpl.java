@@ -178,9 +178,8 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
 
                             // Send to leaders new room table
                             // CS - send requests
-                            var refToTable = node.getRoomsAndLeaders();
-                            refToTable.put(request.getRoomName(), Utils.Mapper.remoteToAddress(request.getRemote()));
-                            updateRooms(refToTable);
+                            node.getRoomsAndLeaders().put(request.getRoomName(), Utils.Mapper.remoteToAddress(request.getRemote()));
+                            updateRooms(node.getRoomsAndLeaders()1);
                         }
 
                     }
@@ -221,7 +220,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
             logger.info("[CS] send requests to leaders, size = [" + leadersAddresses.size() + "]; maxClock: " + maxClock + ", nodeClock: " + myClock);
             for (var key : leadersAddresses.keySet()) {
                 try {
-                    Utils.Skeleton.getSyncSkeleton(leadersAddresses.get(key))
+                    Utils.Skeleton.getFutureStub(leadersAddresses.get(key))
                             .receivePermissionRequest(PermissionRequest.newBuilder()
                                     .setRequestByRemote(Utils.Mapper.nodeToRemote(node))
                                     .setClock(myClock)
@@ -271,7 +270,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
                             .build());
                 } else {
                     logger.info("[CS] request is granted to " + request.getRequestByRemote().getUsername() + ", maxClock: " + maxClock + " nodeClock: " + myClock);
-                    Utils.Skeleton.getSyncSkeleton(Utils.Mapper.remoteToAddress(request.getRequestByRemote()))
+                    Utils.Skeleton.getFutureStub(Utils.Mapper.remoteToAddress(request.getRequestByRemote()))
                             .receivePermissionResponse(generated.PermissionResponse.newBuilder()
                                     .setGranted(true)
                                     .setResponseByRemote(Utils.Mapper.nodeToRemote(node))
@@ -294,7 +293,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
                     logger.info("[CS] responseCount = [" + responseCount + "] is similar to leaders size = [" + necessarySize + "], join CS. maxClock: " + maxClock + " nodeClock: " + myClock);
                     block();
                     for (var leader : node.getRoomsAndLeaders().values()) {
-                        Utils.Skeleton.getSyncSkeleton(leader)
+                        Utils.Skeleton.getFutureStub(leader)
                                 .receiveRooms(Utils.Mapper.leaderRoomsToRemoteRooms(node.getRoomsAndLeaders()));
                     }
                     unblock();
@@ -303,7 +302,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
                         logger.info("[CS] send permission to requesting nodes. maxClock: " + maxClock + " nodeClock: " + myClock);
                         if (rem.getIsRequesting()) {
                             Address address = node.getRoomsAndLeaders().get(rem.getUsername());
-                            Utils.Skeleton.getSyncSkeleton(address).receivePermissionResponse(
+                            Utils.Skeleton.getFutureStub(address).receivePermissionResponse(
                                     generated.PermissionResponse.newBuilder().setGranted(true).build()
                             );
                             rem.setIsRequesting(false);
@@ -371,7 +370,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
                         .setRoomOwner(Utils.Mapper.nodeToRemote(node))
                         .build());
 
-        Utils.Skeleton.getSyncSkeleton(node.getDsvNeighbours().getNext())
+        Utils.Skeleton.getFutureStub(node.getDsvNeighbours().getNext())
                 .elected(Utils.Mapper.addressToRemote(node.getAddress()));
     }
 
