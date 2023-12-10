@@ -1,8 +1,8 @@
 package cz.cvut.fel.dsv.core;
 
+import cz.cvut.fel.dsv.core.data.Address;
 import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.data.DsvRemote;
-import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.Utils;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
@@ -11,18 +11,16 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 public class Room {
-    private static final Logger logger = DsvLogger.getLogger(Room.class);
     @Getter private final String roomName;
     private final List<DsvPair<DsvRemote, StreamObserver<generated.Message>>> users;
-    private Node leader;
+    private Address leader;
 
-    public Room(Node leader, String name) {
+    public Room(Address leader, String name) {
         this.roomName = name;
-        users = new ArrayList<>();
         this.leader = leader;
+        users = new ArrayList<>();
     }
 
     public Room(String name) {
@@ -48,16 +46,17 @@ public class Room {
         for (var user : users) {
             if (!Objects.equals(user.getKey().getAddress().getId(), msg.getRemote().getNodeId()))
                 try {
-                    user.getValue().onNext(msg);    // TODO: status error when node is missing
+                    user.getValue().onNext(msg);
                 } catch (StatusRuntimeException e) {
-                    Utils.Skeleton.getSyncSkeleton(Utils.Mapper.remoteToAddress(msg.getRemote()))
+                    Utils.Skeleton.getSyncSkeleton(leader)
                             .repairTopology(Utils.Mapper.addressToRemote(user.getKey().getAddress()));
+                    users.remove(user);
                 }
         }
     }
 
     public void disconnectAllUsers() {
-        for(var user: users){
+        for (var user : users) {
             user.getValue().onCompleted();
         }
     }
@@ -65,6 +64,7 @@ public class Room {
     public boolean isEmpty() {
         return users.isEmpty();
     }
+
     public int getSize() {
         return users.size();
     }

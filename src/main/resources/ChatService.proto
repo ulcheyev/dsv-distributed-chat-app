@@ -77,11 +77,11 @@ service RemotesService {
 
   // Connecting methods
   rpc joinRoom(JoinRequest) returns (JoinResponse); // To connect to room
-  rpc exitRoom(Remote) returns(Empty);
-  rpc preflight(Remote) returns(stream Message); // To get message streamobserver
-  rpc receiveRooms(Rooms) returns(Empty);
-  rpc receiveRoom(RoomEntry) returns(Empty);
-  rpc removeRoom(RoomEntry) returns(Empty);
+  rpc exitRoom(Remote) returns (Empty);
+  rpc preflight(Remote) returns (stream Message); // To get message streamobserver
+  rpc receiveRooms(Rooms) returns (Empty);
+  rpc receiveRoom(RoomEntry) returns (Empty);
+  rpc removeRoom(RoomEntry) returns (Empty);
 
   // Methods to control CS when non existing rooms are creating
   rpc receivePermissionRequest(PermissionRequest) returns (Empty);
@@ -89,8 +89,8 @@ service RemotesService {
 
   // Chat methods
   rpc receiveMessage(Message) returns (Empty);
-  rpc receiveGetRoomListRequest(Empty) returns(StringPayload);
-  rpc receiveGetNodeListInCurrentRoomRequest(Empty) returns(StringPayload);
+  rpc receiveGetRoomListRequest(Empty) returns (StringPayload);
+  rpc receiveGetNodeListInCurrentRoomRequest(Empty) returns (StringPayload);
 
   //Leader election
   rpc changeNextNext(Remote) returns (Empty);
@@ -98,6 +98,7 @@ service RemotesService {
   rpc election(Remote) returns (Empty);
   rpc elected(Remote) returns (Empty);
   rpc repairTopology(Remote) returns (Empty);
+  rpc changeNeighbours(JoinRequest) returns (Neighbours);
 
   rpc beat(Empty) returns (Health);
 }

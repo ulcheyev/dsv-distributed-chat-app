@@ -3,6 +3,7 @@ package cz.cvut.fel.dsv.core;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import cz.cvut.fel.dsv.core.command.ConsoleHandler;
 import cz.cvut.fel.dsv.core.data.Address;
 import cz.cvut.fel.dsv.core.data.DsvNeighbours;
 import cz.cvut.fel.dsv.core.data.DsvPair;
@@ -34,9 +35,7 @@ public class Node {
     //      key == false => node is not leader in value is null.
     @Getter @Setter private volatile DsvPair<Boolean, Room> isLeader;
     @Getter @Setter private volatile ConcurrentMap<String, Address> roomsAndLeaders;
-
     @Getter @Setter private Address address;
-    //    @Getter @Setter private Address leaderAddress;
     @Getter @Setter private NodeState state;
     @Getter @Setter private DsvNeighbours dsvNeighbours;
     @Getter @Setter private boolean isVoting;
@@ -81,7 +80,6 @@ public class Node {
     }
 
     public void joinRoom(Address joinAddress, String roomName) {
-
         var stub = Utils.Skeleton.getFutureStub(joinAddress);
 
         generated.JoinRequest req = generated.JoinRequest.newBuilder()
@@ -102,17 +100,18 @@ public class Node {
                             Futures.addCallback(joinResponse, callBack, DsvThreadPool.getPool());
                             return;
                         }
-                        
+
+                        var leaderAddress = Utils.Mapper.remoteToAddress(response.getLeader());
                         dsvNeighbours = Utils.Mapper.neighboursToDsvNeighbours(response.getNeighbours());
-                        dsvNeighbours.setLeader(Utils.Mapper.remoteToAddress(response.getLeader()));
+                        dsvNeighbours.setLeader(leaderAddress);
 
 
                         // Node created a room. Set properties
                         if (Utils.Mapper.remoteToAddress(response.getLeader()).equals(address)) {
-                            isLeader = new DsvPair<>(true, new Room(roomName));
+                            isLeader = new DsvPair<>(true, new Room(leaderAddress, roomName));
                         }
                         // Node is not a leader in connecting room. Deletr data about rooms and leaders.
-                        else{
+                        else {
                             roomsAndLeaders = new ConcurrentHashMap<>();
                         }
 
@@ -152,7 +151,7 @@ public class Node {
                 .repairTopology(Utils.Mapper.addressToRemote(missing));
     }
 
-     void startElection(Address onNode) {
+    void startElection(Address onNode) {
         Utils.Skeleton.getSyncSkeleton(onNode)
                 .election(Utils.Mapper.addressToRemote(new Address(Config.STUB_STRING, 0, -1)));
     }
@@ -196,7 +195,7 @@ public class Node {
 
                 // The first node in topology. Creates the global room and is its leader.
                 if (args.length == 2) {
-                    isLeader = new DsvPair<>(true, new Room(Config.INITIAL_ROOM_NAME));
+                    isLeader = new DsvPair<>(true, new Room(address, Config.INITIAL_ROOM_NAME));
                     currentRoom = Config.INITIAL_ROOM_NAME;
                     roomsAndLeaders.put(Config.INITIAL_ROOM_NAME, address);
                     dsvNeighbours.setLeader(address);

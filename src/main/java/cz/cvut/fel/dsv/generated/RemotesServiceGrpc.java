@@ -511,6 +511,37 @@ public final class RemotesServiceGrpc {
     return getRepairTopologyMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<generated.JoinRequest,
+      generated.Neighbours> getChangeNeighboursMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "changeNeighbours",
+      requestType = generated.JoinRequest.class,
+      responseType = generated.Neighbours.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<generated.JoinRequest,
+      generated.Neighbours> getChangeNeighboursMethod() {
+    io.grpc.MethodDescriptor<generated.JoinRequest, generated.Neighbours> getChangeNeighboursMethod;
+    if ((getChangeNeighboursMethod = RemotesServiceGrpc.getChangeNeighboursMethod) == null) {
+      synchronized (RemotesServiceGrpc.class) {
+        if ((getChangeNeighboursMethod = RemotesServiceGrpc.getChangeNeighboursMethod) == null) {
+          RemotesServiceGrpc.getChangeNeighboursMethod = getChangeNeighboursMethod =
+              io.grpc.MethodDescriptor.<generated.JoinRequest, generated.Neighbours>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "changeNeighbours"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.JoinRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.Neighbours.getDefaultInstance()))
+              .setSchemaDescriptor(new RemotesServiceMethodDescriptorSupplier("changeNeighbours"))
+              .build();
+        }
+      }
+    }
+    return getChangeNeighboursMethod;
+  }
+
   private static volatile io.grpc.MethodDescriptor<generated.Empty,
       generated.Health> getBeatMethod;
 
@@ -719,6 +750,13 @@ public final class RemotesServiceGrpc {
 
     /**
      */
+    default void changeNeighbours(generated.JoinRequest request,
+        io.grpc.stub.StreamObserver<generated.Neighbours> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getChangeNeighboursMethod(), responseObserver);
+    }
+
+    /**
+     */
     default void beat(generated.Empty request,
         io.grpc.stub.StreamObserver<generated.Health> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getBeatMethod(), responseObserver);
@@ -897,6 +935,14 @@ public final class RemotesServiceGrpc {
 
     /**
      */
+    public void changeNeighbours(generated.JoinRequest request,
+        io.grpc.stub.StreamObserver<generated.Neighbours> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getChangeNeighboursMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
     public void beat(generated.Empty request,
         io.grpc.stub.StreamObserver<generated.Health> responseObserver) {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
@@ -1046,6 +1092,13 @@ public final class RemotesServiceGrpc {
     public generated.Empty repairTopology(generated.Remote request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getRepairTopologyMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public generated.Neighbours changeNeighbours(generated.JoinRequest request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getChangeNeighboursMethod(), getCallOptions(), request);
     }
 
     /**
@@ -1206,6 +1259,14 @@ public final class RemotesServiceGrpc {
 
     /**
      */
+    public com.google.common.util.concurrent.ListenableFuture<generated.Neighbours> changeNeighbours(
+        generated.JoinRequest request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getChangeNeighboursMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
     public com.google.common.util.concurrent.ListenableFuture<generated.Health> beat(
         generated.Empty request) {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
@@ -1229,7 +1290,8 @@ public final class RemotesServiceGrpc {
   private static final int METHODID_ELECTION = 13;
   private static final int METHODID_ELECTED = 14;
   private static final int METHODID_REPAIR_TOPOLOGY = 15;
-  private static final int METHODID_BEAT = 16;
+  private static final int METHODID_CHANGE_NEIGHBOURS = 16;
+  private static final int METHODID_BEAT = 17;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -1311,6 +1373,10 @@ public final class RemotesServiceGrpc {
         case METHODID_REPAIR_TOPOLOGY:
           serviceImpl.repairTopology((generated.Remote) request,
               (io.grpc.stub.StreamObserver<generated.Empty>) responseObserver);
+          break;
+        case METHODID_CHANGE_NEIGHBOURS:
+          serviceImpl.changeNeighbours((generated.JoinRequest) request,
+              (io.grpc.stub.StreamObserver<generated.Neighbours>) responseObserver);
           break;
         case METHODID_BEAT:
           serviceImpl.beat((generated.Empty) request,
@@ -1447,6 +1513,13 @@ public final class RemotesServiceGrpc {
               generated.Empty>(
                 service, METHODID_REPAIR_TOPOLOGY)))
         .addMethod(
+          getChangeNeighboursMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              generated.JoinRequest,
+              generated.Neighbours>(
+                service, METHODID_CHANGE_NEIGHBOURS)))
+        .addMethod(
           getBeatMethod(),
           io.grpc.stub.ServerCalls.asyncUnaryCall(
             new MethodHandlers<
@@ -1517,6 +1590,7 @@ public final class RemotesServiceGrpc {
               .addMethod(getElectionMethod())
               .addMethod(getElectedMethod())
               .addMethod(getRepairTopologyMethod())
+              .addMethod(getChangeNeighboursMethod())
               .addMethod(getBeatMethod())
               .build();
         }

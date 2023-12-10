@@ -11,7 +11,8 @@ public class DsvThreadPool {
     private DsvThreadPool() {
     }
 
-    public static void execute(Runnable runn) { pool.execute(runn); }
-
+    public static void execute(Runnable runn) {
+        pool.execute(runn);
+    }
 
 }
