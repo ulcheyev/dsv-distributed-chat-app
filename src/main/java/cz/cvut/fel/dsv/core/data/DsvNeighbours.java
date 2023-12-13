@@ -26,6 +26,13 @@ public class DsvNeighbours {
         this.leader = leader;
     }
 
+    public DsvNeighbours(DsvNeighbours dsvNeighbours) {
+        this.next = dsvNeighbours.getNext();
+        this.nextNext = dsvNeighbours.getNextNext();
+        this.prev = dsvNeighbours.getPrev();
+        this.leader = dsvNeighbours.getLeader();
+    }
+
     @Override
     public String toString() {
         return ("[Neighbour] \n\t\t\tnext:" + next +

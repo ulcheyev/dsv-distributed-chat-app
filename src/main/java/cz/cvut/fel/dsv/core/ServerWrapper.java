@@ -27,7 +27,7 @@ public class ServerWrapper {
                     ServerWrapper.this.stopServer();
                     System.err.println("Server shut down");
                 }));
-                logger.info("Server started: " + server);
+                logger.info("Server started on port " + server.getPort());
                 server.awaitTermination();
 
             } catch (Exception e) {

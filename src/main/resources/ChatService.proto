@@ -86,6 +86,7 @@ service RemotesService {
   // Methods to control CS when non existing rooms are creating
   rpc receivePermissionRequest(PermissionRequest) returns (Empty);
   rpc receivePermissionResponse(PermissionResponse) returns (Empty);
+  rpc updateRoomsTable(Empty) returns(Empty);
 
   // Chat methods
   rpc receiveMessage(Message) returns (Empty);

@@ -43,12 +43,15 @@ public class Node {
     private final ServerWrapper server;
     private ManagedChannel managedChannelToLeader;
     private StreamObserver<generated.Message> receiveMessagesObserver;
+    @Setter private RemotesServiceGrpc.RemotesServiceImplBase remotesServiceImpl;
 
     public Node() {
         server = new ServerWrapper(this);
         consoleHandler = new ConsoleHandler(this);
         roomsAndLeaders = new ConcurrentHashMap<>();
         isLeader = new DsvPair<>(false, new Room.NullableRoom());
+        DsvThreadPool.getInstance();
+        DsvThreadPool.setNode(this);
         state = NodeState.RELEASED;
         init();
     }
@@ -112,7 +115,6 @@ public class Node {
                         }
                         // Node is not a leader in connecting room. Deletr data about rooms and leaders.
                         else {
-                            roomsAndLeaders = new ConcurrentHashMap<>();
                         }
 
                         currentRoom = roomName;
@@ -130,20 +132,23 @@ public class Node {
 
     public void joinRoomViaLeader(String roomName) {
         assert dsvNeighbours.getLeader() != null;
-        if (!Objects.equals(roomName, currentRoom))
+        if (!Objects.equals(roomName, currentRoom)){
             exitRoom();
+            startRepairTopology(dsvNeighbours.getPrev(), address);
+            if (nodeWasLeader(address) && leadingRoomIsNotEmpty(isLeader.getValue())) {
+                makeElection(dsvNeighbours.getNext());
+                startUpdateTables();
+            }
+            
+        }
         joinRoom(dsvNeighbours.getLeader(), roomName);
     }
+
+
 
     private void exitRoom() {
         Utils.Skeleton.getSyncSkeleton(dsvNeighbours.getLeader())
                 .exitRoom(Utils.Mapper.nodeToRemote(this));
-
-        startRepairTopology(dsvNeighbours.getPrev(), address);
-
-        if (dsvNeighbours.getLeader().equals(address) && isLeader.getValue().getSize() != 1) {
-            startElection(dsvNeighbours.getNext());
-        }
     }
 
     private void startRepairTopology(Address onNode, Address missing) {
@@ -151,20 +156,24 @@ public class Node {
                 .repairTopology(Utils.Mapper.addressToRemote(missing));
     }
 
-    void startElection(Address onNode) {
+    private void makeElection(Address onNode) {
         Utils.Skeleton.getSyncSkeleton(onNode)
                 .election(Utils.Mapper.addressToRemote(new Address(Config.STUB_STRING, 0, -1)));
     }
 
+    private void startUpdateTables() {
+        Utils.Skeleton.getFutureStub(dsvNeighbours.getLeader()).updateRoomsTable(generated.Empty.getDefaultInstance());
+    }
+
+
     public void repairAndElect(Address onNode, Address missing) {
         startRepairTopology(onNode, missing);
-        startElection(onNode);
+        makeElection(onNode);
     }
 
     public void updateLeaderChannelAndObserver(Address address) {
         setVoting(false);
         dsvNeighbours.setLeader(address);
-
         updateChannelToLeader();
         init();
         preflight();
@@ -178,10 +187,6 @@ public class Node {
         } catch (StatusRuntimeException e) {
             repairAndElect(address, dsvNeighbours.getLeader());
         }
-    }
-
-    private void listen() {
-        DsvThreadPool.execute(consoleHandler);
     }
 
     private void handleArgs(String[] args) {
@@ -230,6 +235,33 @@ public class Node {
                 .preflight(Utils.Mapper.nodeToRemote(this), receiveMessagesObserver);
     }
 
+
+    public String getNodeListInCurrentRoom() {
+        return Utils.Skeleton.getSyncSkeleton(dsvNeighbours.getLeader())
+                .receiveGetNodeListInCurrentRoomRequest(generated.Empty.getDefaultInstance())
+                .getMsg();
+
+    }
+
+    public String getRoomListInNetwork() {
+        return Utils.Skeleton.getSyncSkeleton(dsvNeighbours.getLeader())
+                .receiveGetRoomListRequest(generated.Empty.getDefaultInstance())
+                .getMsg();
+    }
+
+
+    private void listen() {
+        DsvThreadPool.getInstance().execute(consoleHandler);
+    }
+
+    private boolean leadingRoomIsNotEmpty(Room room) {
+        return isLeader.getValue().getSize() != 1;
+    }
+
+    private boolean nodeWasLeader(Address address) {
+        return dsvNeighbours.getLeader().equals(address);
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder()
@@ -257,18 +289,5 @@ public class Node {
                     .append(room.getValue());
         }
         return sb.toString();
-    }
-
-    public String getNodeListInCurrentRoom() {
-        return Utils.Skeleton.getSyncSkeleton(dsvNeighbours.getLeader())
-                .receiveGetNodeListInCurrentRoomRequest(generated.Empty.getDefaultInstance())
-                .getMsg();
-
-    }
-
-    public String getRoomListInNetwork() {
-        return Utils.Skeleton.getSyncSkeleton(dsvNeighbours.getLeader())
-                .receiveGetRoomListRequest(generated.Empty.getDefaultInstance())
-                .getMsg();
     }
 }

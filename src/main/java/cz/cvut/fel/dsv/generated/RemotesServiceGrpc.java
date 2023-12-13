@@ -263,6 +263,37 @@ public final class RemotesServiceGrpc {
     return getReceivePermissionResponseMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<generated.Empty,
+      generated.Empty> getUpdateRoomsTableMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "updateRoomsTable",
+      requestType = generated.Empty.class,
+      responseType = generated.Empty.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<generated.Empty,
+      generated.Empty> getUpdateRoomsTableMethod() {
+    io.grpc.MethodDescriptor<generated.Empty, generated.Empty> getUpdateRoomsTableMethod;
+    if ((getUpdateRoomsTableMethod = RemotesServiceGrpc.getUpdateRoomsTableMethod) == null) {
+      synchronized (RemotesServiceGrpc.class) {
+        if ((getUpdateRoomsTableMethod = RemotesServiceGrpc.getUpdateRoomsTableMethod) == null) {
+          RemotesServiceGrpc.getUpdateRoomsTableMethod = getUpdateRoomsTableMethod =
+              io.grpc.MethodDescriptor.<generated.Empty, generated.Empty>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "updateRoomsTable"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.Empty.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  generated.Empty.getDefaultInstance()))
+              .setSchemaDescriptor(new RemotesServiceMethodDescriptorSupplier("updateRoomsTable"))
+              .build();
+        }
+      }
+    }
+    return getUpdateRoomsTableMethod;
+  }
+
   private static volatile io.grpc.MethodDescriptor<generated.Message,
       generated.Empty> getReceiveMessageMethod;
 
@@ -687,6 +718,13 @@ public final class RemotesServiceGrpc {
     }
 
     /**
+     */
+    default void updateRoomsTable(generated.Empty request,
+        io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getUpdateRoomsTableMethod(), responseObserver);
+    }
+
+    /**
      * <pre>
      * Chat methods
      * </pre>
@@ -864,6 +902,14 @@ public final class RemotesServiceGrpc {
     }
 
     /**
+     */
+    public void updateRoomsTable(generated.Empty request,
+        io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getUpdateRoomsTableMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
      * <pre>
      * Chat methods
      * </pre>
@@ -1033,6 +1079,13 @@ public final class RemotesServiceGrpc {
     }
 
     /**
+     */
+    public generated.Empty updateRoomsTable(generated.Empty request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getUpdateRoomsTableMethod(), getCallOptions(), request);
+    }
+
+    /**
      * <pre>
      * Chat methods
      * </pre>
@@ -1188,6 +1241,14 @@ public final class RemotesServiceGrpc {
     }
 
     /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<generated.Empty> updateRoomsTable(
+        generated.Empty request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getUpdateRoomsTableMethod(), getCallOptions()), request);
+    }
+
+    /**
      * <pre>
      * Chat methods
      * </pre>
@@ -1282,16 +1343,17 @@ public final class RemotesServiceGrpc {
   private static final int METHODID_REMOVE_ROOM = 5;
   private static final int METHODID_RECEIVE_PERMISSION_REQUEST = 6;
   private static final int METHODID_RECEIVE_PERMISSION_RESPONSE = 7;
-  private static final int METHODID_RECEIVE_MESSAGE = 8;
-  private static final int METHODID_RECEIVE_GET_ROOM_LIST_REQUEST = 9;
-  private static final int METHODID_RECEIVE_GET_NODE_LIST_IN_CURRENT_ROOM_REQUEST = 10;
-  private static final int METHODID_CHANGE_NEXT_NEXT = 11;
-  private static final int METHODID_CHANGE_PREV = 12;
-  private static final int METHODID_ELECTION = 13;
-  private static final int METHODID_ELECTED = 14;
-  private static final int METHODID_REPAIR_TOPOLOGY = 15;
-  private static final int METHODID_CHANGE_NEIGHBOURS = 16;
-  private static final int METHODID_BEAT = 17;
+  private static final int METHODID_UPDATE_ROOMS_TABLE = 8;
+  private static final int METHODID_RECEIVE_MESSAGE = 9;
+  private static final int METHODID_RECEIVE_GET_ROOM_LIST_REQUEST = 10;
+  private static final int METHODID_RECEIVE_GET_NODE_LIST_IN_CURRENT_ROOM_REQUEST = 11;
+  private static final int METHODID_CHANGE_NEXT_NEXT = 12;
+  private static final int METHODID_CHANGE_PREV = 13;
+  private static final int METHODID_ELECTION = 14;
+  private static final int METHODID_ELECTED = 15;
+  private static final int METHODID_REPAIR_TOPOLOGY = 16;
+  private static final int METHODID_CHANGE_NEIGHBOURS = 17;
+  private static final int METHODID_BEAT = 18;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -1340,6 +1402,10 @@ public final class RemotesServiceGrpc {
           break;
         case METHODID_RECEIVE_PERMISSION_RESPONSE:
           serviceImpl.receivePermissionResponse((generated.PermissionResponse) request,
+              (io.grpc.stub.StreamObserver<generated.Empty>) responseObserver);
+          break;
+        case METHODID_UPDATE_ROOMS_TABLE:
+          serviceImpl.updateRoomsTable((generated.Empty) request,
               (io.grpc.stub.StreamObserver<generated.Empty>) responseObserver);
           break;
         case METHODID_RECEIVE_MESSAGE:
@@ -1456,6 +1522,13 @@ public final class RemotesServiceGrpc {
               generated.PermissionResponse,
               generated.Empty>(
                 service, METHODID_RECEIVE_PERMISSION_RESPONSE)))
+        .addMethod(
+          getUpdateRoomsTableMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              generated.Empty,
+              generated.Empty>(
+                service, METHODID_UPDATE_ROOMS_TABLE)))
         .addMethod(
           getReceiveMessageMethod(),
           io.grpc.stub.ServerCalls.asyncUnaryCall(
@@ -1582,6 +1655,7 @@ public final class RemotesServiceGrpc {
               .addMethod(getRemoveRoomMethod())
               .addMethod(getReceivePermissionRequestMethod())
               .addMethod(getReceivePermissionResponseMethod())
+              .addMethod(getUpdateRoomsTableMethod())
               .addMethod(getReceiveMessageMethod())
               .addMethod(getReceiveGetRoomListRequestMethod())
               .addMethod(getReceiveGetNodeListInCurrentRoomRequestMethod())
