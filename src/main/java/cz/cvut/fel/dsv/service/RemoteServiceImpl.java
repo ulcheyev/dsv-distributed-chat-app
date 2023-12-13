@@ -13,6 +13,7 @@ import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -78,7 +79,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
     public void removeRoom(generated.RoomEntry request, StreamObserver<Empty> responseObserver) {
         String threadName = "[REMOVE ROOM]";
         dsvThreadPool.blockingExecute(new Thread(() -> {
-            logger.info("Delete room [" + request.getRoomName()+" : "+request.getRoomOwner().getUsername()+"]");
+            logger.info("Delete room [" + request.getRoomName()+"]");
             node.getRoomsAndLeaders().remove(request.getRoomName());
             responseObserver.onNext(Empty.getDefaultInstance());
             responseObserver.onCompleted();
@@ -318,6 +319,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
                 logger.info("[CS] received permission response by " + request.getResponseByRemote().getUsername());
                 responseCount++;
                 int necessarySize = node.getRoomsAndLeaders().size();
+                var copyOfTable = new ConcurrentHashMap<>(node.getRoomsAndLeaders());
                 if (responseCount == necessarySize) { // self -> -1
                     logger.info("[CS] responseCount = [" + responseCount + "] is similar to leaders size = [" + necessarySize + "], join CS. maxClock: " + maxClock + " nodeClock: " + myClock);
                     block();
@@ -328,7 +330,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
                             throw new RuntimeException(e);
                         }
                         Utils.Skeleton.getFutureStub(leader)
-                                .receiveRooms(Utils.Mapper.leaderRoomsToRemoteRooms(node.getRoomsAndLeaders()));
+                                .receiveRooms(Utils.Mapper.leaderRoomsToRemoteRooms(copyOfTable));
                     }
                     unblock();
                     responseCount = 0;

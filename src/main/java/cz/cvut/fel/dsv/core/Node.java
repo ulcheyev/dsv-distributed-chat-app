@@ -113,8 +113,10 @@ public class Node {
                         if (Utils.Mapper.remoteToAddress(response.getLeader()).equals(address)) {
                             isLeader = new DsvPair<>(true, new Room(leaderAddress, roomName));
                         }
-                        // Node is not a leader in connecting room. Deletr data about rooms and leaders.
+                        // Node is not a leader in connecting room. Delete data about rooms and leaders.
                         else {
+                            isLeader = new DsvPair<>(false, new Room.NullableRoom());
+                            roomsAndLeaders.clear();
                         }
 
                         currentRoom = roomName;
@@ -139,7 +141,6 @@ public class Node {
                 makeElection(dsvNeighbours.getNext());
                 startUpdateTables();
             }
-            
         }
         joinRoom(dsvNeighbours.getLeader(), roomName);
     }
