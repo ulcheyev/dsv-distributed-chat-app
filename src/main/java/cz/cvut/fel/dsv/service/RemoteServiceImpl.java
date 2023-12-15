@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServiceImplBase {
+
     private static final Logger logger = DsvLogger.getLogger(RemoteServiceImpl.class);
     private Integer responseCount = 0;
     private final List<DsvRemote> dsvRemotes = new ArrayList<>(); // TODO
@@ -25,6 +26,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
     private int myClock = 0;
     private int maxClock = 0;
     private volatile Node node;
+
     private DsvThreadPool dsvThreadPool;
 
     public RemoteServiceImpl(Node node) {
@@ -43,11 +45,11 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
             logger.info("Receiving room [" + request.getRoomName() + " : " + request.getRoomOwner().getUsername() + "]");
             node.getRoomsAndLeaders().put(request.getRoomName(), Utils.Mapper.remoteToAddress(request.getRoomOwner()));
 
-            responseObserver.onNext(Empty.getDefaultInstance());
-            responseObserver.onCompleted();
-            node.setState(NodeState.RELEASED);
-            dsvThreadPool.notifyExecutors();
-        }, threadName));
+                    responseObserver.onNext(Empty.getDefaultInstance());
+                    responseObserver.onCompleted();
+                    unblock();
+                    dsvThreadPool.notifyExecutors();
+                }, threadName));
     }
 
     @Override
@@ -272,7 +274,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
     @Override
     public void receivePermissionRequest(generated.PermissionRequest request, StreamObserver<generated.Empty> responseObserver) {
         dsvThreadPool.execute(() -> {
-            synchronized (RemoteServiceImpl.this) {
+            synchronized (this) {
                 maxClock = Math.max(maxClock, request.getClock());
                 maxClock++;
                 if (isDelay(request)) {
@@ -284,6 +286,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
                             .build());
                 } else {
                     logger.info("[CS] request is granted to " + request.getRequestByRemote().getUsername() + ", maxClock: " + maxClock + " nodeClock: " + myClock);
+                    block();
                     Utils.Skeleton.getFutureStub(Utils.Mapper.remoteToAddress(request.getRequestByRemote()))
                             .receivePermissionResponse(generated.PermissionResponse.newBuilder()
                                     .setGranted(true)
@@ -309,11 +312,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
                     logger.info("[CS] responseCount = [" + responseCount + "] is similar to leaders size = [" + necessarySize + "], join CS. maxClock: " + maxClock + " nodeClock: " + myClock);
                     block();
                     for (var leader : node.getRoomsAndLeaders().values()) {
-                        try {
-                            Thread.sleep(TimeUnit.SECONDS.toMillis(Config.SLEEP_TIME_IN_CS_S));
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
+                        zleep();
                         Utils.Skeleton.getFutureStub(leader)
                                 .receiveRooms(Utils.Mapper.leaderRoomsToRemoteRooms(copyOfTable));
                     }
@@ -341,7 +340,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
     }
 
     private boolean isDelay(generated.PermissionRequest request) {
-        return (node.getState() == NodeState.HOLDING || node.getState() == NodeState.REQUESTING)
+        return (node.getState() != NodeState.RELEASED)
                 &&
                 ((request.getClock() > myClock)
                         || (request.getClock() == myClock && request.getRequestByRemote().getNodeId() > node.getAddress().getId()));
@@ -512,4 +511,13 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
     private List<Address> getLeadersAddresses() {
         return node.getRoomsAndLeaders().values().stream().toList();
     }
+
+    private static void zleep() {
+        try {
+            Thread.sleep(TimeUnit.SECONDS.toMillis(Config.SLEEP_TIME_IN_CS_S));
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
