@@ -48,7 +48,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
 
                     responseObserver.onNext(Empty.getDefaultInstance());
                     responseObserver.onCompleted();
-                    node.setState(NodeState.RELEASED);
+                    unblock();
                     dsvThreadPool.notifyExecutors();
                 }, threadName));
     }
@@ -287,7 +287,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
     @Override
     public void receivePermissionRequest(generated.PermissionRequest request, StreamObserver<generated.Empty> responseObserver) {
         dsvThreadPool.execute(() -> {
-            synchronized (RemoteServiceImpl.this) {
+            synchronized (this) {
                 maxClock = Math.max(maxClock, request.getClock());
                 maxClock++;
                 if (isDelay(request)) {
@@ -299,6 +299,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
                             .build());
                 } else {
                     logger.info("[CS] request is granted to " + request.getRequestByRemote().getUsername() + ", maxClock: " + maxClock + " nodeClock: " + myClock);
+                    block();
                     Utils.Skeleton.getFutureStub(Utils.Mapper.remoteToAddress(request.getRequestByRemote()))
                             .receivePermissionResponse(generated.PermissionResponse.newBuilder()
                                     .setGranted(true)
@@ -324,11 +325,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
                     logger.info("[CS] responseCount = [" + responseCount + "] is similar to leaders size = [" + necessarySize + "], join CS. maxClock: " + maxClock + " nodeClock: " + myClock);
                     block();
                     for (var leader : node.getRoomsAndLeaders().values()) {
-                        try {
-                            Thread.sleep(TimeUnit.SECONDS.toMillis(Config.SLEEP_TIME_IN_CS_S));
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
+                        zleep();
                         Utils.Skeleton.getFutureStub(leader)
                                 .receiveRooms(Utils.Mapper.leaderRoomsToRemoteRooms(copyOfTable));
                     }
@@ -358,7 +355,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
 
 
     private boolean isDelay(generated.PermissionRequest request) {
-        return (node.getState() == NodeState.HOLDING || node.getState() == NodeState.REQUESTING)
+        return (node.getState() != NodeState.RELEASED)
                 &&
                 ((request.getClock() > myClock)
                         || (request.getClock() == myClock && request.getRequestByRemote().getNodeId() > node.getAddress().getId()));
@@ -418,6 +415,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
 
         node.setIsLeader(new DsvPair<>(true, new Room(node.getAddress(), node.getCurrentRoom())));
         node.getRoomsAndLeaders().put(node.getCurrentRoom(), node.getAddress());
+
 
         Utils.Skeleton.getSyncSkeleton(node.getDsvNeighbours().getLeader())
                 .receiveRoom(generated.RoomEntry.newBuilder()
@@ -513,6 +511,14 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
 
     private List<Address> getLeadersAddresses() {
         return node.getRoomsAndLeaders().values().stream().toList();
+    }
+
+    private static void zleep() {
+        try {
+            Thread.sleep(TimeUnit.SECONDS.toMillis(Config.SLEEP_TIME_IN_CS_S));
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
