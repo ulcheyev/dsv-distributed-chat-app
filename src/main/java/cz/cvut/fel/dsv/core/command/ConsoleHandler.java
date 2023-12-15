@@ -45,6 +45,7 @@ public class ConsoleHandler implements Runnable {
         commandMap.put("!online", new OnlineCommand());
         commandMap.put("!help", new HelpCommand());
         commandMap.put("!rooms", new RoomsCommand());
+        commandMap.put("!election", new StartElectionCommand());
     }
 
     @Override

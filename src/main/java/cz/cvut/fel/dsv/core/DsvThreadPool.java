@@ -1,6 +1,5 @@
 package cz.cvut.fel.dsv.core;
 
-import com.google.protobuf.AbstractMessage;
 import cz.cvut.fel.dsv.core.data.NodeState;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import lombok.Getter;
@@ -13,9 +12,11 @@ import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 public class DsvThreadPool {
-    @Getter private static final Executor pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    @Getter
+    private static final Executor pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     private static final Logger logger = DsvLogger.getLogger(DsvThreadPool.class);
-    @Setter private static Node node;
+    @Setter
+    private static Node node;
     private static DsvThreadPool INSTANCE;
     private static Queue<Runnable> delayedExecutors;
 
@@ -24,7 +25,7 @@ public class DsvThreadPool {
     }
 
     public static DsvThreadPool getInstance() {
-        if(INSTANCE == null) {
+        if (INSTANCE == null) {
             INSTANCE = new DsvThreadPool();
             return INSTANCE;
         }
@@ -37,18 +38,18 @@ public class DsvThreadPool {
 
     public void blockingExecute(Runnable runn) {
         String req = ((Thread) runn).getName();
-        if(node.getState() != NodeState.RELEASED){
-            logger.info("[Blocking executor] request "+req+" is delayed. Queue size = " + delayedExecutors.size());
+        if (node.getState() != NodeState.RELEASED) {
+            logger.info("[Blocking executor] request " + req + " is delayed. Queue size = " + delayedExecutors.size());
             delayedExecutors.add(runn);
-        }else{
+        } else {
             node.setState(NodeState.BUSY);
-            logger.info("[Blocking executor] request "+req+" is processing. Queue size = " + delayedExecutors.size());
+            logger.info("[Blocking executor] request " + req + " is processing. Queue size = " + delayedExecutors.size());
             execute(runn);
         }
     }
 
     public void notifyExecutors() {
-        if(!delayedExecutors.isEmpty()){
+        if (!delayedExecutors.isEmpty()) {
             Runnable removed = delayedExecutors.remove();
             blockingExecute(removed);
         }

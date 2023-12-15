@@ -82,13 +82,20 @@ public class Node {
                 .build();
     }
 
-    public void joinRoom(Address joinAddress, String roomName) {
-        var stub = Utils.Skeleton.getFutureStub(joinAddress);
+    private void joinRoom(Address joinAddress, String roomName) {
+        if (currentRoom == null || !(currentRoom.equals(roomName))) {
+            generated.JoinRequest req = generated.JoinRequest.newBuilder()
+                    .setRoomName(roomName)
+                    .setRemote(Utils.Mapper.nodeToRemote(this))
+                    .build();
+            executeJoining(joinAddress, req);
+        } else {
+            logger.info("You already in room " + roomName);
+        }
+    }
 
-        generated.JoinRequest req = generated.JoinRequest.newBuilder()
-                .setRoomName(roomName)
-                .setRemote(Utils.Mapper.nodeToRemote(this))
-                .build();
+    private void executeJoining(Address joinAddress, generated.JoinRequest req) {
+        var stub = Utils.Skeleton.getFutureStub(joinAddress);
 
         ListenableFuture<JoinResponse> joinResponse = stub.joinRoom(req);
         Futures.addCallback(joinResponse, new FutureCallback<JoinResponse>() {
@@ -111,15 +118,16 @@ public class Node {
 
                         // Node created a room. Set properties
                         if (Utils.Mapper.remoteToAddress(response.getLeader()).equals(address)) {
-                            isLeader = new DsvPair<>(true, new Room(leaderAddress, roomName));
+                            isLeader = new DsvPair<>(true, new Room(leaderAddress, req.getRoomName()));
                         }
                         // Node is not a leader in connecting room. Delete data about rooms and leaders.
                         else {
                             isLeader = new DsvPair<>(false, new Room.NullableRoom());
-                            roomsAndLeaders.clear();
+                            if (!dsvNeighbours.getNext().equals(dsvNeighbours.getLeader()))
+                                roomsAndLeaders.clear();
                         }
 
-                        currentRoom = roomName;
+                        currentRoom = req.getRoomName();
                         updateChannelToLeader();
                         preflight();
                     }
@@ -134,10 +142,10 @@ public class Node {
 
     public void joinRoomViaLeader(String roomName) {
         assert dsvNeighbours.getLeader() != null;
-        if (!Objects.equals(roomName, currentRoom)){
+        if (!Objects.equals(roomName, currentRoom)) {
             exitRoom();
             startRepairTopology(dsvNeighbours.getPrev(), address);
-            if (nodeWasLeader(address) && leadingRoomIsNotEmpty(isLeader.getValue())) {
+            if (nodeWasLeader(address) && leadingRoomIsNotEmpty()) {
                 makeElection(dsvNeighbours.getNext());
                 startUpdateTables();
             }
@@ -145,11 +153,24 @@ public class Node {
         joinRoom(dsvNeighbours.getLeader(), roomName);
     }
 
+    public void startElectionWithDelay(int seconds) {
+        try {
+            Thread.sleep((long) seconds * 1000);
+        } catch (InterruptedException ignored) {}
+        makeElection(address);
+    }
 
-
+    // TODO: If leader is dead, here StatusRuntimeException
     private void exitRoom() {
-        Utils.Skeleton.getSyncSkeleton(dsvNeighbours.getLeader())
-                .exitRoom(Utils.Mapper.nodeToRemote(this));
+        try {
+            Utils.Skeleton.getSyncSkeleton(dsvNeighbours.getLeader())
+                    .exitRoom(Utils.Mapper.nodeToRemote(this));
+        } catch (StatusRuntimeException e) {
+            repairAndElect(address, dsvNeighbours.getLeader());
+            Utils.Skeleton.getSyncSkeleton(dsvNeighbours.getLeader()).updateRoomsTable(generated.Empty.getDefaultInstance());
+
+            exitRoom();
+        }
     }
 
     private void startRepairTopology(Address onNode, Address missing) {
@@ -165,7 +186,6 @@ public class Node {
     private void startUpdateTables() {
         Utils.Skeleton.getFutureStub(dsvNeighbours.getLeader()).updateRoomsTable(generated.Empty.getDefaultInstance());
     }
-
 
     public void repairAndElect(Address onNode, Address missing) {
         startRepairTopology(onNode, missing);
@@ -250,12 +270,11 @@ public class Node {
                 .getMsg();
     }
 
-
     private void listen() {
         DsvThreadPool.getInstance().execute(consoleHandler);
     }
 
-    private boolean leadingRoomIsNotEmpty(Room room) {
+    private boolean leadingRoomIsNotEmpty() {
         return isLeader.getValue().getSize() != 1;
     }
 

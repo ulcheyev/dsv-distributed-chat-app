@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Setter
 @Getter
 public class Address {
-    private static final AtomicLong ID_GEN = new AtomicLong(3287);
+    private static final AtomicLong ID_GEN = new AtomicLong(1823);
     private String hostname;
     private int port;
     private Long id;
