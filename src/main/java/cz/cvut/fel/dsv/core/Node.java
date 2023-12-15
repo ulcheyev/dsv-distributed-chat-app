@@ -146,6 +146,7 @@ public class Node {
             exitRoom();
             startRepairTopology(dsvNeighbours.getPrev(), address);
             if (nodeWasLeader(address) && leadingRoomIsNotEmpty()) {
+                logger.info("Exited node was a leader. Make election and update tables.");
                 makeElection(dsvNeighbours.getNext());
                 startUpdateTables();
             }

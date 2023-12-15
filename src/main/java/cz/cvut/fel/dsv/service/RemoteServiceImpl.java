@@ -55,7 +55,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
     @Override
     public void receiveRooms(generated.Rooms request, StreamObserver<Empty> responseObserver) {
         String threadName = "[RECEIVE ROOMS]";
-        dsvThreadPool.blockingExecute(new Thread(() -> {
+        dsvThreadPool.execute(new Thread(() -> {
             logger.info("Receiving rooms. Count = " + request.getRoomsCount());
             for (var room : request.getRoomsList())
                 node.getRoomsAndLeaders()
@@ -92,6 +92,9 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
     private void makeUpdateRoomsTable() {
         String threadName = "[UPDATE ROOMS ON LEADERS]";
         dsvThreadPool.execute(new Thread(() -> {
+            logger.info("Start update tables");
+            node.getRoomsAndLeaders().forEach((key, value) -> logger.info(value.toString()));
+
             var leadersAddresses = getLeadersAddresses();
             node.setState(NodeState.REQUESTING);
             myClock = maxClock + 1;
@@ -399,8 +402,10 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
     }
 
     private void electedCandidate() {
+        logger.info("Elected candidate");
         node.setIsLeader(new DsvPair<>(true, new Room(node.getAddress(), node.getCurrentRoom())));
         node.getRoomsAndLeaders().put(node.getCurrentRoom(), node.getAddress());
+        node.getRoomsAndLeaders().forEach((key, value) -> logger.info(value.toString()));
 
         try {
             Utils.Skeleton.getSyncSkeleton(node.getDsvNeighbours().getLeader())
