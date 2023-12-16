@@ -7,7 +7,6 @@ import cz.cvut.fel.dsv.core.Node;
 import generated.RemotesServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import org.checkerframework.checker.units.qual.A;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,7 +39,7 @@ public class Utils {
             return generated.RemotesServiceGrpc.newBlockingStub(managedChannel);
         }
 
-        public static RemotesServiceGrpc.RemotesServiceFutureStub getFutureStub(Address address) {
+        public static RemotesServiceGrpc.RemotesServiceFutureStub getFutureSkeleton(Address address) {
             managedChannel = ManagedChannelBuilder
                     .forAddress(address.getHostname(), address.getPort())
                     .usePlaintext()

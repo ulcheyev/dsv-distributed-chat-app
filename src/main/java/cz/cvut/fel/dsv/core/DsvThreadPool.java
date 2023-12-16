@@ -11,10 +11,12 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
+import static cz.cvut.fel.dsv.core.Config.ANSI_YELLOW_TH_POOL;
+
 public class DsvThreadPool {
     @Getter
     private static final Executor pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-    private static final Logger logger = DsvLogger.getLogger(DsvThreadPool.class);
+    private static final Logger logger = DsvLogger.getLogger("THREAD POOl", ANSI_YELLOW_TH_POOL, DsvThreadPool.class);
     @Setter
     private static Node node;
     private static DsvThreadPool INSTANCE;

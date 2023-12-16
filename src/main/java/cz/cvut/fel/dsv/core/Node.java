@@ -26,8 +26,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
 
+import static cz.cvut.fel.dsv.core.Config.ANSI_GREEN_NODE;
+
 public class Node {
-    private static final Logger logger = DsvLogger.getLogger(Node.class);
+    private static final Logger logger = DsvLogger.getLogger("NODE", ANSI_GREEN_NODE, Node.class);
     @Getter @Setter private String username;
     @Getter @Setter private String currentRoom;
     // Flag, which represents the knowledge:
@@ -83,6 +85,7 @@ public class Node {
     }
 
     private void joinRoom(Address joinAddress, String roomName) {
+        logger.info("Joining room " + roomName);
         if (currentRoom == null || !(currentRoom.equals(roomName))) {
             generated.JoinRequest req = generated.JoinRequest.newBuilder()
                     .setRoomName(roomName)
@@ -95,7 +98,7 @@ public class Node {
     }
 
     private void executeJoining(Address joinAddress, generated.JoinRequest req) {
-        var stub = Utils.Skeleton.getFutureStub(joinAddress);
+        var stub = Utils.Skeleton.getFutureSkeleton(joinAddress);
 
         ListenableFuture<JoinResponse> joinResponse = stub.joinRoom(req);
         Futures.addCallback(joinResponse, new FutureCallback<JoinResponse>() {
@@ -104,7 +107,7 @@ public class Node {
                         ListenableFuture<JoinResponse> joinResponse;
                         if (!response.getIsLeader()) {
                             Utils.Skeleton.shutdown();
-                            var stub = Utils.Skeleton.getFutureStub(Utils.Mapper.remoteToAddress(response.getLeader()));
+                            var stub = Utils.Skeleton.getFutureSkeleton(Utils.Mapper.remoteToAddress(response.getLeader()));
                             var callBack = this;
                             joinResponse = stub.joinRoom(req);
                             Futures.addCallback(joinResponse, callBack, DsvThreadPool.getPool());
@@ -146,7 +149,7 @@ public class Node {
             exitRoom();
             startRepairTopology(dsvNeighbours.getPrev(), address);
             if (nodeWasLeader(address) && leadingRoomIsNotEmpty()) {
-                logger.info("Exited node was a leader. Make election and update tables.");
+                logger.info( "Was a leader. Make election and updating tables");
                 makeElection(dsvNeighbours.getNext());
                 startUpdateTables();
             }
@@ -163,6 +166,7 @@ public class Node {
 
     // TODO: If leader is dead, here StatusRuntimeException
     private void exitRoom() {
+        logger.info("Exiting room " + currentRoom);
         try {
             Utils.Skeleton.getSyncSkeleton(dsvNeighbours.getLeader())
                     .exitRoom(Utils.Mapper.nodeToRemote(this));
@@ -175,17 +179,27 @@ public class Node {
     }
 
     private void startRepairTopology(Address onNode, Address missing) {
+        logger.info("[" +username+ " "+address.getHostname() + ":" + address.getPort()+
+                "] started repair topology on " + onNode.getHostname() + ":" + onNode.getPort() + " with missing node " +
+                missing.getHostname() + ":" + missing.getPort());
+
         Utils.Skeleton.getSyncSkeleton(onNode)
                 .repairTopology(Utils.Mapper.addressToRemote(missing));
     }
 
     private void makeElection(Address onNode) {
+        logger.info("Starting election on "
+                + onNode.getHostname() + ":" + onNode.getPort());
+
         Utils.Skeleton.getSyncSkeleton(onNode)
                 .election(Utils.Mapper.addressToRemote(new Address(Config.STUB_STRING, 0, -1)));
     }
 
     private void startUpdateTables() {
-        Utils.Skeleton.getFutureStub(dsvNeighbours.getLeader()).updateRoomsTable(generated.Empty.getDefaultInstance());
+        logger.info("Starting update tables on leader "
+                + dsvNeighbours.getLeader().getHostname() + ":" + dsvNeighbours.getLeader().getPort());
+
+        Utils.Skeleton.getFutureSkeleton(dsvNeighbours.getLeader()).updateRoomsTable(generated.Empty.getDefaultInstance());
     }
 
     public void repairAndElect(Address onNode, Address missing) {
@@ -252,7 +266,7 @@ public class Node {
     }
 
     private void preflight() {
-        logger.info(username + " send preflight to " + dsvNeighbours.getLeader());
+        logger.info("Sending preflight to " + dsvNeighbours.getLeader());
         Utils.Skeleton.getAsyncSkeleton(dsvNeighbours.getLeader())
                 .preflight(Utils.Mapper.nodeToRemote(this), receiveMessagesObserver);
     }

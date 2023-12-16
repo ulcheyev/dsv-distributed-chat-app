@@ -8,9 +8,11 @@ import io.grpc.ServerBuilder;
 
 import java.util.logging.Logger;
 
+import static cz.cvut.fel.dsv.core.Config.ANSI_GREEN_NODE;
+
 public class ServerWrapper {
 
-    private static final Logger logger = DsvLogger.getLogger(ServerWrapper.class);
+    private static final Logger logger = DsvLogger.getLogger("NODE", ANSI_GREEN_NODE, ServerWrapper.class);
     private Server server;
     private final Node node;
 

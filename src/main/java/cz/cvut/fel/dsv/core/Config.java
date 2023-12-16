@@ -9,6 +9,12 @@ public class Config {
     public static final String INITIAL_ROOM_NAME = "global";
     public static final Integer SLEEP_TIME_IN_CS_S = 2;
 
+    public static final String ANSI_GREEN_NODE = "\u001B[32m";
+
+    public static final String ANSI_RED_SERVICE = "\u001B[31m";
+
+    public static final String ANSI_YELLOW_TH_POOL = "\u001B[33m";
+
     public static final String HELP_STRING = """
             Supported commands:
                 !join [room name]: enter a room named [room name];

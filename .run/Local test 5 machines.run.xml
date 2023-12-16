@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Local test 5 machines" type="CompoundRunConfigurationType">
+    <toRun name="1. Bob  8050" type="Application" />
+    <toRun name="2. Alice 8060 to Bob 8050" type="Application" />
+    <toRun name="3. Donald 8070 to Alice 8060" type="Application" />
+    <toRun name="4. Mac 8080 to Alice 8060" type="Application" />
+    <toRun name="5. Buratino 8090 to Mac 8080 " type="Application" />
+    <method v="2" />
+  </configuration>
+</component>
