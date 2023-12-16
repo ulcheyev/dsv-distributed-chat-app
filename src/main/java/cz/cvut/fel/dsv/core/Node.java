@@ -179,8 +179,7 @@ public class Node {
     }
 
     private void startRepairTopology(Address onNode, Address missing) {
-        logger.info("[" +username+ " "+address.getHostname() + ":" + address.getPort()+
-                "] started repair topology on " + onNode.getHostname() + ":" + onNode.getPort() + " with missing node " +
+        logger.info("Starting repair topology on " + onNode.getHostname() + ":" + onNode.getPort() + " with missing node " +
                 missing.getHostname() + ":" + missing.getPort());
 
         Utils.Skeleton.getSyncSkeleton(onNode)

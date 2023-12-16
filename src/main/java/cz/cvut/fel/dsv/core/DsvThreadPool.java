@@ -39,7 +39,12 @@ public class DsvThreadPool {
     }
 
     public void blockingExecute(Runnable runn) {
-        String req = ((Thread) runn).getName();
+        String req;
+        try {
+             req = ((Thread) runn).getName();
+        }catch (ClassCastException e){
+            req = "UN";
+        }
         if (node.getState() != NodeState.RELEASED) {
             logger.info("[Blocking executor] request " + req + " is delayed. Queue size = " + delayedExecutors.size());
             delayedExecutors.add(runn);

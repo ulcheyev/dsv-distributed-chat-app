@@ -113,6 +113,14 @@ public class Utils {
                     .build();
         }
 
+        public static generated.Remote dsvRemoteToRemote(DsvRemote dsvRemote) {
+            return generated.Remote.newBuilder().setUsername(dsvRemote.getUsername())
+                    .setHostname(dsvRemote.getAddress().getHostname())
+                    .setPort(dsvRemote.getAddress().getPort())
+                    .setNodeId(dsvRemote.getAddress().getId())
+                    .build();
+        }
+
         public static generated.Neighbours remoteToNeighbours(generated.Remote remote) {
             return generated.Neighbours.newBuilder()
                     .setNext(remote)

@@ -12,11 +12,9 @@ import generated.Remote;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static cz.cvut.fel.dsv.core.Config.ANSI_RED_SERVICE;
@@ -25,8 +23,8 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
 
     private static final Logger logger = DsvLogger.getLogger("SERVICE", ANSI_RED_SERVICE, RemoteServiceImpl.class);
     private Integer responseCount = 0;
-    private final List<DsvRemote> dsvRemotes = new ArrayList<>(); // TODO
-    private final Queue<DsvPair<generated.JoinRequest, StreamObserver<generated.JoinResponse>>> joinQueue = new LinkedList<>(); // TODO
+    private final List<DsvPair<DsvRemote, StreamObserver<Empty>>> dsvRemotes = new ArrayList<>(); // TODO
+    private static List<Address> tempAddresses = new ArrayList<>();
     private int myClock = 0;
     private int maxClock = 0;
     private volatile Node node;
@@ -45,33 +43,38 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
     @Override
     public void receiveRoom(generated.RoomEntry request, StreamObserver<Empty> responseObserver) {
         String threadName = "[RECEIVE ROOM]";
-        dsvThreadPool.blockingExecute(new Thread(() -> {
-            logger.info("Receiving room [" + request.getRoomName() + " : " + request.getRoomOwner().getUsername() + "]");
+        dsvThreadPool.execute(new Thread(() -> {
+            logger.info("Receiving room [" +request.getRoomOwner().getUsername()+" - "+request.getRoomOwner().getHostname()+":"+request.getRoomOwner().getPort()+" - "+request.getRoomName() + "]");
             node.getRoomsAndLeaders().put(request.getRoomName(), Utils.Mapper.remoteToAddress(request.getRoomOwner()));
-
                     responseObserver.onNext(Empty.getDefaultInstance());
                     responseObserver.onCompleted();
-                    node.setState(NodeState.RELEASED);
-                    dsvThreadPool.notifyExecutors();
+
+                    if(node.getState().equals(NodeState.HOLDING)){
+                        logger.info("Exiting CS");
+                    }
+
+                    unblock();
                 }, threadName));
+
     }
 
     @Override
     public void receiveRooms(generated.Rooms request, StreamObserver<Empty> responseObserver) {
         String threadName = "[RECEIVE ROOMS]";
         dsvThreadPool.execute(new Thread(() -> {
-            logger.info("Receiving rooms. Count = " + request.getRoomsCount());
-            request.getRoomsList().forEach((key) -> logger.info("\t["+key.getRoomOwner().getHostname()+":" +key.getRoomOwner().getPort()+" - "+key.getRoomName()+"]"));
+
+            logger.info("Receiving rooms. Count = " + request.getRoomsCount() + ": ");
+            request.getRoomsList().forEach((key) -> logger.info("\t\t["+key.getRoomOwner().getHostname()+":" +key.getRoomOwner().getPort()+" - "+key.getRoomName()+"]"));
 
             for (var room : request.getRoomsList())
                 node.getRoomsAndLeaders()
                         .put(room.getRoomName(), Utils.Mapper.remoteToAddress(room.getRoomOwner()));
+
             updateBackupNode();
 
             responseObserver.onNext(Empty.getDefaultInstance());
             responseObserver.onCompleted();
-            node.setState(NodeState.RELEASED);
-            dsvThreadPool.notifyExecutors();
+            unblock();
         }, threadName));
     }
 
@@ -83,28 +86,27 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
             node.getRoomsAndLeaders().remove(request.getRoomName());
             responseObserver.onNext(Empty.getDefaultInstance());
             responseObserver.onCompleted();
-            node.setState(NodeState.RELEASED);
-            dsvThreadPool.notifyExecutors();
+            unblock();
         }, threadName));
     }
 
     @Override
     public void updateRoomsTable(Empty request, StreamObserver<Empty> responseObserver) {
-        makeUpdateRoomsTable();
+        makeUpdateRoomsTable(getLeadersAddresses());
         responseObserver.onNext(Empty.getDefaultInstance());
         responseObserver.onCompleted();
     }
 
-    private void makeUpdateRoomsTable() {
-        String threadName = "[UPDATE ROOMS ON LEADERS]";
+    private void makeUpdateRoomsTable(List<Address> leadersAddresses) {
+        String threadName = "[UPDATE ROOMS ON NODES]";
         dsvThreadPool.blockingExecute(new Thread(() -> {
-            logger.info("Start [update tables] : ");
-            node.getRoomsAndLeaders().forEach((key, value) -> logger.info('\t'+key+" "+ value.getHostname()+" "+value.getPort()));
 
-            var leadersAddresses = getLeadersAddresses();
+            logger.info("*[CS] Start CS update tables: *");
+            tempAddresses = new ArrayList<>(leadersAddresses);
+
             node.setState(NodeState.REQUESTING);
             myClock = maxClock + 1;
-            logger.info("[CS] send requests to leaders, size = [" + leadersAddresses.size() + "]; maxClock: " + maxClock + ", nodeClock: " + myClock);
+            logger.info("[CS] send requests to nodes, size = [" + leadersAddresses.size() + "]; maxClock: " + maxClock + ", nodeClock: " + myClock);
             for (var key : leadersAddresses) {
                 try {
                     Utils.Skeleton.getFutureSkeleton(key)
@@ -112,7 +114,9 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
                                     .setRequestByRemote(Utils.Mapper.nodeToRemote(node))
                                     .setClock(myClock)
                                     .build());
+                    logger.info("\t\t-[CS] send request to node "+key);
                 } catch (StatusRuntimeException exc) {
+                    logger.info("\t\t-[CS] node " + key + " is not responding, removing...");
                     leadersAddresses.remove(key);
                 }
             }
@@ -154,8 +158,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
 
             responseObserver.onNext(Empty.getDefaultInstance());
             responseObserver.onCompleted();
-            node.setState(NodeState.RELEASED);
-            dsvThreadPool.notifyExecutors();
+            unblock();
 
         }, threadName));
     }
@@ -205,7 +208,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
                         // Send to leaders new room table
                         // CS - send requests
                         node.getRoomsAndLeaders().put(request.getRoomName(), Utils.Mapper.remoteToAddress(request.getRemote()));
-                        makeUpdateRoomsTable();
+                        makeUpdateRoomsTable(getLeadersAddresses());
                     }
                 }
             }
@@ -225,8 +228,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
                         .build());
             }
             responseObserver.onCompleted();
-            node.setState(NodeState.RELEASED);
-            dsvThreadPool.notifyExecutors();
+            unblock();
         }, threadName));
     }
 
@@ -260,24 +262,26 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
 
     @Override
     public void receiveMessage(Message request, StreamObserver<Empty> responseObserver) {
-        dsvThreadPool.execute(() ->
+        dsvThreadPool.execute(() ->{
                 node.getIsLeader()
                         .getValue()
-                        .sendMessageToRoom(request)
-        );
-
-        responseObserver.onNext(Empty.newBuilder().build());
-        responseObserver.onCompleted();
+                        .sendMessageToRoom(request);
+                responseObserver.onNext(Empty.newBuilder().build());
+                responseObserver.onCompleted();
+        });
     }
 
     @Override
     public void preflight(Remote request, StreamObserver<Message> responseObserver) {
-        dsvThreadPool.execute(() -> {
-            logger.info("Added [" + request.getUsername() + "] to room " + "[" + node.getCurrentRoom() + "]");
+        String threadName = "[PREFLIGHT]";
+        dsvThreadPool.blockingExecute(new Thread(() -> {
+            logger.info("Preflight received. Added [" + request.getUsername() + "] to room " + "[" + node.getCurrentRoom() + "]");
             node.getIsLeader()
                     .getValue()
                     .addToRoom(new DsvPair<>(Utils.Mapper.remoteToDsvRemote(request), responseObserver));
-        });
+            node.setState(NodeState.RELEASED);
+            dsvThreadPool.notifyExecutors();
+        }, threadName));
     }
 
     @Override
@@ -287,24 +291,27 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
                 maxClock = Math.max(maxClock, request.getClock());
                 maxClock++;
                 if (isDelay(request)) {
-                    logger.info("[CS] request by " + request.getRequestByRemote().getUsername() + " is delayed, maxClock: " + maxClock + " nodeClock: " + myClock);
-                    dsvRemotes.add(DsvRemote.builder()
+                    logger.info("[CS] request by [" + request.getRequestByRemote().getUsername() +
+                            " - "+request.getRequestByRemote().getHostname()+":"+request.getRequestByRemote().getPort() + "] is delayed; maxClock: " + maxClock + ", nodeClock: " + myClock);
+                    dsvRemotes.add(new DsvPair<>(DsvRemote.builder()
                             .address(Utils.Mapper.remoteToAddress(request.getRequestByRemote()))
                             .username(request.getRequestByRemote().getUsername())
                             .isRequesting(true)
-                            .build());
+                            .build(),
+                            responseObserver));
                 } else {
-                    logger.info("[CS] request is granted to " + request.getRequestByRemote().getUsername() + ", maxClock: " + maxClock + " nodeClock: " + myClock);
-                    block();
+                    logger.info("[CS] request is granted to [" +request.getRequestByRemote().getUsername()+
+                            " - "+request.getRequestByRemote().getHostname()+":"+request.getRequestByRemote().getPort() + "], maxClock: " + maxClock + ", nodeClock: " + myClock);
                     Utils.Skeleton.getFutureSkeleton(Utils.Mapper.remoteToAddress(request.getRequestByRemote()))
                             .receivePermissionResponse(generated.PermissionResponse.newBuilder()
                                     .setGranted(true)
                                     .setResponseByRemote(Utils.Mapper.nodeToRemote(node))
                                     .build());
+                    block();
+                    logger.info("Joining CS");
                 }
                 responseObserver.onNext(Empty.getDefaultInstance());
                 responseObserver.onCompleted();
-
             }
         });
     }
@@ -313,36 +320,34 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
     public void receivePermissionResponse(generated.PermissionResponse request, StreamObserver<generated.Empty> responseObserver) {
         dsvThreadPool.execute(() -> {
             synchronized (this) {
-                logger.info("[CS] received permission response by " + request.getResponseByRemote().getUsername());
+                logger.info("[CS] received permission response by [" + request.getResponseByRemote().getUsername()+
+                        " - "+request.getResponseByRemote().getHostname()+":"+request.getResponseByRemote().getPort()+"]");
                 responseCount++;
-                int necessarySize = node.getRoomsAndLeaders().size();
+                int necessarySize = tempAddresses.size();
                 var copyOfTable = new ConcurrentHashMap<>(node.getRoomsAndLeaders());
-                if (responseCount == necessarySize) { // self -> -1
-                    logger.info("[CS] responseCount = [" + responseCount + "] is similar to leaders size = [" + necessarySize + "], join CS. maxClock: " + maxClock + " nodeClock: " + myClock);
-                    for (var leader : node.getRoomsAndLeaders().values()) {
+                if (responseCount == necessarySize) {
+                    logger.info("[CS] responseCount = [" + responseCount + "] is equal to requested nodes size = [" + necessarySize + "]; Sending rooms; maxClock: " + maxClock + " nodeClock: " + myClock);
+                    for (var leader : tempAddresses) {
                         tryToSleep();
                         Utils.Skeleton.getFutureSkeleton(leader)
                                 .receiveRooms(Utils.Mapper.leaderRoomsToRemoteRooms(copyOfTable));
                     }
                     responseCount = 0;
                     for (var rem : dsvRemotes) {
-                        logger.info("[CS] send permission to requesting nodes. maxClock: " + maxClock + " nodeClock: " + myClock);
-                        if (rem.getIsRequesting()) {
-                            Address address = node.getRoomsAndLeaders().get(rem.getUsername());
-                            Utils.Skeleton.getFutureSkeleton(address).receivePermissionResponse(
-                                    generated.PermissionResponse.newBuilder().setGranted(true).build()
-                            );
-                            rem.setIsRequesting(false);
+                        if (rem.getKey().getIsRequesting()) {
+                            logger.info("[CS] send permission to requesting node: " + rem + " maxClock: " + maxClock + ", nodeClock: " + myClock);
+                            receivePermissionRequest(PermissionRequest.newBuilder().setRequestByRemote(Utils.Mapper.dsvRemoteToRemote(rem.getKey())).build(),
+                                    rem.getValue());
                         }
                     }
+
+                    logger.info("*[CS] End CS update tables*");
+                    unblock();
                 }
             }
 
             responseObserver.onNext(Empty.getDefaultInstance());
             responseObserver.onCompleted();
-            node.setState(NodeState.RELEASED);
-            dsvThreadPool.notifyExecutors();
-
         });
     }
 
@@ -350,17 +355,17 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
         return (node.getState() != NodeState.RELEASED)
                 &&
                 ((request.getClock() > myClock)
-                        || (request.getClock() == myClock && request.getRequestByRemote().getNodeId() > node.getAddress().getId()));
+                        || (request.getClock() == myClock && request.getRequestByRemote().getNodeId()
+                        > node.getAddress().getId()));
     }
 
     private void block() {
         node.setState(NodeState.HOLDING);
-        logger.info("Joining CS...");
     }
 
     private void unblock() {
-        logger.info("Exiting CS...");
         node.setState(NodeState.RELEASED);
+        dsvThreadPool.notifyExecutors();
     }
 
     @Override
@@ -476,13 +481,11 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
     }
 
     private void updateBackupNode() {
-        dsvThreadPool.execute(() -> {
             if (node.getIsLeader().getKey() && !node.getDsvNeighbours().getPrev().equals(node.getAddress())) {
-                logger.info("Updating backup node...");
-                Utils.Skeleton.getFutureSkeleton(node.getDsvNeighbours().getPrev())
+                logger.info("Updating backup node [" + node.getDsvNeighbours().getPrev() + "]");
+                Utils.Skeleton.getSyncSkeleton(node.getDsvNeighbours().getPrev())
                         .receiveRooms(Utils.Mapper.leaderRoomsToRemoteRooms(node.getRoomsAndLeaders()));
             }
-        });
     }
 
     @Override
