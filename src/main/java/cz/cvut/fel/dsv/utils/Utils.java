@@ -2,6 +2,7 @@ package cz.cvut.fel.dsv.utils;
 
 import cz.cvut.fel.dsv.core.data.Address;
 import cz.cvut.fel.dsv.core.data.DsvNeighbours;
+import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.data.DsvRemote;
 import cz.cvut.fel.dsv.core.Node;
 import generated.RemotesServiceGrpc;
@@ -86,21 +87,30 @@ public class Utils {
                     .build();
         }
 
-        public static generated.Rooms leaderRoomsToRemoteRooms(Map<String, Address> map) {
+        public static generated.Rooms leaderRoomsToRemoteRooms(Map<String, DsvPair<Address, Address>> map) {
             generated.Rooms.Builder builder = generated.Rooms.newBuilder();
-            for(var lead: map.entrySet()) {
+            for (var entry : map.entrySet()) {
                 builder.addRooms(generated.RoomEntry
                         .newBuilder()
-                        .setRoomName(lead.getKey())
-                        .setRoomOwner(Mapper.addressToRemote(lead.getValue()))
+                        .setRoomName(entry.getKey())
+                        .setRoomOwner(Mapper.addressToRemote(entry.getValue().getKey()))
+                        .setRoomBackup(Mapper.addressToRemote(entry.getValue().getValue()))
                         .build());
             }
             return builder.build();
         }
 
-        public static ConcurrentMap<String, Address> remoteRoomsToLeaderRooms(generated.Rooms rooms){
+        public static generated.RoomEntry nodeToRoomEntry(Node node) {
+            return generated.RoomEntry.newBuilder()
+                    .setRoomName(node.getCurrentRoom())
+                    .setRoomOwner(Utils.Mapper.addressToRemote(node.getAddress()))
+                    .setRoomBackup(Utils.Mapper.addressToRemote(node.getDsvNeighbours().getPrev()))
+                    .build();
+        }
+
+        public static ConcurrentMap<String, Address> remoteRoomsToLeaderRooms(generated.Rooms rooms) {
             var map = new ConcurrentHashMap<String, Address>();
-            for(var room : rooms.getRoomsList()){
+            for (var room : rooms.getRoomsList()) {
                 map.put(room.getRoomName(), remoteToAddress(room.getRoomOwner()));
             }
             return map;

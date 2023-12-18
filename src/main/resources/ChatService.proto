@@ -20,7 +20,8 @@ message Rooms {
 
 message RoomEntry {
   Remote roomOwner = 1;
-  string roomName = 2;
+  Remote roomBackup = 2;
+  string roomName = 3;
 }
 
 message Remote {

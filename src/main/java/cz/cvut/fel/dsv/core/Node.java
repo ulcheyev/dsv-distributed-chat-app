@@ -36,7 +36,7 @@ public class Node {
     //      key == true => node is leader and in value is room which that node leads.
     //      key == false => node is not leader in value is null.
     @Getter @Setter private volatile DsvPair<Boolean, Room> isLeader;
-    @Getter @Setter private volatile ConcurrentMap<String, Address> roomsAndLeaders;
+    @Getter @Setter private volatile ConcurrentMap<String, DsvPair<Address, Address>> roomsAndLeaders;
     @Getter @Setter private Address address;
     @Getter @Setter private NodeState state;
     @Getter @Setter private DsvNeighbours dsvNeighbours;
@@ -237,7 +237,7 @@ public class Node {
                 if (args.length == 2) {
                     isLeader = new DsvPair<>(true, new Room(address, Config.INITIAL_ROOM_NAME));
                     currentRoom = Config.INITIAL_ROOM_NAME;
-                    roomsAndLeaders.put(Config.INITIAL_ROOM_NAME, address);
+                    roomsAndLeaders.put(Config.INITIAL_ROOM_NAME, new DsvPair<>(address, address));
                     dsvNeighbours.setLeader(address);
                     updateChannelToLeader();
                     preflight();
