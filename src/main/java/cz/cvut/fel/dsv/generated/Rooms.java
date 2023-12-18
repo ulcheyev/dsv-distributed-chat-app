@@ -59,6 +59,11 @@ private static final long serialVersionUID = 0L;
                 input.readMessage(generated.RoomEntry.parser(), extensionRegistry));
             break;
           }
+          case 16: {
+
+            isNotVisited_ = input.readBool();
+            break;
+          }
           default: {
             if (!parseUnknownField(
                 input, unknownFields, extensionRegistry, tag)) {
@@ -136,6 +141,17 @@ private static final long serialVersionUID = 0L;
     return rooms_.get(index);
   }
 
+  public static final int ISNOTVISITED_FIELD_NUMBER = 2;
+  private boolean isNotVisited_;
+  /**
+   * <code>bool isNotVisited = 2;</code>
+   * @return The isNotVisited.
+   */
+  @java.lang.Override
+  public boolean getIsNotVisited() {
+    return isNotVisited_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -153,6 +169,9 @@ private static final long serialVersionUID = 0L;
     for (int i = 0; i < rooms_.size(); i++) {
       output.writeMessage(1, rooms_.get(i));
     }
+    if (isNotVisited_ != false) {
+      output.writeBool(2, isNotVisited_);
+    }
     unknownFields.writeTo(output);
   }
 
@@ -165,6 +184,10 @@ private static final long serialVersionUID = 0L;
     for (int i = 0; i < rooms_.size(); i++) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(1, rooms_.get(i));
+    }
+    if (isNotVisited_ != false) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(2, isNotVisited_);
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -183,6 +206,8 @@ private static final long serialVersionUID = 0L;
 
     if (!getRoomsList()
         .equals(other.getRoomsList())) return false;
+    if (getIsNotVisited()
+        != other.getIsNotVisited()) return false;
     if (!unknownFields.equals(other.unknownFields)) return false;
     return true;
   }
@@ -198,6 +223,9 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + ROOMS_FIELD_NUMBER;
       hash = (53 * hash) + getRoomsList().hashCode();
     }
+    hash = (37 * hash) + ISNOTVISITED_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+        getIsNotVisited());
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -338,6 +366,8 @@ private static final long serialVersionUID = 0L;
       } else {
         roomsBuilder_.clear();
       }
+      isNotVisited_ = false;
+
       return this;
     }
 
@@ -374,6 +404,7 @@ private static final long serialVersionUID = 0L;
       } else {
         result.rooms_ = roomsBuilder_.build();
       }
+      result.isNotVisited_ = isNotVisited_;
       onBuilt();
       return result;
     }
@@ -447,6 +478,9 @@ private static final long serialVersionUID = 0L;
             roomsBuilder_.addAllMessages(other.rooms_);
           }
         }
+      }
+      if (other.getIsNotVisited() != false) {
+        setIsNotVisited(other.getIsNotVisited());
       }
       this.mergeUnknownFields(other.unknownFields);
       onChanged();
@@ -716,6 +750,37 @@ private static final long serialVersionUID = 0L;
         rooms_ = null;
       }
       return roomsBuilder_;
+    }
+
+    private boolean isNotVisited_ ;
+    /**
+     * <code>bool isNotVisited = 2;</code>
+     * @return The isNotVisited.
+     */
+    @java.lang.Override
+    public boolean getIsNotVisited() {
+      return isNotVisited_;
+    }
+    /**
+     * <code>bool isNotVisited = 2;</code>
+     * @param value The isNotVisited to set.
+     * @return This builder for chaining.
+     */
+    public Builder setIsNotVisited(boolean value) {
+      
+      isNotVisited_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>bool isNotVisited = 2;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearIsNotVisited() {
+      
+      isNotVisited_ = false;
+      onChanged();
+      return this;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

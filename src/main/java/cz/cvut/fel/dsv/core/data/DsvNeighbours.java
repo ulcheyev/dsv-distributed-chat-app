@@ -33,6 +33,10 @@ public class DsvNeighbours {
         this.leader = dsvNeighbours.getLeader();
     }
 
+    public boolean hasRealNeighbours() {
+        return !this.next.equals(this.nextNext) || !this.next.equals(this.prev);
+    }
+
     @Override
     public String toString() {
         return ("[Neighbour] \n\t\t\tnext:" + next +

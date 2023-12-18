@@ -76,7 +76,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
                         .put(room.getRoomName(), new DsvPair<>(leader, backupNode));
             }
 
-            updateBackupNode();
+            updateBackupNode(request.getIsNotVisited());
 
             responseObserver.onNext(Empty.getDefaultInstance());
             responseObserver.onCompleted();
@@ -337,7 +337,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
                     for (var leader : tempAddresses) {
                         tryToSleep();
                         Utils.Skeleton.getFutureSkeleton(leader)
-                                .receiveRooms(Utils.Mapper.leaderRoomsToRemoteRooms(copyOfTable));
+                                .receiveRooms(Utils.Mapper.leaderRoomsToRemoteRooms(copyOfTable, true));
                     }
                     responseCount = 0;
                     for (var rem : dsvRemotes) {
@@ -390,7 +390,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
         logger.info("Method changePrev is called...");
         logger.info("Changing prev to " + prev);
         node.getDsvNeighbours().setPrev(prev);
-        updateBackupNode();
+        updateBackupNode(true);
 
         logger.info("Returning next node " + node.getDsvNeighbours().getNext());
         responseObserver.onNext(Utils.Mapper.addressToRemote(node.getDsvNeighbours().getNext()));
@@ -422,7 +422,7 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
         node.setIsLeader(new DsvPair<>(true, new Room(node.getAddress(), node.getCurrentRoom())));
         node.getRoomsAndLeaders().put(node.getCurrentRoom(), new DsvPair<>(node.getAddress(), node.getDsvNeighbours().getPrev()));
         node.getRoomsAndLeaders().forEach((key, value) -> logger.info(value.toString()));
-        updateBackupNode();
+        updateBackupNode(true);
 
         try {
             Utils.Skeleton.getSyncSkeleton(node.getDsvNeighbours().getLeader())
@@ -488,21 +488,23 @@ public class RemoteServiceImpl extends generated.RemotesServiceGrpc.RemotesServi
         });
     }
 
-    private void updateBackupNode() {
+    private void updateBackupNode(boolean isNotVisited) {
         // Updating backup node via leader
         if (node.getIsLeader().getKey()) {
             if (!node.getDsvNeighbours().getPrev().equals(node.getAddress())) {
                 logger.info("Updating backup node [" + node.getDsvNeighbours().getPrev() + "]");
                 node.getRoomsAndLeaders().put(node.getCurrentRoom(), new DsvPair<>(node.getAddress(), node.getDsvNeighbours().getPrev()));
                 Utils.Skeleton.getSyncSkeleton(node.getDsvNeighbours().getPrev())
-                        .receiveRooms(Utils.Mapper.leaderRoomsToRemoteRooms(node.getRoomsAndLeaders()));
+                        .receiveRooms(Utils.Mapper.leaderRoomsToRemoteRooms(node.getRoomsAndLeaders(), false));
 
-                // After updating backup node -> send updated table to other leaders, but this sent messages several times 'cause in receiveRooms is updateBackupNode()
+                // isNotVisited in Rooms to avoid infinitive recursive invocation
                 // Add try-catch ? If leader is dead, it will start election
-                for (var entry : node.getRoomsAndLeaders().entrySet()) {
-                    if (!node.getAddress().equals(entry.getValue().getKey())) {
-                        Utils.Skeleton.getSyncSkeleton(entry.getValue().getKey())
-                                .receiveRooms(Utils.Mapper.leaderRoomsToRemoteRooms(node.getRoomsAndLeaders()));
+                if (isNotVisited) {
+                    for (var entry : node.getRoomsAndLeaders().entrySet()) {
+                        if (!node.getAddress().equals(entry.getValue().getKey())) {
+                            Utils.Skeleton.getSyncSkeleton(entry.getValue().getKey())
+                                    .receiveRooms(Utils.Mapper.leaderRoomsToRemoteRooms(node.getRoomsAndLeaders(), false));
+                        }
                     }
                 }
 

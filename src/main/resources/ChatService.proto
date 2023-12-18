@@ -16,6 +16,7 @@ message Message {
 
 message Rooms {
   repeated RoomEntry rooms = 1;
+  bool isNotVisited = 2;
 }
 
 message RoomEntry {

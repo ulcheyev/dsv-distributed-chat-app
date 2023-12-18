@@ -87,8 +87,9 @@ public class Utils {
                     .build();
         }
 
-        public static generated.Rooms leaderRoomsToRemoteRooms(Map<String, DsvPair<Address, Address>> map) {
+        public static generated.Rooms leaderRoomsToRemoteRooms(Map<String, DsvPair<Address, Address>> map, boolean isNotVisited) {
             generated.Rooms.Builder builder = generated.Rooms.newBuilder();
+            builder.setIsNotVisited(isNotVisited);
             for (var entry : map.entrySet()) {
                 builder.addRooms(generated.RoomEntry
                         .newBuilder()
