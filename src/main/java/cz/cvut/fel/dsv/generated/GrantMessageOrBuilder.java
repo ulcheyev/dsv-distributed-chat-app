@@ -4,13 +4,13 @@
 // Protobuf Java Version: 3.25.0
 package generated;
 
-public interface HealthOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:generated.Health)
+public interface GrantMessageOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:generated.GrantMessage)
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>bool isAlive = 1;</code>
-   * @return The isAlive.
+   * <code>bool grant = 1;</code>
+   * @return The grant.
    */
-  boolean getIsAlive();
+  boolean getGrant();
 }

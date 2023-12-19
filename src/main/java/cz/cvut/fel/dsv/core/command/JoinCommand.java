@@ -2,7 +2,7 @@ package cz.cvut.fel.dsv.core.command;
 
 import cz.cvut.fel.dsv.core.Node;
 
-import static cz.cvut.fel.dsv.core.Config.hintString;
+import static cz.cvut.fel.dsv.core.infrastructure.Config.hintString;
 
 class JoinCommand implements Command {
 

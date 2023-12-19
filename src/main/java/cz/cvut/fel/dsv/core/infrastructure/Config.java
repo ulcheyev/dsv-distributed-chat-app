@@ -1,4 +1,4 @@
-package cz.cvut.fel.dsv.core;
+package cz.cvut.fel.dsv.core.infrastructure;
 
 public class Config {
 
@@ -7,9 +7,11 @@ public class Config {
 
     public static final String STUB_STRING = "stub";
     public static final String INITIAL_ROOM_NAME = "global";
-    public static final Integer SLEEP_TIME_IN_CS_S = 2;
+    public static final Integer SLEEP_TIME_IN_CS_S = 5;
 
     public static final String ANSI_GREEN_NODE = "\u001B[32m";
+    public static final String ANSI_PURPLE_SERVICE = "\u001B[35m";
+
 
     public static final String ANSI_RED_SERVICE = "\u001B[31m";
 

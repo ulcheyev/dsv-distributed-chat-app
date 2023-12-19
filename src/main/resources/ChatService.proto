@@ -5,6 +5,10 @@ package generated;
 
 message Empty {}
 
+message GrantMessage {
+  bool grant = 1;
+}
+
 message StringPayload {
   string msg = 1;
 }
@@ -75,35 +79,36 @@ message Health {
   bool isAlive = 1;
 }
 
-service RemotesService {
 
-  // Connecting methods
-  rpc joinRoom(JoinRequest) returns (JoinResponse); // To connect to room
-  rpc exitRoom(Remote) returns (Empty);
-  rpc preflight(Remote) returns (stream Message); // To get message streamobserver
-  rpc receiveRooms(Rooms) returns (Empty);
-  rpc receiveRoom(RoomEntry) returns (Empty);
-  rpc removeRoom(RoomEntry) returns (Empty);
 
-  // Methods to control CS when non existing rooms are creating
-  rpc receivePermissionRequest(PermissionRequest) returns (Empty);
-  rpc receivePermissionResponse(PermissionResponse) returns (Empty);
-  rpc updateRoomsTable(Empty) returns(Empty);
-
-  // Chat methods
+service RemoteService {
+  rpc beat(Empty) returns (Health);
+  rpc joinRoom(JoinRequest) returns (JoinResponse);
+  rpc preflight(Remote) returns (stream Message);
   rpc receiveMessage(Message) returns (Empty);
   rpc receiveGetRoomListRequest(Empty) returns (StringPayload);
   rpc receiveGetNodeListInCurrentRoomRequest(Empty) returns (StringPayload);
+  rpc exitRoom(Remote) returns (Empty);
+}
 
-  //Leader election
+service UpdateService {
+  rpc receivePermissionRequest(PermissionRequest) returns (GrantMessage);
+  rpc receivePermissionResponse(PermissionResponse) returns (Empty);
+  rpc receiveRooms(Rooms) returns (Empty);
+  rpc receiveRoom(RoomEntry) returns (Empty);
+  rpc removeRoom(RoomEntry) returns (Empty);
+  rpc updateRoomsTable(Empty) returns(GrantMessage);
+}
+
+service ElectionService {
   rpc changeNextNext(Remote) returns (Empty);
   rpc changePrev(Remote) returns (Remote);
   rpc election(Remote) returns (Empty);
   rpc elected(Remote) returns (Empty);
   rpc repairTopology(Remote) returns (Empty);
   rpc changeNeighbours(JoinRequest) returns (Neighbours);
-
-  rpc beat(Empty) returns (Health);
 }
+
+
 
 

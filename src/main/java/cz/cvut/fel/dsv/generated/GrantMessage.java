@@ -5,101 +5,49 @@
 package generated;
 
 /**
- * Protobuf type {@code generated.RemoteResponse}
+ * Protobuf type {@code generated.GrantMessage}
  */
-public final class RemoteResponse extends
+public final class GrantMessage extends
     com.google.protobuf.GeneratedMessageV3 implements
-    // @@protoc_insertion_point(message_implements:generated.RemoteResponse)
-    RemoteResponseOrBuilder {
+    // @@protoc_insertion_point(message_implements:generated.GrantMessage)
+    GrantMessageOrBuilder {
 private static final long serialVersionUID = 0L;
-  // Use RemoteResponse.newBuilder() to construct.
-  private RemoteResponse(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+  // Use GrantMessage.newBuilder() to construct.
+  private GrantMessage(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
     super(builder);
   }
-  private RemoteResponse() {
-    room_ = "";
+  private GrantMessage() {
   }
 
   @java.lang.Override
   @SuppressWarnings({"unused"})
   protected java.lang.Object newInstance(
       UnusedPrivateParameter unused) {
-    return new RemoteResponse();
+    return new GrantMessage();
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return generated.ChatService.internal_static_generated_RemoteResponse_descriptor;
+    return generated.ChatService.internal_static_generated_GrantMessage_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return generated.ChatService.internal_static_generated_RemoteResponse_fieldAccessorTable
+    return generated.ChatService.internal_static_generated_GrantMessage_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            generated.RemoteResponse.class, generated.RemoteResponse.Builder.class);
+            generated.GrantMessage.class, generated.GrantMessage.Builder.class);
   }
 
-  public static final int ADDED_FIELD_NUMBER = 1;
-  private boolean added_ = false;
+  public static final int GRANT_FIELD_NUMBER = 1;
+  private boolean grant_ = false;
   /**
-   * <pre>
-   * Indicator of adding or not
-   * </pre>
-   *
-   * <code>bool added = 1;</code>
-   * @return The added.
+   * <code>bool grant = 1;</code>
+   * @return The grant.
    */
   @java.lang.Override
-  public boolean getAdded() {
-    return added_;
-  }
-
-  public static final int ROOM_FIELD_NUMBER = 2;
-  @SuppressWarnings("serial")
-  private volatile java.lang.Object room_ = "";
-  /**
-   * <pre>
-   * Connected node room
-   * </pre>
-   *
-   * <code>string room = 2;</code>
-   * @return The room.
-   */
-  @java.lang.Override
-  public java.lang.String getRoom() {
-    java.lang.Object ref = room_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      room_ = s;
-      return s;
-    }
-  }
-  /**
-   * <pre>
-   * Connected node room
-   * </pre>
-   *
-   * <code>string room = 2;</code>
-   * @return The bytes for room.
-   */
-  @java.lang.Override
-  public com.google.protobuf.ByteString
-      getRoomBytes() {
-    java.lang.Object ref = room_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      room_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
+  public boolean getGrant() {
+    return grant_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -116,11 +64,8 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (added_ != false) {
-      output.writeBool(1, added_);
-    }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(room_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 2, room_);
+    if (grant_ != false) {
+      output.writeBool(1, grant_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -131,12 +76,9 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (added_ != false) {
+    if (grant_ != false) {
       size += com.google.protobuf.CodedOutputStream
-        .computeBoolSize(1, added_);
-    }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(room_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, room_);
+        .computeBoolSize(1, grant_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -148,15 +90,13 @@ private static final long serialVersionUID = 0L;
     if (obj == this) {
      return true;
     }
-    if (!(obj instanceof generated.RemoteResponse)) {
+    if (!(obj instanceof generated.GrantMessage)) {
       return super.equals(obj);
     }
-    generated.RemoteResponse other = (generated.RemoteResponse) obj;
+    generated.GrantMessage other = (generated.GrantMessage) obj;
 
-    if (getAdded()
-        != other.getAdded()) return false;
-    if (!getRoom()
-        .equals(other.getRoom())) return false;
+    if (getGrant()
+        != other.getGrant()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -168,54 +108,52 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + ADDED_FIELD_NUMBER;
+    hash = (37 * hash) + GRANT_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-        getAdded());
-    hash = (37 * hash) + ROOM_FIELD_NUMBER;
-    hash = (53 * hash) + getRoom().hashCode();
+        getGrant());
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
   }
 
-  public static generated.RemoteResponse parseFrom(
+  public static generated.GrantMessage parseFrom(
       java.nio.ByteBuffer data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static generated.RemoteResponse parseFrom(
+  public static generated.GrantMessage parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static generated.RemoteResponse parseFrom(
+  public static generated.GrantMessage parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static generated.RemoteResponse parseFrom(
+  public static generated.GrantMessage parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static generated.RemoteResponse parseFrom(byte[] data)
+  public static generated.GrantMessage parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static generated.RemoteResponse parseFrom(
+  public static generated.GrantMessage parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static generated.RemoteResponse parseFrom(java.io.InputStream input)
+  public static generated.GrantMessage parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static generated.RemoteResponse parseFrom(
+  public static generated.GrantMessage parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -223,26 +161,26 @@ private static final long serialVersionUID = 0L;
         .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
-  public static generated.RemoteResponse parseDelimitedFrom(java.io.InputStream input)
+  public static generated.GrantMessage parseDelimitedFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input);
   }
 
-  public static generated.RemoteResponse parseDelimitedFrom(
+  public static generated.GrantMessage parseDelimitedFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-  public static generated.RemoteResponse parseFrom(
+  public static generated.GrantMessage parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static generated.RemoteResponse parseFrom(
+  public static generated.GrantMessage parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -255,7 +193,7 @@ private static final long serialVersionUID = 0L;
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-  public static Builder newBuilder(generated.RemoteResponse prototype) {
+  public static Builder newBuilder(generated.GrantMessage prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
   @java.lang.Override
@@ -271,26 +209,26 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
-   * Protobuf type {@code generated.RemoteResponse}
+   * Protobuf type {@code generated.GrantMessage}
    */
   public static final class Builder extends
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:generated.RemoteResponse)
-      generated.RemoteResponseOrBuilder {
+      // @@protoc_insertion_point(builder_implements:generated.GrantMessage)
+      generated.GrantMessageOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return generated.ChatService.internal_static_generated_RemoteResponse_descriptor;
+      return generated.ChatService.internal_static_generated_GrantMessage_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return generated.ChatService.internal_static_generated_RemoteResponse_fieldAccessorTable
+      return generated.ChatService.internal_static_generated_GrantMessage_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              generated.RemoteResponse.class, generated.RemoteResponse.Builder.class);
+              generated.GrantMessage.class, generated.GrantMessage.Builder.class);
     }
 
-    // Construct using generated.RemoteResponse.newBuilder()
+    // Construct using generated.GrantMessage.newBuilder()
     private Builder() {
 
     }
@@ -304,25 +242,24 @@ private static final long serialVersionUID = 0L;
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      added_ = false;
-      room_ = "";
+      grant_ = false;
       return this;
     }
 
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return generated.ChatService.internal_static_generated_RemoteResponse_descriptor;
+      return generated.ChatService.internal_static_generated_GrantMessage_descriptor;
     }
 
     @java.lang.Override
-    public generated.RemoteResponse getDefaultInstanceForType() {
-      return generated.RemoteResponse.getDefaultInstance();
+    public generated.GrantMessage getDefaultInstanceForType() {
+      return generated.GrantMessage.getDefaultInstance();
     }
 
     @java.lang.Override
-    public generated.RemoteResponse build() {
-      generated.RemoteResponse result = buildPartial();
+    public generated.GrantMessage build() {
+      generated.GrantMessage result = buildPartial();
       if (!result.isInitialized()) {
         throw newUninitializedMessageException(result);
       }
@@ -330,20 +267,17 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public generated.RemoteResponse buildPartial() {
-      generated.RemoteResponse result = new generated.RemoteResponse(this);
+    public generated.GrantMessage buildPartial() {
+      generated.GrantMessage result = new generated.GrantMessage(this);
       if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
     }
 
-    private void buildPartial0(generated.RemoteResponse result) {
+    private void buildPartial0(generated.GrantMessage result) {
       int from_bitField0_ = bitField0_;
       if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.added_ = added_;
-      }
-      if (((from_bitField0_ & 0x00000002) != 0)) {
-        result.room_ = room_;
+        result.grant_ = grant_;
       }
     }
 
@@ -381,23 +315,18 @@ private static final long serialVersionUID = 0L;
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof generated.RemoteResponse) {
-        return mergeFrom((generated.RemoteResponse)other);
+      if (other instanceof generated.GrantMessage) {
+        return mergeFrom((generated.GrantMessage)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
 
-    public Builder mergeFrom(generated.RemoteResponse other) {
-      if (other == generated.RemoteResponse.getDefaultInstance()) return this;
-      if (other.getAdded() != false) {
-        setAdded(other.getAdded());
-      }
-      if (!other.getRoom().isEmpty()) {
-        room_ = other.room_;
-        bitField0_ |= 0x00000002;
-        onChanged();
+    public Builder mergeFrom(generated.GrantMessage other) {
+      if (other == generated.GrantMessage.getDefaultInstance()) return this;
+      if (other.getGrant() != false) {
+        setGrant(other.getGrant());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -426,15 +355,10 @@ private static final long serialVersionUID = 0L;
               done = true;
               break;
             case 8: {
-              added_ = input.readBool();
+              grant_ = input.readBool();
               bitField0_ |= 0x00000001;
               break;
             } // case 8
-            case 18: {
-              room_ = input.readStringRequireUtf8();
-              bitField0_ |= 0x00000002;
-              break;
-            } // case 18
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -452,138 +376,34 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private boolean added_ ;
+    private boolean grant_ ;
     /**
-     * <pre>
-     * Indicator of adding or not
-     * </pre>
-     *
-     * <code>bool added = 1;</code>
-     * @return The added.
+     * <code>bool grant = 1;</code>
+     * @return The grant.
      */
     @java.lang.Override
-    public boolean getAdded() {
-      return added_;
+    public boolean getGrant() {
+      return grant_;
     }
     /**
-     * <pre>
-     * Indicator of adding or not
-     * </pre>
-     *
-     * <code>bool added = 1;</code>
-     * @param value The added to set.
+     * <code>bool grant = 1;</code>
+     * @param value The grant to set.
      * @return This builder for chaining.
      */
-    public Builder setAdded(boolean value) {
+    public Builder setGrant(boolean value) {
 
-      added_ = value;
+      grant_ = value;
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <pre>
-     * Indicator of adding or not
-     * </pre>
-     *
-     * <code>bool added = 1;</code>
+     * <code>bool grant = 1;</code>
      * @return This builder for chaining.
      */
-    public Builder clearAdded() {
+    public Builder clearGrant() {
       bitField0_ = (bitField0_ & ~0x00000001);
-      added_ = false;
-      onChanged();
-      return this;
-    }
-
-    private java.lang.Object room_ = "";
-    /**
-     * <pre>
-     * Connected node room
-     * </pre>
-     *
-     * <code>string room = 2;</code>
-     * @return The room.
-     */
-    public java.lang.String getRoom() {
-      java.lang.Object ref = room_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        room_ = s;
-        return s;
-      } else {
-        return (java.lang.String) ref;
-      }
-    }
-    /**
-     * <pre>
-     * Connected node room
-     * </pre>
-     *
-     * <code>string room = 2;</code>
-     * @return The bytes for room.
-     */
-    public com.google.protobuf.ByteString
-        getRoomBytes() {
-      java.lang.Object ref = room_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        room_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    /**
-     * <pre>
-     * Connected node room
-     * </pre>
-     *
-     * <code>string room = 2;</code>
-     * @param value The room to set.
-     * @return This builder for chaining.
-     */
-    public Builder setRoom(
-        java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
-      room_ = value;
-      bitField0_ |= 0x00000002;
-      onChanged();
-      return this;
-    }
-    /**
-     * <pre>
-     * Connected node room
-     * </pre>
-     *
-     * <code>string room = 2;</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearRoom() {
-      room_ = getDefaultInstance().getRoom();
-      bitField0_ = (bitField0_ & ~0x00000002);
-      onChanged();
-      return this;
-    }
-    /**
-     * <pre>
-     * Connected node room
-     * </pre>
-     *
-     * <code>string room = 2;</code>
-     * @param value The bytes for room to set.
-     * @return This builder for chaining.
-     */
-    public Builder setRoomBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
-      room_ = value;
-      bitField0_ |= 0x00000002;
+      grant_ = false;
       onChanged();
       return this;
     }
@@ -600,23 +420,23 @@ private static final long serialVersionUID = 0L;
     }
 
 
-    // @@protoc_insertion_point(builder_scope:generated.RemoteResponse)
+    // @@protoc_insertion_point(builder_scope:generated.GrantMessage)
   }
 
-  // @@protoc_insertion_point(class_scope:generated.RemoteResponse)
-  private static final generated.RemoteResponse DEFAULT_INSTANCE;
+  // @@protoc_insertion_point(class_scope:generated.GrantMessage)
+  private static final generated.GrantMessage DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new generated.RemoteResponse();
+    DEFAULT_INSTANCE = new generated.GrantMessage();
   }
 
-  public static generated.RemoteResponse getDefaultInstance() {
+  public static generated.GrantMessage getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
-  private static final com.google.protobuf.Parser<RemoteResponse>
-      PARSER = new com.google.protobuf.AbstractParser<RemoteResponse>() {
+  private static final com.google.protobuf.Parser<GrantMessage>
+      PARSER = new com.google.protobuf.AbstractParser<GrantMessage>() {
     @java.lang.Override
-    public RemoteResponse parsePartialFrom(
+    public GrantMessage parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -635,17 +455,17 @@ private static final long serialVersionUID = 0L;
     }
   };
 
-  public static com.google.protobuf.Parser<RemoteResponse> parser() {
+  public static com.google.protobuf.Parser<GrantMessage> parser() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.google.protobuf.Parser<RemoteResponse> getParserForType() {
+  public com.google.protobuf.Parser<GrantMessage> getParserForType() {
     return PARSER;
   }
 
   @java.lang.Override
-  public generated.RemoteResponse getDefaultInstanceForType() {
+  public generated.GrantMessage getDefaultInstanceForType() {
     return DEFAULT_INSTANCE;
   }
 

@@ -1,55 +1,48 @@
 package cz.cvut.fel.dsv.utils;
 
+import cz.cvut.fel.dsv.core.Node;
 import cz.cvut.fel.dsv.core.data.Address;
 import cz.cvut.fel.dsv.core.data.DsvNeighbours;
 import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.data.DsvRemote;
-import cz.cvut.fel.dsv.core.Node;
-import generated.RemotesServiceGrpc;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.*;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 public class Utils {
 
     private Utils() {
     }
 
+    public static void tryToSleep(Integer sec) {
+        try {
+            Thread.sleep(TimeUnit.SECONDS.toMillis(sec));
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static class Skeleton {
-        private static ManagedChannel managedChannel;
+
 
         private Skeleton() {
         }
 
-        public static generated.RemotesServiceGrpc.RemotesServiceStub getAsyncSkeleton(Address address) {
-            managedChannel = ManagedChannelBuilder
+        public static ManagedChannel buildChannel(Address address) {
+            ManagedChannel build = ManagedChannelBuilder
                     .forAddress(address.getHostname(), address.getPort())
                     .usePlaintext()
                     .build();
-            return generated.RemotesServiceGrpc.newStub(managedChannel);
+            build.notifyWhenStateChanged(ConnectivityState.IDLE, build::shutdown);
+            return build;
         }
 
-        public static generated.RemotesServiceGrpc.RemotesServiceBlockingStub getSyncSkeleton(Address address) {
-            managedChannel = ManagedChannelBuilder
-                    .forAddress(address.getHostname(), address.getPort())
-                    .usePlaintext()
-                    .build();
-            return generated.RemotesServiceGrpc.newBlockingStub(managedChannel);
-        }
-
-        public static RemotesServiceGrpc.RemotesServiceFutureStub getFutureSkeleton(Address address) {
-            managedChannel = ManagedChannelBuilder
-                    .forAddress(address.getHostname(), address.getPort())
-                    .usePlaintext()
-                    .build();
-            return generated.RemotesServiceGrpc.newFutureStub(managedChannel);
-        }
-
-        public static void shutdown() {
-            managedChannel.shutdown();
+        public static ManagedChannel buildChannel(generated.Remote remote) {
+           return buildChannel(Utils.Mapper.remoteToAddress(remote));
         }
 
     }
