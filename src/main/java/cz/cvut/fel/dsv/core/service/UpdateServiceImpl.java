@@ -17,8 +17,10 @@ import io.grpc.stub.StreamObserver;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 import static cz.cvut.fel.dsv.core.infrastructure.Config.ANSI_PURPLE_SERVICE;
@@ -33,7 +35,7 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
     private AtomicInteger myClock = new AtomicInteger(0);
     private AtomicInteger maxClock = new AtomicInteger(0);
     private AtomicInteger responseCount = new AtomicInteger(0);
-
+    private Queue<Function<List<Address>, Boolean>> completableFutureQueue = new LinkedList<>();
     private final RemoteServiceImpl remoteService;
 
     public UpdateServiceImpl(Node node, RemoteServiceImpl remoteService, ElectionServiceImpl electionService) {
@@ -55,16 +57,22 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
     }
 
     private void unblock() {
-        if(node.getState().equals(NodeState.HOLDING)){
+        if(!node.getState().equals(NodeState.RELEASED)){
+            logger.info("Unblock node");
             node.setState(NodeState.RELEASED);
             remoteService.notifyJoinObservers();
+            try {
+                completableFutureQueue.remove().apply(getLeadersAddresses());
+            } catch (Exception e) {}
         }
     }
 
     @Override
     public void receiveRooms(generated.Rooms request, StreamObserver<generated.Empty> responseObserver) {
         logger.info("Receiving rooms. Count = " + request.getRoomsCount() + ": ");
-        request.getRoomsList().forEach((key) -> logger.info("\t\t[" + key.getRoomOwner().getHostname() + ":" + key.getRoomOwner().getPort() + " - " + key.getRoomName() + "]"));
+        request.getRoomsList().forEach((key) -> logger.info("\t\t[" +
+                key.getRoomOwner().getHostname() + ":" + key.getRoomOwner().getPort() + " - " + key.getRoomName() + "]" +
+                " [" + key.getRoomBackup().getHostname() + ":" + key.getRoomBackup().getPort() + "]"));
 
         for (var room : request.getRoomsList()) {
             var leader = Utils.Mapper.remoteToAddress(room.getRoomOwner());
@@ -98,53 +106,58 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
 
 
     protected boolean makeUpdateRoomsTable(List<Address> leadersAddresses) {
-        logger.info("*[CS] Start CS update tables: *");
-        node.setState(NodeState.REQUESTING);
-        myClock.set(maxClock.incrementAndGet());
-        logger.info("[CS] send requests to nodes, size = [" + leadersAddresses.size() + "]; maxClock: " + maxClock + ", nodeClock: " + myClock);
-        boolean joinedInCSFlag = true;
-        for (var key : leadersAddresses) {
-            try {
-                logger.info("\t\t-[CS] send request to node " + key);
-                if(!UpdateServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(key))
-                        .receivePermissionRequest(PermissionRequest.newBuilder()
-                                .setRequestByRemote(Utils.Mapper.nodeToRemote(node))
-                                .setClock(myClock.get())
-                                .build()).getGrant())
-                {
-                    joinedInCSFlag = false;
-                };
-            } catch (StatusRuntimeException exc) {
-                logger.info("\t\t-[CS] node " + key + " is not responding, removing...");
-                leadersAddresses.remove(key);
+        if(!node.getState().equals(NodeState.RELEASED)){
+            logger.info("makeUpdateRoomsTable is delayed...");
+            Function<List<Address>, Boolean> foo = this::makeUpdateRoomsTable;
+            completableFutureQueue.add(foo);
+        }else{
+            logger.info("*[CS] Start CS update tables: *");
+            node.setState(NodeState.REQUESTING);
+            myClock.set(maxClock.incrementAndGet());
+            int leaderSize = leadersAddresses.size();
+            if (leaderSize > 0 ) {
+                logger.info("[CS] send requests to nodes, size = [" + leaderSize + "]; maxClock: " + maxClock + ", nodeClock: " + myClock);
+                boolean joinedInCSFlag = true;
+                for (var key : leadersAddresses) {
+                    try {
+                        logger.info("\t\t-[CS] send request to node " + key);
+                        if(!UpdateServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(key))
+                                .receivePermissionRequest(PermissionRequest.newBuilder()
+                                        .setRequestByRemote(Utils.Mapper.nodeToRemote(node))
+                                        .setClock(myClock.get())
+                                        .build()).getGrant())
+                        {
+                            joinedInCSFlag = false;
+                        }
+                    } catch (StatusRuntimeException exc) {
+                        logger.info("\t\t-[CS] node " + key + " is not responding, removing...");
+                        leadersAddresses.remove(key);
+                    }
+                }
+
+                return joinedInCSFlag;
+            } else {
+                logger.info("Leaders size is less than 0");
+                unblock();
+                return true;
             }
         }
-        return joinedInCSFlag;
+        return false;
     }
 
     protected void updateBackupNode(boolean isNotVisited) {
             // Updating backup node via leader
             if (node.getIsLeader().getKey()) {
                 if (!node.getDsvNeighbours().getPrev().equals(node.getAddress())) {
-                    // isNotVisited in Rooms to avoid infinitive recursive invocation
-                    // Add try-catch ? If leader is dead, it will start election
-                    if (isNotVisited) {
-                        logger.info("Updating backup node [" + node.getDsvNeighbours().getPrev() + "]");
-                        node.getRoomsAndLeaders().put(node.getCurrentRoom(), new DsvPair<>(node.getAddress(), node.getDsvNeighbours().getPrev()));
-                        DsvThreadPool.execute(() -> generated.UpdateServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(node.getDsvNeighbours().getPrev()))
-                                .receiveRooms(Utils.Mapper.leaderRoomsToRemoteRooms(node.getRoomsAndLeaders(), false)));
-                        for (var entry : node.getRoomsAndLeaders().entrySet()) {
-                            if (!node.getAddress().equals(entry.getValue().getKey())) {
-                                DsvThreadPool.execute(() ->  generated.UpdateServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(entry.getValue().getKey()))
-                                        .receiveRooms(Utils.Mapper.leaderRoomsToRemoteRooms(node.getRoomsAndLeaders(), false)));
-
-                            }
-                        }
-                    }
+                    logger.info("Updating backup node [" + node.getDsvNeighbours().getPrev() + "]");
+                    node.getRoomsAndLeaders().put(node.getCurrentRoom(), new DsvPair<>(node.getAddress(), node.getDsvNeighbours().getPrev()));
+                    DsvThreadPool.execute(() -> generated.UpdateServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(node.getDsvNeighbours().getPrev()))
+                            .receiveRooms(Utils.Mapper.leaderRoomsToRemoteRooms(node.getRoomsAndLeaders(), false)));
                 } else { // When only a leader in a room. Prev on the leader is leader
                     node.getRoomsAndLeaders().put(node.getCurrentRoom(), new DsvPair<>(node.getAddress(), node.getDsvNeighbours().getPrev()));
                 }
             }
+            remoteService.notifyJoinObservers();
     }
 
 
@@ -197,28 +210,29 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
                 var copyOfTable = new ConcurrentHashMap<>(node.getRoomsAndLeaders());
                 int necessarySize = copyOfTable.size();
 
+                logger.info("Response count to necessary size [ " + responseCount.get() + " : " + necessarySize + " ]");
                 if (responseCount.get() == necessarySize) {
+                    logger.info("[CS] responseCount = [" + responseCount + "] is equal to requested nodes size = [" + necessarySize + "]; Sending rooms; maxClock: " + maxClock + " nodeClock: " + myClock);
+                    node.setState(NodeState.HOLDING);
+                    responseCount.set(0);
                     DsvThreadPool.execute(() -> {
-                        node.setState(NodeState.HOLDING);
-                        logger.info("[CS] responseCount = [" + responseCount + "] is equal to requested nodes size = [" + necessarySize + "]; Sending rooms; maxClock: " + maxClock + " nodeClock: " + myClock);
 
-                            for (var n : copyOfTable.keySet()) {
-                                tryToSleep(Config.SLEEP_TIME_IN_CS_S);
-                                try {
-                                    generated.UpdateServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(copyOfTable.get(n).getKey()))
-                                            .receiveRooms(Utils.Mapper.leaderRoomsToRemoteRooms(copyOfTable, true));
-                                }catch (StatusRuntimeException e) {
-                                    node.getRoomsAndLeaders().remove(n);
-                                    makeUpdateRoomsTable(getLeadersAddresses());
-                                    // todo update
-                                }
-                            };
+                        for (var n : copyOfTable.keySet()) {
+                            tryToSleep(Config.SLEEP_TIME_IN_CS_S);
+                            try {
+                                generated.UpdateServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(copyOfTable.get(n).getKey()))
+                                        .receiveRooms(Utils.Mapper.leaderRoomsToRemoteRooms(copyOfTable, true));
+                            }catch (StatusRuntimeException e) {
+                                node.getRoomsAndLeaders().remove(n);
+                                makeUpdateRoomsTable(getLeadersAddresses());
+                                // todo update
+                            }
+                        }
 
-                        responseCount.set(0);
                         logger.info("*[CS] End CS update tables*");
 
-                       while (!dsvRemotes.isEmpty()){
-                           var cur = dsvRemotes.remove();
+                        while (!dsvRemotes.isEmpty()){
+                            var cur = dsvRemotes.remove();
                             if (cur.getIsRequesting()) {
                                 logger.info("[CS] send permission to requesting node: " + cur.getAddress() + "; maxClock: " + maxClock + ", nodeClock: " + myClock);
                                 receivePermissionRequestHelper(generated.PermissionRequest.newBuilder().setRequestByRemote(Utils.Mapper.dsvRemoteToRemote(cur)).build());
@@ -243,7 +257,7 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
     }
 
 
-    private List<Address> getLeadersAddresses() {
+    public List<Address> getLeadersAddresses() {
         return node.getRoomsAndLeaders().values().stream().map(DsvPair::getKey).toList();
     }
 

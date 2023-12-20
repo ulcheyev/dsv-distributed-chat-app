@@ -38,7 +38,6 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
         // If node to disconnect == leader node in room, then disconnect all nodes from current node
         // Then node will change the room in joinRoom()
 
-
         if (request.getNodeId() == node.getAddress().getId()) {
 
             node.getIsLeader().getValue().disconnectAllUsers();
@@ -170,7 +169,6 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
         node.getIsLeader()
                 .getValue()
                 .addToRoom(new DsvPair<>(Utils.Mapper.remoteToDsvRemote(request), responseObserver));
-        node.setState(NodeState.RELEASED);
     }
 
 
