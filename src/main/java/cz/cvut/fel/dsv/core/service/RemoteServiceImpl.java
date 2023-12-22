@@ -19,18 +19,14 @@ import java.util.logging.Logger;
 import static cz.cvut.fel.dsv.core.infrastructure.Config.ANSI_PURPLE_SERVICE;
 
 public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteServiceImplBase {
-
     private static final Logger logger = DsvLogger.getLogger("REMOTE SERVICE", ANSI_PURPLE_SERVICE, RemoteServiceImpl.class);
-    private volatile Node node;
+    private final Node node = Node.getInstance();
     private final ElectionServiceImpl electionService;
-
     private final Queue<DsvPair<generated.JoinRequest, StreamObserver<generated.JoinResponse>>> joinQueue = new LinkedList<>();
 
-    public RemoteServiceImpl(Node node, ElectionServiceImpl electionService) {
-        this.node = node;
+    public RemoteServiceImpl(ElectionServiceImpl electionService) {
         this.electionService = electionService;
     }
-
 
     @Override
     public void exitRoom(Remote request, StreamObserver<Empty> responseObserver) {
@@ -46,7 +42,7 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
             if (node.getIsLeader().getValue().getSize() == 1) {
                 for (var key : node.getRoomsAndLeaders().keySet()) {
                     try {
-                       generated.UpdateServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(node.getRoomsAndLeaders().get(key).getKey()))
+                        generated.UpdateServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(node.getRoomsAndLeaders().get(key).getKey()))
                                 .removeRoom(generated.RoomEntry.newBuilder().setRoomName(node.getCurrentRoom()).build());
                     } catch (StatusRuntimeException exc) {
                         // todo
@@ -66,9 +62,9 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
     @Override
     public void joinRoom(generated.JoinRequest request, StreamObserver<generated.JoinResponse> responseObserver) {
         logger.info("[request by Node " + request.getRemote().getUsername() + "] request to join is processing");
-        if(node.getState() == NodeState.HOLDING) {
-            joinQueue.add(new DsvPair<>(request, responseObserver));
-        }else{
+        if (node.getState() == NodeState.HOLDING) {
+            joinQueue.add(DsvPair.of(request, responseObserver));
+        } else {
             // If node is leader
             if (node.getIsLeader().getKey()) {
                 // Leader of requested room
@@ -101,7 +97,7 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
                         // Send to leaders new rooms table
                         // CS - send requests
                         var initial = Utils.Mapper.remoteToAddress(request.getRemote());
-                        node.getRoomsAndLeaders().put(request.getRoomName(), new DsvPair<>(initial, initial));
+                        node.getRoomsAndLeaders().put(request.getRoomName(), DsvPair.of(initial, initial));
                         responseObserver.onNext(generated.JoinResponse.newBuilder()
                                 .setNeighbours(Utils.Mapper.remoteToNeighbours(request.getRemote()))
                                 .setIsLeader(true)
@@ -121,17 +117,13 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
             }
             responseObserver.onCompleted();
         }
-
     }
-
-
 
     @Override
     public void beat(Empty request, StreamObserver<generated.Health> responseObserver) {
         responseObserver.onNext(generated.Health.newBuilder().setIsAlive(true).build());
         responseObserver.onCompleted();
     }
-
 
     @Override
     public void receiveGetRoomListRequest(Empty request, StreamObserver<generated.StringPayload> responseObserver) {
@@ -168,20 +160,15 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
         logger.info("Preflight received. Added [" + request.getUsername() + "] to room " + "[" + node.getCurrentRoom() + "]");
         node.getIsLeader()
                 .getValue()
-                .addToRoom(new DsvPair<>(Utils.Mapper.remoteToDsvRemote(request), responseObserver));
+                .addToRoom(DsvPair.of(Utils.Mapper.remoteToDsvRemote(request), responseObserver));
     }
-
 
     public void notifyJoinObservers() {
         try {
             var suspect = joinQueue.remove();
             joinRoom(suspect.getKey(), suspect.getValue());
-        }catch (NoSuchElementException ignored){};
-    }
-
-
-    private RemoteServiceImpl(ElectionServiceImpl electionService, UpdateServiceImpl updateService) {
-        this.electionService = electionService;
+        } catch (NoSuchElementException ignored) {
+        }
     }
 
     private generated.Neighbours changeNeighbours(generated.JoinRequest request) {
@@ -193,7 +180,4 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
                 .map(DsvPair::getKey)
                 .toList();
     }
-
-
-
 }

@@ -4,9 +4,13 @@ public class DsvPair<K, V> {
     private final K key;
     private final V value;
 
-    public DsvPair(K key, V value) {
+    private DsvPair(K key, V value) {
         this.key = key;
         this.value = value;
+    }
+
+    public static <K, V> DsvPair<K, V> of(K key, V value) {
+        return new DsvPair<>(key, value);
     }
 
     public K getKey() {

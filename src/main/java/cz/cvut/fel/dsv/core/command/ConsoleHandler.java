@@ -9,13 +9,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ConsoleHandler implements Runnable {
-    private final Node node;
+    private final Node node = Node.getInstance();
     private boolean reading = true;
     private final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     private final Map<String, Command> commandMap = new HashMap<>();
 
-    public ConsoleHandler(Node node) {
-        this.node = node;
+    public ConsoleHandler() {
         initMap();
     }
 
@@ -46,6 +45,7 @@ public class ConsoleHandler implements Runnable {
         commandMap.put("!help", new HelpCommand());
         commandMap.put("!rooms", new RoomsCommand());
         commandMap.put("!election", new StartElectionCommand());
+        commandMap.put("!exit", new DisconnectCommand());
     }
 
     @Override

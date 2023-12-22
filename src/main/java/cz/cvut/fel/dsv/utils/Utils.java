@@ -7,15 +7,27 @@ import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.data.DsvRemote;
 import io.grpc.*;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 public class Utils {
 
     private Utils() {
+    }
+
+    public static <R> Optional<R> handleAndReturn(Function<Object, R> funcToHandle, UnaryOperator<Void> handler) {
+        Optional<R> toRet = Optional.empty();
+        try {
+            toRet = Optional.ofNullable(funcToHandle.apply(generated.Empty.getDefaultInstance()));
+        } catch (Exception e) {
+            handler.apply(null);
+        }
+        return toRet;
     }
 
     public static void tryToSleep(Integer sec) {
@@ -42,12 +54,13 @@ public class Utils {
         }
 
         public static ManagedChannel buildChannel(generated.Remote remote) {
-           return buildChannel(Utils.Mapper.remoteToAddress(remote));
+            return buildChannel(Utils.Mapper.remoteToAddress(remote));
         }
 
     }
 
     public static class Mapper {
+        private static final Node node = Node.getInstance();
 
         private Mapper() {
         }
@@ -71,7 +84,7 @@ public class Utils {
                     .build();
         }
 
-        public static generated.Remote nodeToRemote(Node node) {
+        public static generated.Remote nodeToRemote() {
             return generated.Remote.newBuilder()
                     .setHostname(node.getAddress().getHostname())
                     .setNodeId(node.getAddress().getId())
@@ -94,7 +107,7 @@ public class Utils {
             return builder.build();
         }
 
-        public static generated.RoomEntry nodeToRoomEntry(Node node) {
+        public static generated.RoomEntry nodeToRoomEntry() {
             return generated.RoomEntry.newBuilder()
                     .setRoomName(node.getCurrentRoom())
                     .setRoomOwner(Utils.Mapper.addressToRemote(node.getAddress()))

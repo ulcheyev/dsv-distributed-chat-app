@@ -1,6 +1,5 @@
 package cz.cvut.fel.dsv.core.service;
 
-import cz.cvut.fel.dsv.core.DsvThreadPool;
 import cz.cvut.fel.dsv.core.Node;
 import cz.cvut.fel.dsv.core.Room;
 import cz.cvut.fel.dsv.core.data.Address;
@@ -16,17 +15,12 @@ import lombok.Setter;
 import java.util.List;
 import java.util.logging.Logger;
 
-import static cz.cvut.fel.dsv.core.infrastructure.Config.*;
+import static cz.cvut.fel.dsv.core.infrastructure.Config.ANSI_PURPLE_SERVICE;
 
 public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImplBase {
-
     private static final Logger logger = DsvLogger.getLogger("ELECTION SERVICE", ANSI_PURPLE_SERVICE, ElectionServiceImpl.class);
-    private final Node node;
+    private final Node node = Node.getInstance();
     @Setter private UpdateServiceImpl updateService;
-
-    public ElectionServiceImpl(Node node) {
-        this.node = node;
-    }
 
     @Override
     public void changeNextNext(generated.Remote request, StreamObserver<generated.Empty> responseObserver) {
@@ -74,9 +68,9 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
 
     private void electedCandidate() {
         logger.info("Node is elected candidate. Setting up properties...");
-        node.setIsLeader(new DsvPair<>(true, new Room(node.getAddress(), node.getCurrentRoom())));
+        node.setIsLeader(DsvPair.of(true, new Room(node.getAddress(), node.getCurrentRoom())));
         var former = node.getDsvNeighbours().getLeader();
-        node.getRoomsAndLeaders().put(node.getCurrentRoom(), new DsvPair<>(node.getAddress(), node.getDsvNeighbours().getPrev()));
+        node.getRoomsAndLeaders().put(node.getCurrentRoom(), DsvPair.of(node.getAddress(), node.getDsvNeighbours().getPrev()));
         node.getRoomsAndLeaders().forEach((key, value) -> logger.info(value.toString()));
         updateService.updateBackupNode(true);
         updateService.makeUpdateRoomsTable(List.of(node.getAddress(), former));
@@ -107,7 +101,6 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
 
         responseObserver.onNext(generated.Empty.getDefaultInstance());
         responseObserver.onCompleted();
-
     }
 
     @Override

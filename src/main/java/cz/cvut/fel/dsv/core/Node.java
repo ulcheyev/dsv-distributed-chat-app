@@ -27,6 +27,7 @@ import java.net.InetAddress;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.UnaryOperator;
 import java.util.logging.Logger;
 
 import static cz.cvut.fel.dsv.core.infrastructure.Config.ANSI_GREEN_NODE;
@@ -44,19 +45,26 @@ public class Node {
     @Getter @Setter private NodeState state;
     @Getter @Setter private DsvNeighbours dsvNeighbours;
     @Getter @Setter private boolean isVoting;
-    private final ConsoleHandler consoleHandler;
+    private ConsoleHandler consoleHandler;
     private final ServerWrapper server;
     private ManagedChannel managedChannelToLeader;
     private StreamObserver<generated.Message> receiveMessagesObserver;
+    private static volatile Node INSTANCE;
 
     public Node() {
-        server = new ServerWrapper(this);
-        consoleHandler = new ConsoleHandler(this);
+        server = new ServerWrapper();
         roomsAndLeaders = new ConcurrentHashMap<>();
-        isLeader = new DsvPair<>(false, new Room.NullableRoom());
-        DsvThreadPool.setNode(this);
+        isLeader = DsvPair.of(false, new Room.NullableRoom());
         state = NodeState.RELEASED;
         init();
+    }
+
+    public static Node getInstance() {
+        if (INSTANCE != null) return INSTANCE;
+        synchronized (Node.class) {
+            if (INSTANCE == null) INSTANCE = new Node();
+        }
+        return INSTANCE;
     }
 
     private void init() {
@@ -90,7 +98,7 @@ public class Node {
         if (currentRoom == null || !(currentRoom.equals(roomName))) {
             generated.JoinRequest req = generated.JoinRequest.newBuilder()
                     .setRoomName(roomName)
-                    .setRemote(Utils.Mapper.nodeToRemote(this))
+                    .setRemote(Utils.Mapper.nodeToRemote())
                     .build();
             executeJoining(joinAddress, req);
         } else {
@@ -125,16 +133,15 @@ public class Node {
                         if (leaderAddressFromResponse.equals(address)) {
                             boolean grant = startUpdateTables(oldLeaderAddress);
                             logger.info("Grant is " + grant);
-                            if(grant)
-                            {
+                            if (grant) {
                                 logger.info("Node created the room " + req.getRoomName());
-                                isLeader = new DsvPair<>(true, new Room(address, req.getRoomName()));
+                                isLeader = DsvPair.of(true, new Room(address, req.getRoomName()));
                             }
                         }
                         // Node is not a leader in connecting room. Delete data about rooms and leaders.
                         else {
                             logger.info("Joined room " + req.getRoomName());
-                            isLeader = new DsvPair<>(false, new Room.NullableRoom());
+                            isLeader = DsvPair.of(false, new Room.NullableRoom());
                             if (!dsvNeighbours.getNext().equals(dsvNeighbours.getLeader()))
                                 roomsAndLeaders.clear();
                         }
@@ -154,27 +161,18 @@ public class Node {
 
     public void joinRoomViaLeader(String roomName) {
         assert dsvNeighbours.getLeader() != null;
-        if (!Objects.equals(roomName, currentRoom)) {
-            exitRoom();
-            startRepairTopology(dsvNeighbours.getPrev(), address);
-            if (nodeWasLeader(address) && leadingRoomIsNotEmpty()) {
-                logger.info( "Was a leader. Make election and update tables");
-                makeElection(dsvNeighbours.getNext());
-                startUpdateTables(dsvNeighbours.getLeader());
-            }
-        }
+        if (!Objects.equals(roomName, currentRoom))
+            executeExit();
         joinRoom(dsvNeighbours.getLeader(), roomName);
     }
 
-    // TODO: If leader is dead, here StatusRuntimeException
     private void exitRoom() {
         logger.info("Exiting room " + currentRoom);
         try {
             generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(dsvNeighbours.getLeader()))
-                    .exitRoom(Utils.Mapper.nodeToRemote(this));
+                    .exitRoom(Utils.Mapper.nodeToRemote());
         } catch (StatusRuntimeException e) {
-            startRepairTopology(address, dsvNeighbours.getLeader());
-            makeElection(address);
+            emergencyRepairAndElection();
             startUpdateTables(dsvNeighbours.getLeader());
             exitRoom();
         }
@@ -190,7 +188,7 @@ public class Node {
 
     public void startElectionWithDelay(int seconds) {
         try {
-            Thread.sleep(seconds* 1000L);
+            Thread.sleep(seconds * 1000L);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -209,6 +207,7 @@ public class Node {
         logger.info("Try update tables on node "
                 + address.getHostname() + ":" + address.getPort());
 
+        // TODO: If leader is dead and we do not update leader table on other nodes, it will occur error because address of dead leader is still in the table
         GrantMessage grantMessage = UpdateServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(address))
                 .updateRoomsTable(generated.Empty.getDefaultInstance());
         return grantMessage.getGrant();
@@ -223,13 +222,19 @@ public class Node {
     }
 
     public void sendMessage(String msg) {
-        try {
-            generated.RemoteServiceGrpc.newFutureStub(managedChannelToLeader)
-                    .receiveMessage(Utils.Mapper.stringToMessage(Utils.Mapper.nodeToRemote(this), msg));
-        } catch (StatusRuntimeException e) {
-            startRepairTopology(address, dsvNeighbours.getLeader());
-            makeElection(address);
-        }
+        var stub = generated.RemoteServiceGrpc.newFutureStub(managedChannelToLeader);
+        ListenableFuture<generated.Empty> sendMessageResponse = stub.receiveMessage(Utils.Mapper.stringToMessage(Utils.Mapper.nodeToRemote(), msg));
+        Futures.addCallback(sendMessageResponse, new FutureCallback<generated.Empty>() {
+            @Override
+            public void onSuccess(generated.Empty result) {
+                // Do nothing
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                emergencyRepairAndElection().apply(null);
+            }
+        }, DsvThreadPool.getPool());
     }
 
     private void handleArgs(String[] args) {
@@ -243,9 +248,9 @@ public class Node {
 
                 // The first node in topology. Creates the global room and is its leader.
                 if (args.length == 2) {
-                    isLeader = new DsvPair<>(true, new Room(address, Config.INITIAL_ROOM_NAME));
+                    isLeader = DsvPair.of(true, new Room(address, Config.INITIAL_ROOM_NAME));
                     currentRoom = Config.INITIAL_ROOM_NAME;
-                    roomsAndLeaders.put(Config.INITIAL_ROOM_NAME, new DsvPair<>(address, address));
+                    roomsAndLeaders.put(Config.INITIAL_ROOM_NAME, DsvPair.of(address, address));
                     dsvNeighbours.setLeader(address);
                     updateChannelToLeader();
                     preflight();
@@ -267,7 +272,7 @@ public class Node {
     }
 
     public static void main(String[] args) {
-        final Node node = new Node();
+        final Node node = getInstance();
         node.handleArgs(args);
         node.listen();
     }
@@ -276,25 +281,39 @@ public class Node {
         DsvThreadPool.execute(() -> {
             logger.info("Sending preflight to " + dsvNeighbours.getLeader());
             generated.RemoteServiceGrpc.newStub(Utils.Skeleton.buildChannel(dsvNeighbours.getLeader()))
-                    .preflight(Utils.Mapper.nodeToRemote(this), receiveMessagesObserver);
+                    .preflight(Utils.Mapper.nodeToRemote(), receiveMessagesObserver);
         });
-
     }
 
-
     public String getNodeListInCurrentRoom() {
-        return generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(dsvNeighbours.getLeader()))
-                .receiveGetNodeListInCurrentRoomRequest(generated.Empty.getDefaultInstance())
-                .getMsg();
+        return Utils.handleAndReturn(empty ->
+                        generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(dsvNeighbours.getLeader()))
+                                .receiveGetNodeListInCurrentRoomRequest(generated.Empty.getDefaultInstance())
+                                .getMsg(),
+                emergencyRepairAndElection()
+        ).orElse("");
     }
 
     public String getRoomListInNetwork() {
-        return generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(dsvNeighbours.getLeader()))
-                .receiveGetRoomListRequest(generated.Empty.getDefaultInstance())
-                .getMsg();
+        return Utils.handleAndReturn(empty ->
+                        generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(dsvNeighbours.getLeader()))
+                                .receiveGetRoomListRequest(generated.Empty.getDefaultInstance())
+                                .getMsg(),
+                emergencyRepairAndElection()
+        ).orElse("");
+    }
+
+    private UnaryOperator<Void> emergencyRepairAndElection() {
+        // Use this method for handle leader's death
+        return v -> {
+            startRepairTopology(address, dsvNeighbours.getLeader());
+            makeElection(address);
+            return null;
+        };
     }
 
     private void listen() {
+        consoleHandler = new ConsoleHandler();
         DsvThreadPool.execute(consoleHandler);
     }
 
@@ -304,6 +323,16 @@ public class Node {
 
     private boolean nodeWasLeader(Address address) {
         return dsvNeighbours.getLeader().equals(address);
+    }
+
+    public void executeExit() {
+        exitRoom();
+        startRepairTopology(dsvNeighbours.getPrev(), address);
+        if (nodeWasLeader(address) && leadingRoomIsNotEmpty()) {
+            logger.info("Was a leader. Make election and update tables");
+            makeElection(dsvNeighbours.getNext());
+            startUpdateTables(dsvNeighbours.getLeader());
+        }
     }
 
     @Override

@@ -7,7 +7,7 @@ public class Config {
 
     public static final String STUB_STRING = "stub";
     public static final String INITIAL_ROOM_NAME = "global";
-    public static final Integer SLEEP_TIME_IN_CS_S = 2;
+    public static final Integer SLEEP_TIME_IN_CS_S = 3;
 
     public static final String ANSI_GREEN_NODE = "\u001B[32m";
     public static final String ANSI_PURPLE_SERVICE = "\u001B[35m";
@@ -23,7 +23,8 @@ public class Config {
                 !online: show the list of online users in room;
                 !rooms: show list of available rooms;
                 !info:  show information about the current user;
-                !election [seconds]: start election with [seconds] delay.
+                !election [seconds]: start election with [seconds] delay;
+                !exit: disconnect from the chat.
             """;
 
     public static String hintString(String command) {
