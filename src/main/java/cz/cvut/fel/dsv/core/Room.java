@@ -14,7 +14,7 @@ import java.util.Objects;
 
 public class Room {
     @Getter private final String roomName;
-    private final List<DsvPair<DsvRemote, StreamObserver<generated.Message>>> users;
+    private final List<DsvPair<DsvRemote, StreamObserver<generated.ChatMessage>>> users;
     private Address leader;
 
     public Room(Address leader, String name) {
@@ -28,7 +28,7 @@ public class Room {
         users = new ArrayList<>();
     }
 
-    public void addToRoom(DsvPair<DsvRemote, StreamObserver<generated.Message>> user) {
+    public void addToRoom(DsvPair<DsvRemote, StreamObserver<generated.ChatMessage>> user) {
         users.add(user);
     }
 
@@ -42,7 +42,7 @@ public class Room {
         }
     }
 
-    public void sendMessageToRoom(generated.Message msg) {
+    public void sendMessageToRoom(generated.ChatMessage msg) {
         for (var user : users) {
             if (!Objects.equals(user.getKey().getAddress().getId(), msg.getRemote().getNodeId()))
                 try {

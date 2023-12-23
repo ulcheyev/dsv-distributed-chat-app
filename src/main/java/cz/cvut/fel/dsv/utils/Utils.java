@@ -5,6 +5,9 @@ import cz.cvut.fel.dsv.core.data.Address;
 import cz.cvut.fel.dsv.core.data.DsvNeighbours;
 import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.data.DsvRemote;
+import cz.cvut.fel.dsv.core.service.DsvClientInterceptor;
+import generated.ChatMessage;
+import generated.Remote;
 import io.grpc.*;
 
 import java.util.Map;
@@ -48,6 +51,7 @@ public class Utils {
             ManagedChannel build = ManagedChannelBuilder
                     .forAddress(address.getHostname(), address.getPort())
                     .usePlaintext()
+                    .intercept(new DsvClientInterceptor())
                     .build();
             build.notifyWhenStateChanged(ConnectivityState.IDLE, build::shutdown);
             return build;
@@ -77,8 +81,8 @@ public class Utils {
             return new Address(remote.getHostname(), remote.getPort(), remote.getNodeId());
         }
 
-        public static generated.Message stringToMessage(generated.Remote remote, String message) {
-            return generated.Message.newBuilder()
+        public static ChatMessage stringToMessage(Remote remote, String message) {
+            return generated.ChatMessage.newBuilder()
                     .setMsg(message)
                     .setRemote(remote)
                     .build();

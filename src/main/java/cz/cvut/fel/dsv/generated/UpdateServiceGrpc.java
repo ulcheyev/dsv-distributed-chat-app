@@ -78,28 +78,28 @@ public final class UpdateServiceGrpc {
   }
 
   private static volatile io.grpc.MethodDescriptor<generated.Rooms,
-      generated.Empty> getReceiveRoomsMethod;
+      generated.Message> getReceiveRoomsMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "receiveRooms",
       requestType = generated.Rooms.class,
-      responseType = generated.Empty.class,
+      responseType = generated.Message.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<generated.Rooms,
-      generated.Empty> getReceiveRoomsMethod() {
-    io.grpc.MethodDescriptor<generated.Rooms, generated.Empty> getReceiveRoomsMethod;
+      generated.Message> getReceiveRoomsMethod() {
+    io.grpc.MethodDescriptor<generated.Rooms, generated.Message> getReceiveRoomsMethod;
     if ((getReceiveRoomsMethod = UpdateServiceGrpc.getReceiveRoomsMethod) == null) {
       synchronized (UpdateServiceGrpc.class) {
         if ((getReceiveRoomsMethod = UpdateServiceGrpc.getReceiveRoomsMethod) == null) {
           UpdateServiceGrpc.getReceiveRoomsMethod = getReceiveRoomsMethod =
-              io.grpc.MethodDescriptor.<generated.Rooms, generated.Empty>newBuilder()
+              io.grpc.MethodDescriptor.<generated.Rooms, generated.Message>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(SERVICE_NAME, "receiveRooms"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   generated.Rooms.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  generated.Empty.getDefaultInstance()))
+                  generated.Message.getDefaultInstance()))
               .setSchemaDescriptor(new UpdateServiceMethodDescriptorSupplier("receiveRooms"))
               .build();
         }
@@ -109,28 +109,28 @@ public final class UpdateServiceGrpc {
   }
 
   private static volatile io.grpc.MethodDescriptor<generated.RoomEntry,
-      generated.Empty> getReceiveRoomMethod;
+      generated.Message> getReceiveRoomMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "receiveRoom",
       requestType = generated.RoomEntry.class,
-      responseType = generated.Empty.class,
+      responseType = generated.Message.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<generated.RoomEntry,
-      generated.Empty> getReceiveRoomMethod() {
-    io.grpc.MethodDescriptor<generated.RoomEntry, generated.Empty> getReceiveRoomMethod;
+      generated.Message> getReceiveRoomMethod() {
+    io.grpc.MethodDescriptor<generated.RoomEntry, generated.Message> getReceiveRoomMethod;
     if ((getReceiveRoomMethod = UpdateServiceGrpc.getReceiveRoomMethod) == null) {
       synchronized (UpdateServiceGrpc.class) {
         if ((getReceiveRoomMethod = UpdateServiceGrpc.getReceiveRoomMethod) == null) {
           UpdateServiceGrpc.getReceiveRoomMethod = getReceiveRoomMethod =
-              io.grpc.MethodDescriptor.<generated.RoomEntry, generated.Empty>newBuilder()
+              io.grpc.MethodDescriptor.<generated.RoomEntry, generated.Message>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(SERVICE_NAME, "receiveRoom"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   generated.RoomEntry.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  generated.Empty.getDefaultInstance()))
+                  generated.Message.getDefaultInstance()))
               .setSchemaDescriptor(new UpdateServiceMethodDescriptorSupplier("receiveRoom"))
               .build();
         }
@@ -140,28 +140,28 @@ public final class UpdateServiceGrpc {
   }
 
   private static volatile io.grpc.MethodDescriptor<generated.RoomEntry,
-      generated.Empty> getRemoveRoomMethod;
+      generated.Message> getRemoveRoomMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "removeRoom",
       requestType = generated.RoomEntry.class,
-      responseType = generated.Empty.class,
+      responseType = generated.Message.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<generated.RoomEntry,
-      generated.Empty> getRemoveRoomMethod() {
-    io.grpc.MethodDescriptor<generated.RoomEntry, generated.Empty> getRemoveRoomMethod;
+      generated.Message> getRemoveRoomMethod() {
+    io.grpc.MethodDescriptor<generated.RoomEntry, generated.Message> getRemoveRoomMethod;
     if ((getRemoveRoomMethod = UpdateServiceGrpc.getRemoveRoomMethod) == null) {
       synchronized (UpdateServiceGrpc.class) {
         if ((getRemoveRoomMethod = UpdateServiceGrpc.getRemoveRoomMethod) == null) {
           UpdateServiceGrpc.getRemoveRoomMethod = getRemoveRoomMethod =
-              io.grpc.MethodDescriptor.<generated.RoomEntry, generated.Empty>newBuilder()
+              io.grpc.MethodDescriptor.<generated.RoomEntry, generated.Message>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(SERVICE_NAME, "removeRoom"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   generated.RoomEntry.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  generated.Empty.getDefaultInstance()))
+                  generated.Message.getDefaultInstance()))
               .setSchemaDescriptor(new UpdateServiceMethodDescriptorSupplier("removeRoom"))
               .build();
         }
@@ -266,21 +266,21 @@ public final class UpdateServiceGrpc {
     /**
      */
     default void receiveRooms(generated.Rooms request,
-        io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
+        io.grpc.stub.StreamObserver<generated.Message> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getReceiveRoomsMethod(), responseObserver);
     }
 
     /**
      */
     default void receiveRoom(generated.RoomEntry request,
-        io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
+        io.grpc.stub.StreamObserver<generated.Message> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getReceiveRoomMethod(), responseObserver);
     }
 
     /**
      */
     default void removeRoom(generated.RoomEntry request,
-        io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
+        io.grpc.stub.StreamObserver<generated.Message> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getRemoveRoomMethod(), responseObserver);
     }
 
@@ -338,7 +338,7 @@ public final class UpdateServiceGrpc {
     /**
      */
     public void receiveRooms(generated.Rooms request,
-        io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
+        io.grpc.stub.StreamObserver<generated.Message> responseObserver) {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getReceiveRoomsMethod(), getCallOptions()), request, responseObserver);
     }
@@ -346,7 +346,7 @@ public final class UpdateServiceGrpc {
     /**
      */
     public void receiveRoom(generated.RoomEntry request,
-        io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
+        io.grpc.stub.StreamObserver<generated.Message> responseObserver) {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getReceiveRoomMethod(), getCallOptions()), request, responseObserver);
     }
@@ -354,7 +354,7 @@ public final class UpdateServiceGrpc {
     /**
      */
     public void removeRoom(generated.RoomEntry request,
-        io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
+        io.grpc.stub.StreamObserver<generated.Message> responseObserver) {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getRemoveRoomMethod(), getCallOptions()), request, responseObserver);
     }
@@ -400,21 +400,21 @@ public final class UpdateServiceGrpc {
 
     /**
      */
-    public generated.Empty receiveRooms(generated.Rooms request) {
+    public generated.Message receiveRooms(generated.Rooms request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getReceiveRoomsMethod(), getCallOptions(), request);
     }
 
     /**
      */
-    public generated.Empty receiveRoom(generated.RoomEntry request) {
+    public generated.Message receiveRoom(generated.RoomEntry request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getReceiveRoomMethod(), getCallOptions(), request);
     }
 
     /**
      */
-    public generated.Empty removeRoom(generated.RoomEntry request) {
+    public generated.Message removeRoom(generated.RoomEntry request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getRemoveRoomMethod(), getCallOptions(), request);
     }
@@ -461,7 +461,7 @@ public final class UpdateServiceGrpc {
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<generated.Empty> receiveRooms(
+    public com.google.common.util.concurrent.ListenableFuture<generated.Message> receiveRooms(
         generated.Rooms request) {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
           getChannel().newCall(getReceiveRoomsMethod(), getCallOptions()), request);
@@ -469,7 +469,7 @@ public final class UpdateServiceGrpc {
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<generated.Empty> receiveRoom(
+    public com.google.common.util.concurrent.ListenableFuture<generated.Message> receiveRoom(
         generated.RoomEntry request) {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
           getChannel().newCall(getReceiveRoomMethod(), getCallOptions()), request);
@@ -477,7 +477,7 @@ public final class UpdateServiceGrpc {
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<generated.Empty> removeRoom(
+    public com.google.common.util.concurrent.ListenableFuture<generated.Message> removeRoom(
         generated.RoomEntry request) {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
           getChannel().newCall(getRemoveRoomMethod(), getCallOptions()), request);
@@ -526,15 +526,15 @@ public final class UpdateServiceGrpc {
           break;
         case METHODID_RECEIVE_ROOMS:
           serviceImpl.receiveRooms((generated.Rooms) request,
-              (io.grpc.stub.StreamObserver<generated.Empty>) responseObserver);
+              (io.grpc.stub.StreamObserver<generated.Message>) responseObserver);
           break;
         case METHODID_RECEIVE_ROOM:
           serviceImpl.receiveRoom((generated.RoomEntry) request,
-              (io.grpc.stub.StreamObserver<generated.Empty>) responseObserver);
+              (io.grpc.stub.StreamObserver<generated.Message>) responseObserver);
           break;
         case METHODID_REMOVE_ROOM:
           serviceImpl.removeRoom((generated.RoomEntry) request,
-              (io.grpc.stub.StreamObserver<generated.Empty>) responseObserver);
+              (io.grpc.stub.StreamObserver<generated.Message>) responseObserver);
           break;
         case METHODID_UPDATE_ROOMS_TABLE:
           serviceImpl.updateRoomsTable((generated.Empty) request,
@@ -577,21 +577,21 @@ public final class UpdateServiceGrpc {
           io.grpc.stub.ServerCalls.asyncUnaryCall(
             new MethodHandlers<
               generated.Rooms,
-              generated.Empty>(
+              generated.Message>(
                 service, METHODID_RECEIVE_ROOMS)))
         .addMethod(
           getReceiveRoomMethod(),
           io.grpc.stub.ServerCalls.asyncUnaryCall(
             new MethodHandlers<
               generated.RoomEntry,
-              generated.Empty>(
+              generated.Message>(
                 service, METHODID_RECEIVE_ROOM)))
         .addMethod(
           getRemoveRoomMethod(),
           io.grpc.stub.ServerCalls.asyncUnaryCall(
             new MethodHandlers<
               generated.RoomEntry,
-              generated.Empty>(
+              generated.Message>(
                 service, METHODID_REMOVE_ROOM)))
         .addMethod(
           getUpdateRoomsTableMethod(),

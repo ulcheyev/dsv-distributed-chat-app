@@ -46,13 +46,12 @@ public class Node {
     @Getter @Setter private DsvNeighbours dsvNeighbours;
     @Getter @Setter private boolean isVoting;
     private ConsoleHandler consoleHandler;
-    private final ServerWrapper server;
+    private ServerWrapper server;
     private ManagedChannel managedChannelToLeader;
-    private StreamObserver<generated.Message> receiveMessagesObserver;
+    private StreamObserver<generated.ChatMessage> receiveMessagesObserver;
     private static volatile Node INSTANCE;
 
     public Node() {
-        server = new ServerWrapper();
         roomsAndLeaders = new ConcurrentHashMap<>();
         isLeader = DsvPair.of(false, new Room.NullableRoom());
         state = NodeState.RELEASED;
@@ -68,9 +67,9 @@ public class Node {
     }
 
     private void init() {
-        receiveMessagesObserver = new StreamObserver<Message>() {
+        receiveMessagesObserver = new StreamObserver<generated.ChatMessage>() {
             @Override
-            public void onNext(Message message) {
+            public void onNext(generated.ChatMessage message) {
                 System.out.println("\r[" + currentRoom + "] " + message.getRemote().getUsername() + ": " + message.getMsg());
             }
 
@@ -120,7 +119,7 @@ public class Node {
                         if (!response.getIsLeader()) {
                             var stub = generated.RemoteServiceGrpc.newFutureStub(Utils.Skeleton.buildChannel(response.getLeader()));
                             joinResponse = stub.joinRoom(req);
-                            Futures.addCallback(joinResponse, callBack, DsvThreadPool.getPool());
+                            Futures.addCallback(joinResponse, callBack, DsvThreadPool.getInstance().getPool());
                             return;
                         }
 
@@ -132,7 +131,7 @@ public class Node {
                         // Node created a room. Set properties. Make update rooms on leaders;
                         if (leaderAddressFromResponse.equals(address)) {
                             boolean grant = startUpdateTables(oldLeaderAddress);
-                            logger.info("Grant is " + grant);
+                            logger.info("Grant to update is " + grant);
                             if (grant) {
                                 logger.info("Node created the room " + req.getRoomName());
                                 isLeader = DsvPair.of(true, new Room(address, req.getRoomName()));
@@ -155,8 +154,7 @@ public class Node {
                     public void onFailure(Throwable t) {
                         logger.severe("Error while handling response in future in node. " + t.getMessage());
                     }
-                },
-                DsvThreadPool.getPool());
+                }, DsvThreadPool.getInstance().getPool());
     }
 
     public void joinRoomViaLeader(String roomName) {
@@ -181,9 +179,8 @@ public class Node {
     private void startRepairTopology(Address onNode, Address missing) {
         logger.info("Starting repair topology on " + onNode.getHostname() + ":" + onNode.getPort() + " with missing node " +
                 missing.getHostname() + ":" + missing.getPort());
-
-        DsvThreadPool.execute(() -> generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(onNode))
-                .repairTopology(Utils.Mapper.addressToRemote(missing)));
+        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(onNode))
+                .repairTopology(Utils.Mapper.addressToRemote(missing));
     }
 
     public void startElectionWithDelay(int seconds) {
@@ -198,9 +195,8 @@ public class Node {
     private void makeElection(Address onNode) {
         logger.info("Starting election on "
                 + onNode.getHostname() + ":" + onNode.getPort());
-
-        DsvThreadPool.execute(() -> generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(onNode))
-                .election(Utils.Mapper.addressToRemote(new Address(Config.STUB_STRING, 0, -1))));
+        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(onNode))
+                .election(Utils.Mapper.addressToRemote(new Address(Config.STUB_STRING, 0, -1)));
     }
 
     private boolean startUpdateTables(Address address) {
@@ -234,7 +230,7 @@ public class Node {
             public void onFailure(Throwable t) {
                 emergencyRepairAndElection().apply(null);
             }
-        }, DsvThreadPool.getPool());
+        }, DsvThreadPool.getInstance().getPool());
     }
 
     private void handleArgs(String[] args) {
@@ -244,7 +240,8 @@ public class Node {
                 this.address = new Address(InetAddress.getLocalHost().getHostAddress(), Integer.parseInt(args[1]));
                 this.address.generateId();
                 this.dsvNeighbours = new DsvNeighbours(this.address);
-                this.server.startServer(address.getPort());
+                this.server = new ServerWrapper(address.getPort());
+                DsvThreadPool.getInstance().execute(this.server);
 
                 // The first node in topology. Creates the global room and is its leader.
                 if (args.length == 2) {
@@ -278,11 +275,9 @@ public class Node {
     }
 
     private void preflight() {
-        DsvThreadPool.execute(() -> {
             logger.info("Sending preflight to " + dsvNeighbours.getLeader());
             generated.RemoteServiceGrpc.newStub(Utils.Skeleton.buildChannel(dsvNeighbours.getLeader()))
                     .preflight(Utils.Mapper.nodeToRemote(), receiveMessagesObserver);
-        });
     }
 
     public String getNodeListInCurrentRoom() {
@@ -314,7 +309,7 @@ public class Node {
 
     private void listen() {
         consoleHandler = new ConsoleHandler();
-        DsvThreadPool.execute(consoleHandler);
+        DsvThreadPool.getInstance().execute(consoleHandler);
     }
 
     private boolean leadingRoomIsNotEmpty() {

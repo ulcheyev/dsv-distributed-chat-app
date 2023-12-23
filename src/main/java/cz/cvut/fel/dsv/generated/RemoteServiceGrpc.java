@@ -78,28 +78,28 @@ public final class RemoteServiceGrpc {
   }
 
   private static volatile io.grpc.MethodDescriptor<generated.Remote,
-      generated.Message> getPreflightMethod;
+      generated.ChatMessage> getPreflightMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "preflight",
       requestType = generated.Remote.class,
-      responseType = generated.Message.class,
+      responseType = generated.ChatMessage.class,
       methodType = io.grpc.MethodDescriptor.MethodType.SERVER_STREAMING)
   public static io.grpc.MethodDescriptor<generated.Remote,
-      generated.Message> getPreflightMethod() {
-    io.grpc.MethodDescriptor<generated.Remote, generated.Message> getPreflightMethod;
+      generated.ChatMessage> getPreflightMethod() {
+    io.grpc.MethodDescriptor<generated.Remote, generated.ChatMessage> getPreflightMethod;
     if ((getPreflightMethod = RemoteServiceGrpc.getPreflightMethod) == null) {
       synchronized (RemoteServiceGrpc.class) {
         if ((getPreflightMethod = RemoteServiceGrpc.getPreflightMethod) == null) {
           RemoteServiceGrpc.getPreflightMethod = getPreflightMethod =
-              io.grpc.MethodDescriptor.<generated.Remote, generated.Message>newBuilder()
+              io.grpc.MethodDescriptor.<generated.Remote, generated.ChatMessage>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.SERVER_STREAMING)
               .setFullMethodName(generateFullMethodName(SERVICE_NAME, "preflight"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   generated.Remote.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  generated.Message.getDefaultInstance()))
+                  generated.ChatMessage.getDefaultInstance()))
               .setSchemaDescriptor(new RemoteServiceMethodDescriptorSupplier("preflight"))
               .build();
         }
@@ -108,27 +108,27 @@ public final class RemoteServiceGrpc {
     return getPreflightMethod;
   }
 
-  private static volatile io.grpc.MethodDescriptor<generated.Message,
+  private static volatile io.grpc.MethodDescriptor<generated.ChatMessage,
       generated.Empty> getReceiveMessageMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "receiveMessage",
-      requestType = generated.Message.class,
+      requestType = generated.ChatMessage.class,
       responseType = generated.Empty.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
-  public static io.grpc.MethodDescriptor<generated.Message,
+  public static io.grpc.MethodDescriptor<generated.ChatMessage,
       generated.Empty> getReceiveMessageMethod() {
-    io.grpc.MethodDescriptor<generated.Message, generated.Empty> getReceiveMessageMethod;
+    io.grpc.MethodDescriptor<generated.ChatMessage, generated.Empty> getReceiveMessageMethod;
     if ((getReceiveMessageMethod = RemoteServiceGrpc.getReceiveMessageMethod) == null) {
       synchronized (RemoteServiceGrpc.class) {
         if ((getReceiveMessageMethod = RemoteServiceGrpc.getReceiveMessageMethod) == null) {
           RemoteServiceGrpc.getReceiveMessageMethod = getReceiveMessageMethod =
-              io.grpc.MethodDescriptor.<generated.Message, generated.Empty>newBuilder()
+              io.grpc.MethodDescriptor.<generated.ChatMessage, generated.Empty>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(SERVICE_NAME, "receiveMessage"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  generated.Message.getDefaultInstance()))
+                  generated.ChatMessage.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   generated.Empty.getDefaultInstance()))
               .setSchemaDescriptor(new RemoteServiceMethodDescriptorSupplier("receiveMessage"))
@@ -297,13 +297,13 @@ public final class RemoteServiceGrpc {
     /**
      */
     default void preflight(generated.Remote request,
-        io.grpc.stub.StreamObserver<generated.Message> responseObserver) {
+        io.grpc.stub.StreamObserver<generated.ChatMessage> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getPreflightMethod(), responseObserver);
     }
 
     /**
      */
-    default void receiveMessage(generated.Message request,
+    default void receiveMessage(generated.ChatMessage request,
         io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getReceiveMessageMethod(), responseObserver);
     }
@@ -376,14 +376,14 @@ public final class RemoteServiceGrpc {
     /**
      */
     public void preflight(generated.Remote request,
-        io.grpc.stub.StreamObserver<generated.Message> responseObserver) {
+        io.grpc.stub.StreamObserver<generated.ChatMessage> responseObserver) {
       io.grpc.stub.ClientCalls.asyncServerStreamingCall(
           getChannel().newCall(getPreflightMethod(), getCallOptions()), request, responseObserver);
     }
 
     /**
      */
-    public void receiveMessage(generated.Message request,
+    public void receiveMessage(generated.ChatMessage request,
         io.grpc.stub.StreamObserver<generated.Empty> responseObserver) {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getReceiveMessageMethod(), getCallOptions()), request, responseObserver);
@@ -446,7 +446,7 @@ public final class RemoteServiceGrpc {
 
     /**
      */
-    public java.util.Iterator<generated.Message> preflight(
+    public java.util.Iterator<generated.ChatMessage> preflight(
         generated.Remote request) {
       return io.grpc.stub.ClientCalls.blockingServerStreamingCall(
           getChannel(), getPreflightMethod(), getCallOptions(), request);
@@ -454,7 +454,7 @@ public final class RemoteServiceGrpc {
 
     /**
      */
-    public generated.Empty receiveMessage(generated.Message request) {
+    public generated.Empty receiveMessage(generated.ChatMessage request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getReceiveMessageMethod(), getCallOptions(), request);
     }
@@ -516,7 +516,7 @@ public final class RemoteServiceGrpc {
     /**
      */
     public com.google.common.util.concurrent.ListenableFuture<generated.Empty> receiveMessage(
-        generated.Message request) {
+        generated.ChatMessage request) {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
           getChannel().newCall(getReceiveMessageMethod(), getCallOptions()), request);
     }
@@ -581,10 +581,10 @@ public final class RemoteServiceGrpc {
           break;
         case METHODID_PREFLIGHT:
           serviceImpl.preflight((generated.Remote) request,
-              (io.grpc.stub.StreamObserver<generated.Message>) responseObserver);
+              (io.grpc.stub.StreamObserver<generated.ChatMessage>) responseObserver);
           break;
         case METHODID_RECEIVE_MESSAGE:
-          serviceImpl.receiveMessage((generated.Message) request,
+          serviceImpl.receiveMessage((generated.ChatMessage) request,
               (io.grpc.stub.StreamObserver<generated.Empty>) responseObserver);
           break;
         case METHODID_RECEIVE_GET_ROOM_LIST_REQUEST:
@@ -636,13 +636,13 @@ public final class RemoteServiceGrpc {
           io.grpc.stub.ServerCalls.asyncServerStreamingCall(
             new MethodHandlers<
               generated.Remote,
-              generated.Message>(
+              generated.ChatMessage>(
                 service, METHODID_PREFLIGHT)))
         .addMethod(
           getReceiveMessageMethod(),
           io.grpc.stub.ServerCalls.asyncUnaryCall(
             new MethodHandlers<
-              generated.Message,
+              generated.ChatMessage,
               generated.Empty>(
                 service, METHODID_RECEIVE_MESSAGE)))
         .addMethod(

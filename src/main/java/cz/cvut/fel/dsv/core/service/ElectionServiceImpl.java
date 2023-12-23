@@ -8,7 +8,7 @@ import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.Utils;
 import generated.ElectionServiceGrpc;
-import io.grpc.StatusRuntimeException;
+import generated.Neighbours;
 import io.grpc.stub.StreamObserver;
 import lombok.Setter;
 
@@ -40,7 +40,7 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
         node.getDsvNeighbours().setPrev(prev);
         if (node.getIsLeader().getKey()) {
             updateService.updateBackupNode(true);
-            updateService.makeUpdateRoomsTable(updateService.getLeadersAddresses());
+            updateService.makeUpdateRoomsTable(node.getRoomsAndLeaders(), updateService.getCurrentLeadersAddresses());
         }
 
         logger.info("Returning next node " + node.getDsvNeighbours().getNext());
@@ -71,10 +71,11 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
         node.setIsLeader(DsvPair.of(true, new Room(node.getAddress(), node.getCurrentRoom())));
         var former = node.getDsvNeighbours().getLeader();
         node.getRoomsAndLeaders().put(node.getCurrentRoom(), DsvPair.of(node.getAddress(), node.getDsvNeighbours().getPrev()));
-        node.getRoomsAndLeaders().forEach((key, value) -> logger.info(value.toString()));
+
         updateService.updateBackupNode(true);
-        updateService.makeUpdateRoomsTable(List.of(node.getAddress(), former));
-//
+        updateService.makeUpdateRoomsTable(node.getRoomsAndLeaders(), List.of(former));
+
+        //
 //        try {
 //            generated.UpdateServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(node.getDsvNeighbours().getLeader()))
 //                    .receiveRoom(generated.RoomEntry.newBuilder()
@@ -135,7 +136,8 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
 
     @Override
     public void changeNeighbours(generated.JoinRequest request, StreamObserver<generated.Neighbours> responseObserver) {
-        responseObserver.onNext(changeNeighbours(request));
+        Neighbours toSend = changeNeighbours(request);
+        responseObserver.onNext(toSend);
         responseObserver.onCompleted();
     }
 

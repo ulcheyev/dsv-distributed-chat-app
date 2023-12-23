@@ -44,8 +44,7 @@ public class Address {
         if (obj instanceof Address) {
             Address casted = (Address) obj;
             return Objects.equals(casted.getHostname(), hostname)
-                    && casted.getPort() == port
-                    && Objects.equals(casted.getId(), id);
+                    && casted.getPort() == port;
         }
         return false;
     }
@@ -56,5 +55,9 @@ public class Address {
         result = 31 * result + hostname.hashCode();
         result = 31 * result + port;
         return result;
+    }
+
+    public String getStringAddress() {
+        return this.hostname+":"+port;
     }
 }

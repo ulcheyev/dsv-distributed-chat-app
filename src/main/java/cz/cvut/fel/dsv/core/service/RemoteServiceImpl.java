@@ -9,6 +9,7 @@ import cz.cvut.fel.dsv.utils.Utils;
 import generated.*;
 import generated.Empty;
 import generated.Message;
+import generated.Neighbours;
 import generated.Remote;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
@@ -61,19 +62,21 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
 
     @Override
     public void joinRoom(generated.JoinRequest request, StreamObserver<generated.JoinResponse> responseObserver) {
-        logger.info("[request by Node " + request.getRemote().getUsername() + "] request to join is processing");
-        if (node.getState() == NodeState.HOLDING) {
+        if(node.getState() == NodeState.HOLDING) {
+            logger.info("[request by Node " + request.getRemote().getUsername() + "] request to join is delayed");
             joinQueue.add(DsvPair.of(request, responseObserver));
-        } else {
+        }else{
+            logger.info("[request by Node " + request.getRemote().getUsername() + "] request to join is processing");
             // If node is leader
             if (node.getIsLeader().getKey()) {
                 // Leader of requested room
                 if (Objects.equals(node.getIsLeader().getValue().getRoomName(), request.getRoomName())) {
-                    logger.info("[request by Node " + request.getRemote().getUsername() + "] requested node to connect is leader");
+                    logger.info("[request by Node " + request.getRemote().getUsername() + "] requested node to connect is leader in requested room");
+                    Neighbours value = changeNeighbours(request);
                     responseObserver.onNext(generated.JoinResponse.newBuilder()
                             .setIsLeader(true)
                             .setLeader(Utils.Mapper.addressToRemote(node.getDsvNeighbours().getLeader()))
-                            .setNeighbours(changeNeighbours(request))
+                            .setNeighbours(value)
                             .build());
                 }
                 // Not a leader of requested room
@@ -147,7 +150,7 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
     }
 
     @Override
-    public void receiveMessage(Message request, StreamObserver<Empty> responseObserver) {
+    public void receiveMessage(generated.ChatMessage request, StreamObserver<Empty> responseObserver) {
         node.getIsLeader()
                 .getValue()
                 .sendMessageToRoom(request);
@@ -156,7 +159,7 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
     }
 
     @Override
-    public void preflight(Remote request, StreamObserver<Message> responseObserver) {
+    public void preflight(Remote request, StreamObserver<generated.ChatMessage> responseObserver) {
         logger.info("Preflight received. Added [" + request.getUsername() + "] to room " + "[" + node.getCurrentRoom() + "]");
         node.getIsLeader()
                 .getValue()
