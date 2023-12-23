@@ -2,35 +2,37 @@
 Semestral work from Distributed Computing subject
 ## What?
 
-
-
 **EN version**
 
 *Chat program* </br>
-A Program that allows messages to be sent between nodes
+The semester project involves developing a distributed chat application for exchanging messages between nodes. The primary focus will be on addressing the Leader Election and Mutual Exclusion problems.
 
-- Problem type: the semester project will address the Leader Election problem.
-- Implemented symmetric algorithm: the Chang-Roberts algorithm will be used to solve the Leader Election problem.
-- Programming language and message transport: the semester project will be implemented in the Java programming language, using the gRPC framework for communication between nodes.
-- Functionality of the semester project: the semester project will simulate a chat application in a distributed environment. System nodes will be able of sending/receiving messages, logging in/logging out of the system, exiting without logging out, and collaborating in leader selection.
+- **Problem type**: the semester project will address the Leader Election and Mutual Exclusion problems.
+- **Implemented algorithms**: for Leader Election, the project will utilize the Chang-Roberts algorithm, providing a symmetric solution. To tackle the Mutual Exclusion problem, the Ricart-Agrawala algorithm will be implemented.
+- **Programming language and message transport**: the semester project will be implemented in the Java programming language, using the gRPC framework for communication between nodes.
+- **Functionality of the semester project**: the semester project will simulate a chat application in a distributed environment. System nodes will be able of sending/receiving messages, logging in/out of the system, exiting without logging out and joining room.
 
 **CZ version**
 
 *Chatovací program* </br>
-Program umožnující zasílání zpráv mezi jednotlivými uzly
+Semestrální projekt zahrnuje vývoj distribuované chatovací aplikace pro výměnu zpráv mezi uzly. Primárně se zaměří na řešení problémů Volby Vůdce a Vzájemného Vyloučení.
 
-- Typ problému: semestrální práce bude řešit problém volby vůdce.
-- Implementovaný symetrický algoritmus: pro řešení problému volby vůdce bude použit Chang-Roberts algoritmus.
-- Programovací jazyk a transport zpráv: semestrální práce bude implementována v programovacím jazyce Java s využitím frameworku gRPC pro komunikaci mezi uzly. 
-- Funkcionalita semestrální práce: semestrální práce bude simulovat chatovací aplikaci v distribuovaném prostředí. Uzly systému budou schopny posílat/přijímat zprávy, odhlasit/přihlasit se se ze/do systému, skončit bez odhlášení a spolupracovat při volbě vůdce. 
+- **Typ problému**: semestrální projekt se bude zabývat problémy volby vůdce a vzájemného vyloučení.
+- **Využívané algoritmy**: pro řešení problému volby vůdce bude použit Chang-Roberts algoritmus, který poskytuje symetrické řešení. Pro řešení problému vzájemného vyloučení bude implementován algoritmus Ricart-Agrawala.
+- **Programovací jazyk a přenos zpráv**: semestrální projekt bude implementována v programovacím jazyce Java s využitím frameworku gRPC pro komunikaci mezi uzly.
+- **Funkčnost semestrálního projektu**: semestrální projekt bude simulovat chatovací aplikaci v distribuovaném prostředí. Uzly systému budou moci odesílat/přijímat zprávy, přihlašovat se/odhlašovat se ze systému, skončení bez odhlášení a připojovat se k místnosti.
 
 ## Why?
 
-To study new technologies and deepen knowledge  :rage1:
+The semester project serves as a comprehensive learning opportunity, combining theoretical knowledge with practical implementation, and equipping us with the skills and insights necessary for the distributed systems and software development. :rage1:
 
 ## Key features
 
-To write...
+1. Supports dynamic creation and participation in rooms, fostering interactive discussions.
+2. Chang-Roberts algorithm ensures a fair and reliable mechanism for electing a leader among system nodes.
+3. Mutual Exclusion guarantees that critical sections of code are executed by only one node at a time, preventing conflicts.
+4. Maintains detailed logs for system activities, aiding in debugging and analysis.
+5. Ensures the system's robustness and availability under varying conditions.
 
 ## Prerequisites
 
@@ -38,7 +40,9 @@ To write...
 
 ## Install
 
+```
 To write...
+```
 
 ## Usage
 
