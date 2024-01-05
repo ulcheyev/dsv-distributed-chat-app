@@ -106,6 +106,17 @@ private static final long serialVersionUID = 0L;
     return remote_ == null ? generated.Remote.getDefaultInstance() : remote_;
   }
 
+  public static final int DELAY_FIELD_NUMBER = 3;
+  private int delay_ = 0;
+  /**
+   * <code>int32 delay = 3;</code>
+   * @return The delay.
+   */
+  @java.lang.Override
+  public int getDelay() {
+    return delay_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -126,6 +137,9 @@ private static final long serialVersionUID = 0L;
     if (((bitField0_ & 0x00000001) != 0)) {
       output.writeMessage(2, getRemote());
     }
+    if (delay_ != 0) {
+      output.writeInt32(3, delay_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -141,6 +155,10 @@ private static final long serialVersionUID = 0L;
     if (((bitField0_ & 0x00000001) != 0)) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(2, getRemote());
+    }
+    if (delay_ != 0) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(3, delay_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -164,6 +182,8 @@ private static final long serialVersionUID = 0L;
       if (!getRemote()
           .equals(other.getRemote())) return false;
     }
+    if (getDelay()
+        != other.getDelay()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -181,6 +201,8 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + REMOTE_FIELD_NUMBER;
       hash = (53 * hash) + getRemote().hashCode();
     }
+    hash = (37 * hash) + DELAY_FIELD_NUMBER;
+    hash = (53 * hash) + getDelay();
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -324,6 +346,7 @@ private static final long serialVersionUID = 0L;
         remoteBuilder_.dispose();
         remoteBuilder_ = null;
       }
+      delay_ = 0;
       return this;
     }
 
@@ -366,6 +389,9 @@ private static final long serialVersionUID = 0L;
             ? remote_
             : remoteBuilder_.build();
         to_bitField0_ |= 0x00000001;
+      }
+      if (((from_bitField0_ & 0x00000004) != 0)) {
+        result.delay_ = delay_;
       }
       result.bitField0_ |= to_bitField0_;
     }
@@ -422,6 +448,9 @@ private static final long serialVersionUID = 0L;
       if (other.hasRemote()) {
         mergeRemote(other.getRemote());
       }
+      if (other.getDelay() != 0) {
+        setDelay(other.getDelay());
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -460,6 +489,11 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000002;
               break;
             } // case 18
+            case 24: {
+              delay_ = input.readInt32();
+              bitField0_ |= 0x00000004;
+              break;
+            } // case 24
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -668,6 +702,38 @@ private static final long serialVersionUID = 0L;
         remote_ = null;
       }
       return remoteBuilder_;
+    }
+
+    private int delay_ ;
+    /**
+     * <code>int32 delay = 3;</code>
+     * @return The delay.
+     */
+    @java.lang.Override
+    public int getDelay() {
+      return delay_;
+    }
+    /**
+     * <code>int32 delay = 3;</code>
+     * @param value The delay to set.
+     * @return This builder for chaining.
+     */
+    public Builder setDelay(int value) {
+
+      delay_ = value;
+      bitField0_ |= 0x00000004;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>int32 delay = 3;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearDelay() {
+      bitField0_ = (bitField0_ & ~0x00000004);
+      delay_ = 0;
+      onChanged();
+      return this;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

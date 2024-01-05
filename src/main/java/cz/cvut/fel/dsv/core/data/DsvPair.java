@@ -12,6 +12,9 @@ public class DsvPair<K, V> {
     public static <K, V> DsvPair<K, V> of(K key, V value) {
         return new DsvPair<>(key, value);
     }
+    public static <K> DsvPair<K, K> of(K keyVal) {
+        return new DsvPair<>(keyVal, keyVal);
+    }
 
     public K getKey() {
         return key;

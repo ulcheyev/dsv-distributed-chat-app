@@ -7,7 +7,7 @@ import static cz.cvut.fel.dsv.core.infrastructure.Config.HELP_STRING;
 class HelpCommand implements Command {
 
     @Override
-    public void handle(String arg, Node node) {
+    public void handle(Node node, String ... arg) {
         System.out.println(HELP_STRING);
     }
 }

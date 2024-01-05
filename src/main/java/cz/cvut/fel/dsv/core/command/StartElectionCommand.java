@@ -10,9 +10,9 @@ public class StartElectionCommand implements Command {
     private Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
 
     @Override
-    public void handle(String arg, Node node) {
-        if (!arg.isEmpty() && isNumeric(arg))
-            node.startElectionWithDelay(Integer.parseInt(arg));
+    public void handle(Node node, String ...arg) {
+        if (arg.length != 0 && isNumeric(arg[0]))
+            node.startElectionWithDelay(Integer.parseInt(arg[0]));
         else
             System.out.println(hintString("!election"));
     }

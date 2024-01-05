@@ -81,17 +81,6 @@ private static final long serialVersionUID = 0L;
     return rooms_.get(index);
   }
 
-  public static final int ISNOTVISITED_FIELD_NUMBER = 2;
-  private boolean isNotVisited_ = false;
-  /**
-   * <code>bool isNotVisited = 2;</code>
-   * @return The isNotVisited.
-   */
-  @java.lang.Override
-  public boolean getIsNotVisited() {
-    return isNotVisited_;
-  }
-
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -109,9 +98,6 @@ private static final long serialVersionUID = 0L;
     for (int i = 0; i < rooms_.size(); i++) {
       output.writeMessage(1, rooms_.get(i));
     }
-    if (isNotVisited_ != false) {
-      output.writeBool(2, isNotVisited_);
-    }
     getUnknownFields().writeTo(output);
   }
 
@@ -124,10 +110,6 @@ private static final long serialVersionUID = 0L;
     for (int i = 0; i < rooms_.size(); i++) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(1, rooms_.get(i));
-    }
-    if (isNotVisited_ != false) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeBoolSize(2, isNotVisited_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -146,8 +128,6 @@ private static final long serialVersionUID = 0L;
 
     if (!getRoomsList()
         .equals(other.getRoomsList())) return false;
-    if (getIsNotVisited()
-        != other.getIsNotVisited()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -163,9 +143,6 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + ROOMS_FIELD_NUMBER;
       hash = (53 * hash) + getRoomsList().hashCode();
     }
-    hash = (37 * hash) + ISNOTVISITED_FIELD_NUMBER;
-    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-        getIsNotVisited());
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -304,7 +281,6 @@ private static final long serialVersionUID = 0L;
         roomsBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000001);
-      isNotVisited_ = false;
       return this;
     }
 
@@ -351,9 +327,6 @@ private static final long serialVersionUID = 0L;
 
     private void buildPartial0(generated.Rooms result) {
       int from_bitField0_ = bitField0_;
-      if (((from_bitField0_ & 0x00000002) != 0)) {
-        result.isNotVisited_ = isNotVisited_;
-      }
     }
 
     @java.lang.Override
@@ -426,9 +399,6 @@ private static final long serialVersionUID = 0L;
           }
         }
       }
-      if (other.getIsNotVisited() != false) {
-        setIsNotVisited(other.getIsNotVisited());
-      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -468,11 +438,6 @@ private static final long serialVersionUID = 0L;
               }
               break;
             } // case 10
-            case 16: {
-              isNotVisited_ = input.readBool();
-              bitField0_ |= 0x00000002;
-              break;
-            } // case 16
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -728,38 +693,6 @@ private static final long serialVersionUID = 0L;
         rooms_ = null;
       }
       return roomsBuilder_;
-    }
-
-    private boolean isNotVisited_ ;
-    /**
-     * <code>bool isNotVisited = 2;</code>
-     * @return The isNotVisited.
-     */
-    @java.lang.Override
-    public boolean getIsNotVisited() {
-      return isNotVisited_;
-    }
-    /**
-     * <code>bool isNotVisited = 2;</code>
-     * @param value The isNotVisited to set.
-     * @return This builder for chaining.
-     */
-    public Builder setIsNotVisited(boolean value) {
-
-      isNotVisited_ = value;
-      bitField0_ |= 0x00000002;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>bool isNotVisited = 2;</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearIsNotVisited() {
-      bitField0_ = (bitField0_ & ~0x00000002);
-      isNotVisited_ = false;
-      onChanged();
-      return this;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

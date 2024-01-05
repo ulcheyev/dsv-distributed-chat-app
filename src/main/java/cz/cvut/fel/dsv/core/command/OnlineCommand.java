@@ -5,7 +5,7 @@ import cz.cvut.fel.dsv.core.Node;
 class OnlineCommand implements Command {
 
     @Override
-    public void handle(String arg, Node node) {
+    public void handle(Node node, String ...arg) {
         System.out.println(node.getNodeListInCurrentRoom());
     }
 }

@@ -40,17 +40,6 @@ private static final long serialVersionUID = 0L;
   }
 
   private int bitField0_;
-  public static final int GRANTED_FIELD_NUMBER = 1;
-  private boolean granted_ = false;
-  /**
-   * <code>bool granted = 1;</code>
-   * @return The granted.
-   */
-  @java.lang.Override
-  public boolean getGranted() {
-    return granted_;
-  }
-
   public static final int RESPONSEBYREMOTE_FIELD_NUMBER = 2;
   private generated.Remote responseByRemote_;
   /**
@@ -91,9 +80,6 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (granted_ != false) {
-      output.writeBool(1, granted_);
-    }
     if (((bitField0_ & 0x00000001) != 0)) {
       output.writeMessage(2, getResponseByRemote());
     }
@@ -106,10 +92,6 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (granted_ != false) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeBoolSize(1, granted_);
-    }
     if (((bitField0_ & 0x00000001) != 0)) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(2, getResponseByRemote());
@@ -129,8 +111,6 @@ private static final long serialVersionUID = 0L;
     }
     generated.PermissionResponse other = (generated.PermissionResponse) obj;
 
-    if (getGranted()
-        != other.getGranted()) return false;
     if (hasResponseByRemote() != other.hasResponseByRemote()) return false;
     if (hasResponseByRemote()) {
       if (!getResponseByRemote()
@@ -147,9 +127,6 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + GRANTED_FIELD_NUMBER;
-    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-        getGranted());
     if (hasResponseByRemote()) {
       hash = (37 * hash) + RESPONSEBYREMOTE_FIELD_NUMBER;
       hash = (53 * hash) + getResponseByRemote().hashCode();
@@ -291,7 +268,6 @@ private static final long serialVersionUID = 0L;
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      granted_ = false;
       responseByRemote_ = null;
       if (responseByRemoteBuilder_ != null) {
         responseByRemoteBuilder_.dispose();
@@ -330,11 +306,8 @@ private static final long serialVersionUID = 0L;
 
     private void buildPartial0(generated.PermissionResponse result) {
       int from_bitField0_ = bitField0_;
-      if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.granted_ = granted_;
-      }
       int to_bitField0_ = 0;
-      if (((from_bitField0_ & 0x00000002) != 0)) {
+      if (((from_bitField0_ & 0x00000001) != 0)) {
         result.responseByRemote_ = responseByRemoteBuilder_ == null
             ? responseByRemote_
             : responseByRemoteBuilder_.build();
@@ -387,9 +360,6 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(generated.PermissionResponse other) {
       if (other == generated.PermissionResponse.getDefaultInstance()) return this;
-      if (other.getGranted() != false) {
-        setGranted(other.getGranted());
-      }
       if (other.hasResponseByRemote()) {
         mergeResponseByRemote(other.getResponseByRemote());
       }
@@ -419,16 +389,11 @@ private static final long serialVersionUID = 0L;
             case 0:
               done = true;
               break;
-            case 8: {
-              granted_ = input.readBool();
-              bitField0_ |= 0x00000001;
-              break;
-            } // case 8
             case 18: {
               input.readMessage(
                   getResponseByRemoteFieldBuilder().getBuilder(),
                   extensionRegistry);
-              bitField0_ |= 0x00000002;
+              bitField0_ |= 0x00000001;
               break;
             } // case 18
             default: {
@@ -448,38 +413,6 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private boolean granted_ ;
-    /**
-     * <code>bool granted = 1;</code>
-     * @return The granted.
-     */
-    @java.lang.Override
-    public boolean getGranted() {
-      return granted_;
-    }
-    /**
-     * <code>bool granted = 1;</code>
-     * @param value The granted to set.
-     * @return This builder for chaining.
-     */
-    public Builder setGranted(boolean value) {
-
-      granted_ = value;
-      bitField0_ |= 0x00000001;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>bool granted = 1;</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearGranted() {
-      bitField0_ = (bitField0_ & ~0x00000001);
-      granted_ = false;
-      onChanged();
-      return this;
-    }
-
     private generated.Remote responseByRemote_;
     private com.google.protobuf.SingleFieldBuilderV3<
         generated.Remote, generated.Remote.Builder, generated.RemoteOrBuilder> responseByRemoteBuilder_;
@@ -488,7 +421,7 @@ private static final long serialVersionUID = 0L;
      * @return Whether the responseByRemote field is set.
      */
     public boolean hasResponseByRemote() {
-      return ((bitField0_ & 0x00000002) != 0);
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
      * <code>.generated.Remote responseByRemote = 2;</code>
@@ -513,7 +446,7 @@ private static final long serialVersionUID = 0L;
       } else {
         responseByRemoteBuilder_.setMessage(value);
       }
-      bitField0_ |= 0x00000002;
+      bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
@@ -527,7 +460,7 @@ private static final long serialVersionUID = 0L;
       } else {
         responseByRemoteBuilder_.setMessage(builderForValue.build());
       }
-      bitField0_ |= 0x00000002;
+      bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
@@ -536,7 +469,7 @@ private static final long serialVersionUID = 0L;
      */
     public Builder mergeResponseByRemote(generated.Remote value) {
       if (responseByRemoteBuilder_ == null) {
-        if (((bitField0_ & 0x00000002) != 0) &&
+        if (((bitField0_ & 0x00000001) != 0) &&
           responseByRemote_ != null &&
           responseByRemote_ != generated.Remote.getDefaultInstance()) {
           getResponseByRemoteBuilder().mergeFrom(value);
@@ -547,7 +480,7 @@ private static final long serialVersionUID = 0L;
         responseByRemoteBuilder_.mergeFrom(value);
       }
       if (responseByRemote_ != null) {
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000001;
         onChanged();
       }
       return this;
@@ -556,7 +489,7 @@ private static final long serialVersionUID = 0L;
      * <code>.generated.Remote responseByRemote = 2;</code>
      */
     public Builder clearResponseByRemote() {
-      bitField0_ = (bitField0_ & ~0x00000002);
+      bitField0_ = (bitField0_ & ~0x00000001);
       responseByRemote_ = null;
       if (responseByRemoteBuilder_ != null) {
         responseByRemoteBuilder_.dispose();
@@ -569,7 +502,7 @@ private static final long serialVersionUID = 0L;
      * <code>.generated.Remote responseByRemote = 2;</code>
      */
     public generated.Remote.Builder getResponseByRemoteBuilder() {
-      bitField0_ |= 0x00000002;
+      bitField0_ |= 0x00000001;
       onChanged();
       return getResponseByRemoteFieldBuilder().getBuilder();
     }

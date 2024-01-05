@@ -5,6 +5,7 @@ import cz.cvut.fel.dsv.core.Node;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,10 +19,10 @@ public class ConsoleHandler implements Runnable {
         initMap();
     }
 
-    private void handleCommand(String command, String arg) {
+    private void handleCommand(String command, String ...arg) {
         Command listener = commandMap.get(command);
         if (listener != null)
-            listener.handle(arg, this.node);
+            listener.handle(this.node, arg);
         else
             System.out.println("Command: " + command + " does not exist! Type !help for more information.");
     }
@@ -29,9 +30,9 @@ public class ConsoleHandler implements Runnable {
     private void parseCommandLine(String commandLine) {
         if (!commandLine.isEmpty()) {
             if (commandLine.charAt(0) == '!') {
-                String[] split = commandLine.split("\\s+");
+                String[] split = commandLine.split(" ");
                 if (split.length > 1)
-                    handleCommand(split[0], split[1]);
+                    handleCommand(split[0], split);
                 else
                     handleCommand(split[0], "");
             } else node.sendMessage(commandLine);

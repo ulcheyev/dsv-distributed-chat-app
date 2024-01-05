@@ -103,58 +103,56 @@ public final class ChatService {
       "\026\n\007Message\022\013\n\003msg\030\001 \001(\t\"\035\n\014GrantMessage\022" +
       "\r\n\005grant\030\001 \001(\010\"\034\n\rStringPayload\022\013\n\003msg\030\001" +
       " \001(\t\"=\n\013ChatMessage\022!\n\006remote\030\001 \001(\0132\021.ge" +
-      "nerated.Remote\022\013\n\003msg\030\002 \001(\t\"B\n\005Rooms\022#\n\005" +
-      "rooms\030\001 \003(\0132\024.generated.RoomEntry\022\024\n\014isN" +
-      "otVisited\030\002 \001(\010\"j\n\tRoomEntry\022$\n\troomOwne" +
-      "r\030\001 \001(\0132\021.generated.Remote\022%\n\nroomBackup" +
-      "\030\002 \001(\0132\021.generated.Remote\022\020\n\010roomName\030\003 " +
-      "\001(\t\"J\n\006Remote\022\016\n\006nodeId\030\001 \001(\003\022\020\n\010hostnam" +
-      "e\030\002 \001(\t\022\014\n\004port\030\003 \001(\005\022\020\n\010username\030\004 \001(\t\"" +
-      "-\n\016RemoteResponse\022\r\n\005added\030\001 \001(\010\022\014\n\004room" +
-      "\030\002 \001(\t\"\226\001\n\nNeighbours\022\037\n\004next\030\001 \001(\0132\021.ge" +
-      "nerated.Remote\022#\n\010nextNext\030\002 \001(\0132\021.gener" +
-      "ated.Remote\022\037\n\004prev\030\003 \001(\0132\021.generated.Re" +
-      "mote\022!\n\006leader\030\004 \001(\0132\021.generated.Remote\"" +
-      "B\n\013JoinRequest\022\020\n\010roomName\030\001 \001(\t\022!\n\006remo" +
-      "te\030\002 \001(\0132\021.generated.Remote\"n\n\014JoinRespo" +
-      "nse\022\020\n\010isLeader\030\001 \001(\010\022!\n\006leader\030\002 \001(\0132\021." +
-      "generated.Remote\022)\n\nneighbours\030\003 \001(\0132\025.g" +
-      "enerated.Neighbours\"N\n\021PermissionRequest" +
-      "\022*\n\017requestByRemote\030\001 \001(\0132\021.generated.Re" +
-      "mote\022\r\n\005clock\030\002 \001(\005\"R\n\022PermissionRespons" +
-      "e\022\017\n\007granted\030\001 \001(\010\022+\n\020responseByRemote\030\002" +
-      " \001(\0132\021.generated.Remote\"\031\n\006Health\022\017\n\007isA" +
-      "live\030\001 \001(\0102\277\003\n\rRemoteService\022+\n\004beat\022\020.g" +
-      "enerated.Empty\032\021.generated.Health\022;\n\010joi" +
-      "nRoom\022\026.generated.JoinRequest\032\027.generate" +
-      "d.JoinResponse\0228\n\tpreflight\022\021.generated." +
-      "Remote\032\026.generated.ChatMessage0\001\022:\n\016rece" +
-      "iveMessage\022\026.generated.ChatMessage\032\020.gen" +
-      "erated.Empty\022G\n\031receiveGetRoomListReques" +
-      "t\022\020.generated.Empty\032\030.generated.StringPa" +
-      "yload\022T\n&receiveGetNodeListInCurrentRoom" +
-      "Request\022\020.generated.Empty\032\030.generated.St" +
-      "ringPayload\022/\n\010exitRoom\022\021.generated.Remo" +
-      "te\032\020.generated.Empty2\226\003\n\rUpdateService\022Q" +
-      "\n\030receivePermissionRequest\022\034.generated.P" +
-      "ermissionRequest\032\027.generated.GrantMessag" +
-      "e\022L\n\031receivePermissionResponse\022\035.generat" +
-      "ed.PermissionResponse\032\020.generated.Empty\022" +
-      "4\n\014receiveRooms\022\020.generated.Rooms\032\022.gene" +
-      "rated.Message\0227\n\013receiveRoom\022\024.generated" +
-      ".RoomEntry\032\022.generated.Message\0226\n\nremove" +
-      "Room\022\024.generated.RoomEntry\032\022.generated.M" +
-      "essage\022=\n\020updateRoomsTable\022\020.generated.E" +
-      "mpty\032\027.generated.GrantMessage2\327\002\n\017Electi" +
-      "onService\0225\n\016changeNextNext\022\021.generated." +
-      "Remote\032\020.generated.Empty\0222\n\nchangePrev\022\021" +
-      ".generated.Remote\032\021.generated.Remote\022/\n\010" +
-      "election\022\021.generated.Remote\032\020.generated." +
-      "Empty\022.\n\007elected\022\021.generated.Remote\032\020.ge" +
-      "nerated.Empty\0225\n\016repairTopology\022\021.genera" +
-      "ted.Remote\032\020.generated.Empty\022A\n\020changeNe" +
-      "ighbours\022\026.generated.JoinRequest\032\025.gener" +
-      "ated.NeighboursB\002P\001b\006proto3"
+      "nerated.Remote\022\013\n\003msg\030\002 \001(\t\",\n\005Rooms\022#\n\005" +
+      "rooms\030\001 \003(\0132\024.generated.RoomEntry\"j\n\tRoo" +
+      "mEntry\022$\n\troomOwner\030\001 \001(\0132\021.generated.Re" +
+      "mote\022%\n\nroomBackup\030\002 \001(\0132\021.generated.Rem" +
+      "ote\022\020\n\010roomName\030\003 \001(\t\"J\n\006Remote\022\016\n\006nodeI" +
+      "d\030\001 \001(\003\022\020\n\010hostname\030\002 \001(\t\022\014\n\004port\030\003 \001(\005\022" +
+      "\020\n\010username\030\004 \001(\t\"-\n\016RemoteResponse\022\r\n\005a" +
+      "dded\030\001 \001(\010\022\014\n\004room\030\002 \001(\t\"\226\001\n\nNeighbours\022" +
+      "\037\n\004next\030\001 \001(\0132\021.generated.Remote\022#\n\010next" +
+      "Next\030\002 \001(\0132\021.generated.Remote\022\037\n\004prev\030\003 " +
+      "\001(\0132\021.generated.Remote\022!\n\006leader\030\004 \001(\0132\021" +
+      ".generated.Remote\"Q\n\013JoinRequest\022\020\n\010room" +
+      "Name\030\001 \001(\t\022!\n\006remote\030\002 \001(\0132\021.generated.R" +
+      "emote\022\r\n\005delay\030\003 \001(\005\"n\n\014JoinResponse\022\020\n\010" +
+      "isLeader\030\001 \001(\010\022!\n\006leader\030\002 \001(\0132\021.generat" +
+      "ed.Remote\022)\n\nneighbours\030\003 \001(\0132\025.generate" +
+      "d.Neighbours\"N\n\021PermissionRequest\022*\n\017req" +
+      "uestByRemote\030\001 \001(\0132\021.generated.Remote\022\r\n" +
+      "\005clock\030\002 \001(\005\"A\n\022PermissionResponse\022+\n\020re" +
+      "sponseByRemote\030\002 \001(\0132\021.generated.Remote\"" +
+      "\031\n\006Health\022\017\n\007isAlive\030\001 \001(\0102\277\003\n\rRemoteSer" +
+      "vice\022+\n\004beat\022\020.generated.Empty\032\021.generat" +
+      "ed.Health\022;\n\010joinRoom\022\026.generated.JoinRe" +
+      "quest\032\027.generated.JoinResponse\0228\n\tprefli" +
+      "ght\022\021.generated.Remote\032\026.generated.ChatM" +
+      "essage0\001\022:\n\016receiveMessage\022\026.generated.C" +
+      "hatMessage\032\020.generated.Empty\022G\n\031receiveG" +
+      "etRoomListRequest\022\020.generated.Empty\032\030.ge" +
+      "nerated.StringPayload\022T\n&receiveGetNodeL" +
+      "istInCurrentRoomRequest\022\020.generated.Empt" +
+      "y\032\030.generated.StringPayload\022/\n\010exitRoom\022" +
+      "\021.generated.Remote\032\020.generated.Empty2\324\002\n" +
+      "\rUpdateService\022Q\n\030receivePermissionReque" +
+      "st\022\034.generated.PermissionRequest\032\027.gener" +
+      "ated.GrantMessage\022I\n\026receivePermissionRe" +
+      "ply\022\035.generated.PermissionResponse\032\020.gen" +
+      "erated.Empty\0224\n\014receiveRooms\022\020.generated" +
+      ".Rooms\032\022.generated.Message\0227\n\013receiveRoo" +
+      "m\022\024.generated.RoomEntry\032\022.generated.Mess" +
+      "age\0226\n\nremoveRoom\022\024.generated.RoomEntry\032" +
+      "\022.generated.Message2\327\002\n\017ElectionService\022" +
+      "5\n\016changeNextNext\022\021.generated.Remote\032\020.g" +
+      "enerated.Empty\0222\n\nchangePrev\022\021.generated" +
+      ".Remote\032\021.generated.Remote\022/\n\010election\022\021" +
+      ".generated.Remote\032\020.generated.Empty\022.\n\007e" +
+      "lected\022\021.generated.Remote\032\020.generated.Em" +
+      "pty\0225\n\016repairTopology\022\021.generated.Remote" +
+      "\032\020.generated.Empty\022A\n\020changeNeighbours\022\026" +
+      ".generated.JoinRequest\032\025.generated.Neigh" +
+      "boursB\002P\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -195,7 +193,7 @@ public final class ChatService {
     internal_static_generated_Rooms_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_generated_Rooms_descriptor,
-        new java.lang.String[] { "Rooms", "IsNotVisited", });
+        new java.lang.String[] { "Rooms", });
     internal_static_generated_RoomEntry_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_generated_RoomEntry_fieldAccessorTable = new
@@ -225,7 +223,7 @@ public final class ChatService {
     internal_static_generated_JoinRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_generated_JoinRequest_descriptor,
-        new java.lang.String[] { "RoomName", "Remote", });
+        new java.lang.String[] { "RoomName", "Remote", "Delay", });
     internal_static_generated_JoinResponse_descriptor =
       getDescriptor().getMessageTypes().get(11);
     internal_static_generated_JoinResponse_fieldAccessorTable = new
@@ -243,7 +241,7 @@ public final class ChatService {
     internal_static_generated_PermissionResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_generated_PermissionResponse_descriptor,
-        new java.lang.String[] { "Granted", "ResponseByRemote", });
+        new java.lang.String[] { "ResponseByRemote", });
     internal_static_generated_Health_descriptor =
       getDescriptor().getMessageTypes().get(14);
     internal_static_generated_Health_fieldAccessorTable = new

@@ -6,7 +6,7 @@ import cz.cvut.fel.dsv.utils.Utils;
 public class DisconnectCommand implements Command {
 
     @Override
-    public void handle(String arg, Node node) {
+    public void handle(Node node, String ...arg) {
         System.out.println("Disconnecting...");
         node.executeExit();
         System.out.println("Disconnected... Bye " + node.getUsername() + "!");

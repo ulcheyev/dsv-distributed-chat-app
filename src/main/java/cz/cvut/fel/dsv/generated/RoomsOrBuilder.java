@@ -31,10 +31,4 @@ public interface RoomsOrBuilder extends
    */
   generated.RoomEntryOrBuilder getRoomsOrBuilder(
       int index);
-
-  /**
-   * <code>bool isNotVisited = 2;</code>
-   * @return The isNotVisited.
-   */
-  boolean getIsNotVisited();
 }

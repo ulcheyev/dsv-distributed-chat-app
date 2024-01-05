@@ -34,4 +34,10 @@ public interface JoinRequestOrBuilder extends
    * <code>.generated.Remote remote = 2;</code>
    */
   generated.RemoteOrBuilder getRemoteOrBuilder();
+
+  /**
+   * <code>int32 delay = 3;</code>
+   * @return The delay.
+   */
+  int getDelay();
 }

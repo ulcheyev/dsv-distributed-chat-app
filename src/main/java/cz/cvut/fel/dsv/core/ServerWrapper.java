@@ -1,6 +1,8 @@
 package cz.cvut.fel.dsv.core;
 
-import cz.cvut.fel.dsv.core.service.*;
+import cz.cvut.fel.dsv.core.service.ElectionServiceImpl;
+import cz.cvut.fel.dsv.core.service.RemoteServiceImpl;
+import cz.cvut.fel.dsv.core.service.UpdateServiceImpl;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
@@ -28,12 +30,11 @@ public class ServerWrapper implements Runnable{
 
     private void startServer(int port) {
         ElectionServiceImpl electionService = new ElectionServiceImpl();
-        RemoteServiceImpl remoteService = new RemoteServiceImpl(electionService);
-        UpdateServiceImpl updateService = new UpdateServiceImpl(remoteService, electionService);
-        DsvServerInterceptorImpl interceptor = new DsvServerInterceptorImpl();
+        UpdateServiceImpl updateService = new UpdateServiceImpl(electionService);
+        RemoteServiceImpl remoteService = new RemoteServiceImpl(updateService, electionService);
         this.server = ServerBuilder
                 .forPort(port)
-                .intercept(interceptor)
+//                .intercept(interceptor)
                 .addService(remoteService)
                 .addService(electionService)
                 .addService(updateService)

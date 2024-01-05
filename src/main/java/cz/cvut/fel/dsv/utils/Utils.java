@@ -8,7 +8,9 @@ import cz.cvut.fel.dsv.core.data.DsvRemote;
 import cz.cvut.fel.dsv.core.service.DsvClientInterceptor;
 import generated.ChatMessage;
 import generated.Remote;
-import io.grpc.*;
+import io.grpc.ConnectivityState;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 
 import java.util.Map;
 import java.util.Optional;
@@ -97,9 +99,8 @@ public class Utils {
                     .build();
         }
 
-        public static generated.Rooms leaderRoomsToRemoteRooms(Map<String, DsvPair<Address, Address>> map, boolean isNotVisited) {
+        public static generated.Rooms leaderRoomsToRemoteRooms(Map<String, DsvPair<Address, Address>> map) {
             generated.Rooms.Builder builder = generated.Rooms.newBuilder();
-            builder.setIsNotVisited(isNotVisited);
             for (var entry : map.entrySet()) {
                 builder.addRooms(generated.RoomEntry
                         .newBuilder()

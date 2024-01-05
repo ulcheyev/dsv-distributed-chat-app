@@ -23,7 +23,6 @@ message ChatMessage {
 
 message Rooms {
   repeated RoomEntry rooms = 1;
-  bool isNotVisited = 2;
 }
 
 message RoomEntry {
@@ -56,6 +55,7 @@ message Neighbours {
 message JoinRequest {
   string roomName = 1;
   Remote remote = 2;
+  int32 delay = 3;
 }
 
 message JoinResponse {
@@ -74,7 +74,6 @@ message PermissionRequest {
 }
 
 message PermissionResponse {
-  bool granted = 1;
   Remote responseByRemote = 2;
 }
 
@@ -96,11 +95,10 @@ service RemoteService {
 
 service UpdateService {
   rpc receivePermissionRequest(PermissionRequest) returns (GrantMessage);
-  rpc receivePermissionResponse(PermissionResponse) returns (Empty);
+  rpc receivePermissionReply(PermissionResponse) returns (Empty);
   rpc receiveRooms(Rooms) returns (Message);
   rpc receiveRoom(RoomEntry) returns (Message);
   rpc removeRoom(RoomEntry) returns (Message);
-  rpc updateRoomsTable(Empty) returns(GrantMessage);
 }
 
 service ElectionService {

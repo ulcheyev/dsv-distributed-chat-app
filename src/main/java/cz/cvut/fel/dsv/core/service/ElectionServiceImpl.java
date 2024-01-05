@@ -5,6 +5,7 @@ import cz.cvut.fel.dsv.core.Room;
 import cz.cvut.fel.dsv.core.data.Address;
 import cz.cvut.fel.dsv.core.data.DsvNeighbours;
 import cz.cvut.fel.dsv.core.data.DsvPair;
+import cz.cvut.fel.dsv.core.data.SharedData;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.Utils;
 import generated.ElectionServiceGrpc;
@@ -38,9 +39,10 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
         logger.info("Changing prev to " + prev);
 
         node.getDsvNeighbours().setPrev(prev);
-        if (node.getIsLeader().getKey()) {
-            updateService.updateBackupNode(true);
-            updateService.makeUpdateRoomsTable(node.getRoomsAndLeaders(), updateService.getCurrentLeadersAddresses());
+        if (node.isLeader()) {
+           SharedData.put(node.getCurrentRoom(), DsvPair.of(node.getAddress(), prev));
+//            List<Address> nodeAddresses = updateService.getSpecifiedAddressesToRequest(node.getRoomsAndLeaders());
+//            updateService.makeUpdateRoomsTable(node.getRoomsAndLeaders(), nodeAddresses);
         }
 
         logger.info("Returning next node " + node.getDsvNeighbours().getNext());
@@ -70,21 +72,9 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
         logger.info("Node is elected candidate. Setting up properties...");
         node.setIsLeader(DsvPair.of(true, new Room(node.getAddress(), node.getCurrentRoom())));
         var former = node.getDsvNeighbours().getLeader();
-        node.getRoomsAndLeaders().put(node.getCurrentRoom(), DsvPair.of(node.getAddress(), node.getDsvNeighbours().getPrev()));
-
-        updateService.updateBackupNode(true);
-        updateService.makeUpdateRoomsTable(node.getRoomsAndLeaders(), List.of(former));
-
-        //
-//        try {
-//            generated.UpdateServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(node.getDsvNeighbours().getLeader()))
-//                    .receiveRoom(generated.RoomEntry.newBuilder()
-//                            .setRoomName(node.getCurrentRoom())
-//                            .setRoomOwner(Utils.Mapper.nodeToRemote(node))
-//                            .build());
-//        } catch (StatusRuntimeException ignored) {
-//            // todo
-//        }
+        Address prevToUpdate = node.getDsvNeighbours().getPrev();
+        SharedData.put(node.getCurrentRoom(), DsvPair.of(node.getAddress(), node.getDsvNeighbours().getPrev()));
+//        updateService.makeUpdateRoomsTable(node.getRoomsAndLeaders(), List.of(former));
 
         node.updateLeaderChannelAndObserver(node.getAddress());
         generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(node.getDsvNeighbours().getNext()))

@@ -1,14 +1,9 @@
 package cz.cvut.fel.dsv.core.service;
 
 import cz.cvut.fel.dsv.core.Node;
-import cz.cvut.fel.dsv.core.infrastructure.Config;
-import cz.cvut.fel.dsv.utils.DsvLogger;
 import io.grpc.*;
 
 import java.util.concurrent.Executor;
-import java.util.logging.Logger;
-
-import static cz.cvut.fel.dsv.core.infrastructure.Config.ANSI_INTERCEPTOR;
 
 public class DsvClientInterceptor implements ClientInterceptor {
 

@@ -1,7 +1,5 @@
 package cz.cvut.fel.dsv.core.infrastructure;
 
-import lombok.Setter;
-
 public class Config {
 
     private Config() {
@@ -17,7 +15,7 @@ public class Config {
 
     public static final String ANSI_RED_SERVICE = "\u001B[31m";
 
-    public static final String ANSI_YELLOW_TH_POOL = "\u001B[33m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
 
     public static final String ANSI_INTERCEPTOR = "\u001B[95m";
 

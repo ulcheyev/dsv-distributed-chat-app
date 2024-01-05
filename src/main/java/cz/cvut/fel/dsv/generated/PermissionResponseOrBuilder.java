@@ -9,12 +9,6 @@ public interface PermissionResponseOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>bool granted = 1;</code>
-   * @return The granted.
-   */
-  boolean getGranted();
-
-  /**
    * <code>.generated.Remote responseByRemote = 2;</code>
    * @return Whether the responseByRemote field is set.
    */

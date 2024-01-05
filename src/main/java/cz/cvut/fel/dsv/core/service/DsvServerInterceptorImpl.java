@@ -1,24 +1,35 @@
 package cz.cvut.fel.dsv.core.service;
 
-import io.grpc.*;
+import cz.cvut.fel.dsv.core.DsvRequestsQueue;
+import io.grpc.Metadata;
+import io.grpc.ServerCall;
+import io.grpc.ServerCallHandler;
+import io.grpc.ServerInterceptor;
+import lombok.Getter;
+
+import java.util.concurrent.ExecutionException;
 
 
 public class DsvServerInterceptorImpl implements ServerInterceptor {
-    private static final Context.Key<String> CLIENT_IP_KEY = Context.key("Client-IP");
+    @Getter
+    private static String clientIP;
+    private static final DsvRequestsQueue requestsQueue = new DsvRequestsQueue();
     @Override
     public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(
             ServerCall<ReqT, RespT> call,
             Metadata headers,
-            ServerCallHandler<ReqT, RespT> next) {
-        String clientIP = headers.get(Metadata.Key.of("Client-IP", Metadata.ASCII_STRING_MARSHALLER));
-        // Create a new context with the client's IP address
-        Context context = Context.current().withValue(CLIENT_IP_KEY, clientIP);
+            ServerCallHandler<ReqT, RespT> next)
+    {
+        clientIP = headers.get(Metadata.Key.of("Client-IP", Metadata.ASCII_STRING_MARSHALLER));
         // Invoke the next handler in the chain with the updated context
-        return Contexts.interceptCall(context, call, headers, next);
-    }
-
-    public static String getClientIP() {
-        return CLIENT_IP_KEY.get();
+        try {
+            ServerCall.Listener listener = requestsQueue.handle(next, call, headers).get();
+            return listener;
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
