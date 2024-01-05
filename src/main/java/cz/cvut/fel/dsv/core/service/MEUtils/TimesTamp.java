@@ -1,15 +1,19 @@
 package cz.cvut.fel.dsv.core.service.MEUtils;
 
-public class LamportClock {
+public class TimesTamp {
 
     private int clock;
 
-    public LamportClock(){
+    public TimesTamp(){
         clock=1;
     }
 
     public synchronized int update(){
         return clock++;
+    }
+
+    public synchronized void setClock(TimesTamp other){
+        this.clock = other.clock;
     }
 
     public synchronized void receiveMsg(int time){

@@ -18,50 +18,52 @@ import static cz.cvut.fel.dsv.core.infrastructure.Config.ANSI_PURPLE_SERVICE;
 
 public class CSManager {
     private static final Logger logger = DsvLogger.getLogger("CS MANAGER", ANSI_PURPLE_SERVICE, CSManager.class);
-
-    private final LamportClock logicalClock;
+    private final TimesTamp maxClock;
+    private final TimesTamp nodeClock;
     private int replyCount;
-
     private final Queue<DelayedRequest> delayedRequests = new LinkedList<>();
-
     private CountDownLatch replyLatch;
 
+
     public CSManager() {
-        logicalClock = new LamportClock();
+        maxClock = new TimesTamp();
+        nodeClock = new TimesTamp();
     }
 
     public synchronized void requestCriticalSection(Integer delay) {
         replyCount = 0;
-        int necessaryReplyCount = SharedData.getSize()-1;
+        maxClock.update();
+        nodeClock.setClock(maxClock);
+        int currentIntValueOfClock = nodeClock.getClock();
+        int necessaryReplyCount = SharedData.getSizeNecessaryForUpdate();
         replyLatch = new CountDownLatch(necessaryReplyCount);
         Node.getInstance().setState(NodeState.REQUESTING);
-        logger.log(Level.INFO, "[CS] Requesting nodes to enter CS. Clock: {0}. Need {1} replies", new Object[]{logicalClock, necessaryReplyCount});
+        logger.log(Level.INFO, "[CS] Requesting nodes to enter CS. Clock: {0}. Need {1} replies", new Object[]{currentIntValueOfClock, necessaryReplyCount});
         for (var remoteNodeAddr: SharedData.getNodeAddressesWithoutCurrent()) {
-            logicalClock.update();
             Utils.tryToSleep(delay);
-            new UpdatableClient(Node.getInstance().getAddress(), remoteNodeAddr).sendRequestCriticalSection(logicalClock.getClock());
+            new UpdatableClient(Node.getInstance().getAddress(), remoteNodeAddr).sendRequestCriticalSection(currentIntValueOfClock);
             logger.log(Level.INFO, "[- CS] Request sent to {0}", remoteNodeAddr);
         }
     }
 
     public synchronized void receiveRequest(Address requestingNodeAddress, int timestamp) {
-        int currentClock = logicalClock.getClock();
         boolean delayed = isDelay(timestamp, requestingNodeAddress.getId());
-        logicalClock.receiveMsg(timestamp);
+        maxClock.receiveMsg(timestamp);
         if (!delayed) {
             new UpdatableClient(Node.getInstance().getAddress(), requestingNodeAddress).sendPermitCriticalSection();
             logger.log(Level.INFO, "[CS] request by {0} is permitted; Request clock: {1}; Node clock: {2}; State: {3}",
-                    new Object[]{requestingNodeAddress, timestamp, currentClock, Node.getInstance().getState()});
+                    new Object[]{requestingNodeAddress, timestamp, nodeClock.getClock(), Node.getInstance().getState()});
         }
         else {
             logger.log(Level.INFO, "[CS] request by {0} is delayed; Request clock: {1}; Node clock: {2}; State: {3}",
-                    new Object[]{requestingNodeAddress, timestamp, currentClock, Node.getInstance().getState()});
+                    new Object[]{requestingNodeAddress, timestamp, nodeClock.getClock(), Node.getInstance().getState()});
             delayedRequests.add(new DelayedRequest(requestingNodeAddress, timestamp));
         }
     }
 
     public synchronized void receivePermit() {
         int necessarySize = SharedData.getSizeNecessaryForUpdate();
+
         replyCount++;
         int awaitingReplies = necessarySize - replyCount;
         logger.log(Level.INFO, "[CS] Awaiting {0}", new Object[]{awaitingReplies});
@@ -75,7 +77,7 @@ public class CSManager {
         while (!delayedRequests.isEmpty()) {
             DelayedRequest delayedRequest = delayedRequests.poll();
             logger.log(Level.INFO, "[CS] Processing delayed request {0}", delayedRequest);
-            new UpdatableClient(Node.getInstance().getAddress(), delayedRequest.getRequestingNodeAddress()).sendPermitCriticalSection();
+            new UpdatableClient(Node.getInstance().getAddress(), delayedRequest.requestingNodeAddress()).sendPermitCriticalSection();
         }
     }
 
@@ -98,7 +100,7 @@ public class CSManager {
     }
 
     public void awaitReplies() {
-        logger.log(Level.INFO, "[CS] awaiting {0} replies; Node clock: {1}", new Object[]{SharedData.getSizeNecessaryForUpdate(), logicalClock});
+        logger.log(Level.INFO, "[CS] awaiting {0} replies; Node clock: {1}", new Object[]{SharedData.getSizeNecessaryForUpdate(), maxClock});
         try {
             replyLatch.await();
         } catch (InterruptedException e) {
@@ -112,27 +114,20 @@ public class CSManager {
             return true;
         }
         if(Node.getInstance().getState().equals(NodeState.REQUESTING) &&
-                ((logicalClock.isLessThan(timestamp))
-                || (logicalClock.isEqual(timestamp) && requestedNodeId > Node.getInstance().getAddress().getId()))) {
+                ((nodeClock.isLessThan(timestamp))
+                || (nodeClock.isEqual(timestamp) && requestedNodeId > Node.getInstance().getAddress().getId())))
+        {
             return true;
         }
         return false;
     }
 
 
-    @Getter
-    private static class DelayedRequest {
-        private final Address requestingNodeAddress;
-        private final int timestamp;
-
-        public DelayedRequest(Address requestingNodeAddress, int timestamp) {
-            this.requestingNodeAddress = requestingNodeAddress;
-            this.timestamp = timestamp;
-        }
+        private record DelayedRequest(Address requestingNodeAddress, int timestamp) {
 
         @Override
-        public String toString() {
-            return requestingNodeAddress.toString();
+            public String toString() {
+                return requestingNodeAddress.toString();
+            }
         }
-    }
 }
