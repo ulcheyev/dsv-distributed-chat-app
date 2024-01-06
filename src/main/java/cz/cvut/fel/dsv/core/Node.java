@@ -18,8 +18,6 @@ import lombok.Setter;
 
 import java.net.InetAddress;
 import java.util.Objects;
-import java.util.Timer;
-import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
 import java.util.logging.Logger;
 
@@ -98,7 +96,7 @@ public class Node {
     }
 
     private void executeJoining(Address joinAddress, generated.JoinRequest req) {
-        var stub = generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(joinAddress));
+        var stub = generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(joinAddress));
         var joinResponse = stub.joinRoom(req);
 
         if (!joinResponse.getIsLeader()) {
@@ -139,7 +137,7 @@ public class Node {
     private void exitRoom() {
 //        logger.info("Exiting room " + currentRoom);
         try {
-            generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(dsvNeighbours.getLeader()))
+            generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(dsvNeighbours.getLeader()))
                     .exitRoom(Utils.Mapper.nodeToRemote());
         } catch (StatusRuntimeException e) {
             emergencyRepairAndElection();
@@ -150,7 +148,7 @@ public class Node {
     private void startRepairTopology(Address onNode, Address missing) {
         logger.info("Starting repair topology on " + onNode.getHostname() + ":" + onNode.getPort() + " with missing node " +
                 missing.getHostname() + ":" + missing.getPort());
-        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(onNode))
+        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(onNode))
                 .repairTopology(Utils.Mapper.addressToRemote(missing));
     }
 
@@ -166,7 +164,7 @@ public class Node {
     private void makeElection(Address onNode) {
         logger.info("Starting election on node"
                 + onNode.getHostname() + ":" + onNode.getPort());
-        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(onNode))
+        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(onNode))
                 .election(Utils.Mapper.addressToRemote(new Address(Config.STUB_STRING, 0, -1)));
     }
 
@@ -237,13 +235,13 @@ public class Node {
 
     private void preflight() {
             logger.info("Sending preflight to " + dsvNeighbours.getLeader());
-            generated.RemoteServiceGrpc.newStub(Utils.Skeleton.buildChannel(dsvNeighbours.getLeader()))
+            generated.RemoteServiceGrpc.newStub(Utils.Skeleton.buildManagedChannel(dsvNeighbours.getLeader()))
                     .preflight(Utils.Mapper.nodeToRemote(), receiveMessagesObserver);
     }
 
     public String getNodeListInCurrentRoom() {
         return Utils.handleAndReturn(empty ->
-                        generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(dsvNeighbours.getLeader()))
+                        generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(dsvNeighbours.getLeader()))
                                 .receiveGetNodeListInCurrentRoomRequest(generated.Empty.getDefaultInstance())
                                 .getMsg(),
                 emergencyRepairAndElection()
@@ -252,7 +250,7 @@ public class Node {
 
     public String getRoomListInNetwork() {
         return Utils.handleAndReturn(empty ->
-                        generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(dsvNeighbours.getLeader()))
+                        generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(dsvNeighbours.getLeader()))
                                 .receiveGetRoomListRequest(generated.Empty.getDefaultInstance())
                                 .getMsg(),
                 emergencyRepairAndElection()

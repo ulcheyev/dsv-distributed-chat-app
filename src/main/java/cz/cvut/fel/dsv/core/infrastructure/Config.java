@@ -17,6 +17,8 @@ public class Config {
 
     public static final String ANSI_YELLOW = "\u001B[33m";
 
+    public static final Integer TIMEOUT_SECONDS_IN_CS = 5;
+
     public static final String ANSI_INTERCEPTOR = "\u001B[95m";
 
     public static final String HELP_STRING = """

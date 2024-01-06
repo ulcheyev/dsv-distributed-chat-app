@@ -28,6 +28,8 @@ public class Address {
         this(addr.hostname, addr.port, addr.id);
     }
 
+    public Address(){}
+
     public void generateId() {
         int hash = Objects.hash(hostname, port);
         long newId = (((long) hash) << 32) | (hash & 0xFFFFFFFFL) + ID_GEN.incrementAndGet();

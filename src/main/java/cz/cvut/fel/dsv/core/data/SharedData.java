@@ -45,6 +45,11 @@ public class SharedData {
         return data.remove(key);
     }
 
+
+    public static synchronized void removeByLeaderAddress(Address leaderAddress) {
+        data.entrySet().removeIf(entry -> entry.getValue().getKey().equals(leaderAddress));
+    }
+
     public static String stringify(){
         StringBuilder sb = new StringBuilder();
         for (var room : data.entrySet()) {

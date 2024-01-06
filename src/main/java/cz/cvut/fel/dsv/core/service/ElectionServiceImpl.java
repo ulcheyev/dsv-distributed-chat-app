@@ -13,7 +13,6 @@ import generated.Neighbours;
 import io.grpc.stub.StreamObserver;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.logging.Logger;
 
 import static cz.cvut.fel.dsv.core.infrastructure.Config.ANSI_PURPLE_SERVICE;
@@ -53,7 +52,7 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
     @Override
     public void election(generated.Remote request, StreamObserver<generated.Empty> responseObserver) {
         logger.info("Election is called with ID: " + request.getNodeId());
-        var nextSkeleton = generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(node.getDsvNeighbours().getNext()));
+        var nextSkeleton = generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(node.getDsvNeighbours().getNext()));
 
         if (node.getAddress().getId() < request.getNodeId()) {
             node.setVoting(true);
@@ -77,7 +76,7 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
 //        updateService.makeUpdateRoomsTable(node.getRoomsAndLeaders(), List.of(former));
 
         node.updateLeaderChannelAndObserver(node.getAddress());
-        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(node.getDsvNeighbours().getNext()))
+        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(node.getDsvNeighbours().getNext()))
                 .elected(Utils.Mapper.addressToRemote(node.getAddress()));
     }
 
@@ -86,7 +85,7 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
         logger.info("Elected is called with ID: " + request.getNodeId());
         if (node.getAddress().getId() != request.getNodeId()) {
             node.updateLeaderChannelAndObserver(Utils.Mapper.remoteToAddress(request));
-            generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(node.getDsvNeighbours().getNext()))
+            generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(node.getDsvNeighbours().getNext()))
                     .elected(request);
         }
 
@@ -102,7 +101,7 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
             logger.info("Setting next to " + dsvNeighbours.getNextNext());
             dsvNeighbours.setNext(dsvNeighbours.getNextNext());
 
-            var nextNextSkeleton = generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(dsvNeighbours.getNextNext()));
+            var nextNextSkeleton = generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(dsvNeighbours.getNextNext()));
 
             logger.info("Changing prev on " + dsvNeighbours.getNextNext() + " to " + node.getAddress() + " called by " + node.getAddress());
             var nextOfNextNextNode = nextNextSkeleton.changePrev(Utils.Mapper.addressToRemote(node.getAddress()));
@@ -111,12 +110,12 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
             dsvNeighbours.setNextNext(Utils.Mapper.remoteToAddress(nextOfNextNextNode));
 
             logger.info("Changing nextNext on " + dsvNeighbours.getPrev() + " to " + dsvNeighbours.getNext() + "called by " + node.getAddress());
-            generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(dsvNeighbours.getPrev()))
+            generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(dsvNeighbours.getPrev()))
                     .changeNextNext(Utils.Mapper.addressToRemote(dsvNeighbours.getNext()));
 
         } else {
             logger.info("Send message [repair topology] to the next node " + dsvNeighbours.getNext());
-            generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(dsvNeighbours.getNext()))
+            generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(dsvNeighbours.getNext()))
                     .repairTopology(request);
         }
 
@@ -143,9 +142,9 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
                 myDsvNeighbours.getLeader()
         );
 
-        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(node.getDsvNeighbours().getNext()))
+        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(node.getDsvNeighbours().getNext()))
                 .changePrev(request.getRemote());
-        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(initialPrev))
+        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(initialPrev))
                 .changeNextNext(request.getRemote());
 
         tempDsvNeighbours.setNextNext(myDsvNeighbours.getNextNext());

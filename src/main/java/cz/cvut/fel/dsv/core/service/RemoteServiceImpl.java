@@ -5,6 +5,7 @@ import cz.cvut.fel.dsv.core.Room;
 import cz.cvut.fel.dsv.core.data.Address;
 import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.data.SharedData;
+import cz.cvut.fel.dsv.utils.DsvConditionLock;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.Utils;
 import generated.*;
@@ -23,11 +24,13 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
     private final Node node = Node.getInstance();
     private final ElectionServiceImpl electionService;
     private final UpdateServiceImpl updateService;
-    private final Queue<DsvPair<generated.JoinRequest, StreamObserver<generated.JoinResponse>>> joinQueue = new LinkedList<>();
+
+    private final DsvConditionLock lock;
 
     public RemoteServiceImpl(UpdateServiceImpl updateService, ElectionServiceImpl electionService) {
         this.electionService = electionService;
         this.updateService = updateService;
+        lock = new DsvConditionLock(true);
     }
 
     @Override
@@ -55,7 +58,9 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
 
 
     @Override
-    public synchronized void joinRoom(generated.JoinRequest request, StreamObserver<generated.JoinResponse> responseObserver) {
+    public void joinRoom(generated.JoinRequest request, StreamObserver<generated.JoinResponse> responseObserver) {
+            lock.await();
+            lock.lock();
             logger.info("[request by Node " + request.getRemote().getUsername() + "] request to join is processing");
             // If node is leader
             if (node.isLeader()) {
@@ -78,7 +83,7 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
 
                     try {
                         var leader = SharedData.get(request.getRoomName()).getKey();
-                        var neighbours = generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(leader)).changeNeighbours(request);
+                        var neighbours = generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(leader)).changeNeighbours(request);
                         responseObserver.onNext(generated.JoinResponse.newBuilder()
                                 .setIsLeader(true)
                                 .setLeader(Utils.Mapper.addressToRemote(leader))
@@ -102,6 +107,7 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
                         responseObserver.onCompleted();
                     }
                 }
+                updateService.releaseCS();
             }
             // Not a leader at all, send a leader address
             else {
@@ -112,7 +118,7 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
                         .build());
                 responseObserver.onCompleted();
             }
-            updateService.releaseCS();
+            lock.signal();
         }
 
     @Override

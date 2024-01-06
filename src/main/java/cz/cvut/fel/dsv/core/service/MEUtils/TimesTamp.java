@@ -24,11 +24,11 @@ public class TimesTamp {
         return clock;
     }
 
-    public boolean isLessThan(int other){
+    public synchronized boolean isLessThan(int other){
         return this.clock < other;
     }
 
-    public boolean isEqual(int other) {
+    public synchronized boolean isEqual(int other) {
         return this.clock == other;
     }
 

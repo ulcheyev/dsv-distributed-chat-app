@@ -13,6 +13,7 @@ import generated.Remote;
 import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,6 +52,7 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
             tempMap.put(room.getRoomName(), DsvPair.of(leader, backupNode));
         }
         SharedData.updateData(tempMap);
+        csManager.dataReceived();
         responseObserver.onNext(generated.Message.newBuilder().setMsg("OK: Rooms received").build());
         responseObserver.onCompleted();
     }
@@ -65,7 +67,7 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
 
     @Override
     public void receivePermissionRequest(generated.PermissionRequest request, StreamObserver<generated.GrantMessage> responseObserver) {
-        csManager.receiveRequest(Utils.Mapper.remoteToAddress(request.getRequestByRemote()), request.getClock());
+        csManager.receiveRequest(Utils.Mapper.remoteToAddress(request.getRequestByRemote()), request.getClock(), request.getDelay(), request.getId());
         responseObserver.onNext(generated.GrantMessage.newBuilder().setGrant(false).build());
         responseObserver.onCompleted();
     }
@@ -76,7 +78,7 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
         logger.log(Level.INFO, "[CS] received permit by {0}", Utils.Mapper.remoteToAddress(response.getResponseByRemote()));
         responseObserver.onNext(generated.Empty.getDefaultInstance());
         responseObserver.onCompleted();
-        csManager.receivePermit();
+        csManager.receivePermit(response.getId());
     }
 
     public void requestCS(Integer delay) {
@@ -93,6 +95,10 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
 
     public void releaseCS() {
         csManager.receiveRelease();
+    }
+
+    public void awaitCs() {
+        csManager.awaitCs();
     }
 
     private UpdateServiceImpl() {}

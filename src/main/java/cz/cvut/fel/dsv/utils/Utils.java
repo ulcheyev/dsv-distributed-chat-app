@@ -49,7 +49,7 @@ public class Utils {
         private Skeleton() {
         }
 
-        public static ManagedChannel buildChannel(Address address) {
+        public static ManagedChannel buildManagedChannel(Address address) {
             ManagedChannel build = ManagedChannelBuilder
                     .forAddress(address.getHostname(), address.getPort())
                     .usePlaintext()
@@ -57,6 +57,18 @@ public class Utils {
                     .build();
             build.notifyWhenStateChanged(ConnectivityState.IDLE, build::shutdown);
             return build;
+        }
+
+        public static ManagedChannel buildManagedChannel(generated.Remote remote) {
+            return buildManagedChannel(Utils.Mapper.remoteToAddress(remote));
+        }
+
+        public static ManagedChannel buildChannel(Address address){
+            return ManagedChannelBuilder
+                    .forAddress(address.getHostname(), address.getPort())
+                    .usePlaintext()
+                    .intercept(new DsvClientInterceptor())
+                    .build();
         }
 
         public static ManagedChannel buildChannel(generated.Remote remote) {

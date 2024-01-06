@@ -66,6 +66,17 @@ private static final long serialVersionUID = 0L;
     return responseByRemote_ == null ? generated.Remote.getDefaultInstance() : responseByRemote_;
   }
 
+  public static final int ID_FIELD_NUMBER = 4;
+  private long id_ = 0L;
+  /**
+   * <code>int64 id = 4;</code>
+   * @return The id.
+   */
+  @java.lang.Override
+  public long getId() {
+    return id_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -83,6 +94,9 @@ private static final long serialVersionUID = 0L;
     if (((bitField0_ & 0x00000001) != 0)) {
       output.writeMessage(2, getResponseByRemote());
     }
+    if (id_ != 0L) {
+      output.writeInt64(4, id_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -95,6 +109,10 @@ private static final long serialVersionUID = 0L;
     if (((bitField0_ & 0x00000001) != 0)) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(2, getResponseByRemote());
+    }
+    if (id_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt64Size(4, id_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -116,6 +134,8 @@ private static final long serialVersionUID = 0L;
       if (!getResponseByRemote()
           .equals(other.getResponseByRemote())) return false;
     }
+    if (getId()
+        != other.getId()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -131,6 +151,9 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + RESPONSEBYREMOTE_FIELD_NUMBER;
       hash = (53 * hash) + getResponseByRemote().hashCode();
     }
+    hash = (37 * hash) + ID_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getId());
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -273,6 +296,7 @@ private static final long serialVersionUID = 0L;
         responseByRemoteBuilder_.dispose();
         responseByRemoteBuilder_ = null;
       }
+      id_ = 0L;
       return this;
     }
 
@@ -312,6 +336,9 @@ private static final long serialVersionUID = 0L;
             ? responseByRemote_
             : responseByRemoteBuilder_.build();
         to_bitField0_ |= 0x00000001;
+      }
+      if (((from_bitField0_ & 0x00000002) != 0)) {
+        result.id_ = id_;
       }
       result.bitField0_ |= to_bitField0_;
     }
@@ -363,6 +390,9 @@ private static final long serialVersionUID = 0L;
       if (other.hasResponseByRemote()) {
         mergeResponseByRemote(other.getResponseByRemote());
       }
+      if (other.getId() != 0L) {
+        setId(other.getId());
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -396,6 +426,11 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000001;
               break;
             } // case 18
+            case 32: {
+              id_ = input.readInt64();
+              bitField0_ |= 0x00000002;
+              break;
+            } // case 32
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -532,6 +567,38 @@ private static final long serialVersionUID = 0L;
         responseByRemote_ = null;
       }
       return responseByRemoteBuilder_;
+    }
+
+    private long id_ ;
+    /**
+     * <code>int64 id = 4;</code>
+     * @return The id.
+     */
+    @java.lang.Override
+    public long getId() {
+      return id_;
+    }
+    /**
+     * <code>int64 id = 4;</code>
+     * @param value The id to set.
+     * @return This builder for chaining.
+     */
+    public Builder setId(long value) {
+
+      id_ = value;
+      bitField0_ |= 0x00000002;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>int64 id = 4;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearId() {
+      bitField0_ = (bitField0_ & ~0x00000002);
+      id_ = 0L;
+      onChanged();
+      return this;
     }
     @java.lang.Override
     public final Builder setUnknownFields(
