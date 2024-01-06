@@ -21,4 +21,10 @@ public interface PermissionResponseOrBuilder extends
    * <code>.generated.Remote responseByRemote = 2;</code>
    */
   generated.RemoteOrBuilder getResponseByRemoteOrBuilder();
+
+  /**
+   * <code>int64 id = 4;</code>
+   * @return The id.
+   */
+  long getId();
 }

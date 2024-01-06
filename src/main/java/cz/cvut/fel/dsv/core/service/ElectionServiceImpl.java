@@ -1,12 +1,17 @@
 package cz.cvut.fel.dsv.core.service;
 
 import cz.cvut.fel.dsv.core.Node;
-import cz.cvut.fel.dsv.core.service.LEUtils.LEManager;
+import cz.cvut.fel.dsv.core.Room;
+import cz.cvut.fel.dsv.core.data.Address;
+import cz.cvut.fel.dsv.core.data.DsvNeighbours;
+import cz.cvut.fel.dsv.core.data.DsvPair;
+import cz.cvut.fel.dsv.core.data.SharedData;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.Utils;
 import generated.ElectionServiceGrpc;
 import generated.Neighbours;
 import io.grpc.stub.StreamObserver;
+import lombok.Setter;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -82,7 +87,7 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
         logger.log(Level.INFO, "Elected is called with ID: {0}", request.getNodeId());
         if (node.getAddress().getId() != request.getNodeId()) {
             node.updateLeaderChannelAndObserver(Utils.Mapper.remoteToAddress(request));
-            generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(node.getDsvNeighbours().getNext()))
+            generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(node.getDsvNeighbours().getNext()))
                     .elected(request);
         }
 
@@ -150,6 +155,10 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
 //        myDsvNeighbours.setNextNext(initialNext);
 //        myDsvNeighbours.setNext(Utils.Mapper.remoteToAddress(request.getRemote()));
 
+        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(node.getDsvNeighbours().getNext()))
+                .changePrev(request.getRemote());
+        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(initialPrev))
+                .changeNextNext(request.getRemote());
         return Utils.Mapper.dsvNeighboursToNeighbours(leManager.startChanging(request));
     }
 

@@ -19,6 +19,8 @@ import lombok.Setter;
 
 import java.net.InetAddress;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,14 +39,16 @@ public class Node {
     @Getter @Setter private NodeState state;
     @Getter @Setter private DsvNeighbours dsvNeighbours;
     @Getter @Setter private boolean isVoting;
+    private ConsoleHandler consoleHandler;
+    private ServerWrapper server;
     private ManagedChannel managedChannelToLeader;
     private StreamObserver<generated.ChatMessage> receiveMessagesObserver;
     private static volatile Node INSTANCE;
 
-    private Node() {
+    public Node() {
         isLeader = DsvPair.of(false, new Room.NullableRoom());
         state = NodeState.RELEASED;
-        receiveMessagesObserver = new StreamObserverImpl();
+        init();
     }
 
     public static Node getInstance() {
@@ -53,6 +57,25 @@ public class Node {
             if (INSTANCE == null) INSTANCE = new Node();
         }
         return INSTANCE;
+    }
+
+    private void init() {
+        receiveMessagesObserver = new StreamObserver<generated.ChatMessage>() {
+            @Override
+            public void onNext(generated.ChatMessage message) {
+                System.out.println("\r[" + currentRoom + "] " + message.getRemote().getUsername() + ": " + message.getMsg());
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                // todo
+            }
+
+            @Override
+            public void onCompleted() {
+                // todo
+            }
+        };
     }
 
     private void updateChannelToLeader() {
@@ -101,7 +124,7 @@ public class Node {
     private void exitRoom() {
         logger.log(Level.INFO, "Exiting room {0}", currentRoom);
         try {
-            generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(dsvNeighbours.getLeader()))
+            generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(dsvNeighbours.getLeader()))
                     .exitRoom(Utils.Mapper.nodeToRemote());
         } catch (StatusRuntimeException e) {
             startRepairTopology(address, dsvNeighbours.getLeader());
@@ -200,12 +223,14 @@ public class Node {
     private void preflight() {
             logger.log(Level.INFO, "Sending preflight to {0}", dsvNeighbours.getLeader());
             generated.RemoteServiceGrpc.newStub(Utils.Skeleton.buildChannel(dsvNeighbours.getLeader()))
+            logger.info("Sending preflight to " + dsvNeighbours.getLeader());
+            generated.RemoteServiceGrpc.newStub(Utils.Skeleton.buildManagedChannel(dsvNeighbours.getLeader()))
                     .preflight(Utils.Mapper.nodeToRemote(), receiveMessagesObserver);
     }
 
     public String getNodeListInCurrentRoom() {
         return Utils.handleAndReturn(empty ->
-                        generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(dsvNeighbours.getLeader()))
+                        generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(dsvNeighbours.getLeader()))
                                 .receiveGetNodeListInCurrentRoomRequest(generated.Empty.getDefaultInstance())
                                 .getMsg(),
                 emergencyRepairAndElection()
@@ -214,7 +239,7 @@ public class Node {
 
     public String getRoomListInNetwork() {
         return Utils.handleAndReturn(empty ->
-                        generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(dsvNeighbours.getLeader()))
+                        generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(dsvNeighbours.getLeader()))
                                 .receiveGetRoomListRequest(generated.Empty.getDefaultInstance())
                                 .getMsg(),
                 emergencyRepairAndElection()

@@ -8,6 +8,7 @@ import cz.cvut.fel.dsv.core.service.strategy.BaseJoinRoomStrategy;
 import cz.cvut.fel.dsv.core.service.strategy.JoinViaLeaderRoomStrategy;
 import cz.cvut.fel.dsv.core.service.strategy.JoinViaNonLeaderRoomStrategy;
 import cz.cvut.fel.dsv.utils.Director;
+import cz.cvut.fel.dsv.utils.DsvConditionLock;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.Utils;
 import generated.*;
@@ -26,11 +27,14 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
     private final Node node = Node.getInstance();
     private final ElectionServiceImpl electionService;
     private final UpdateServiceImpl updateService;
-    private final Queue<DsvPair<generated.JoinRequest, StreamObserver<generated.JoinResponse>>> joinQueue = new LinkedList<>();
 
     public RemoteServiceImpl(UpdateServiceImpl updateService, ElectionServiceImpl electionService) {
         this.electionService = electionService;
         this.updateService = updateService;
+        // final DsvConditionLock lock = new DsvConditionLock(true);
+        // lock.await()
+        // lock.lock()
+        // --- lock.signal()
     }
 
     @Override

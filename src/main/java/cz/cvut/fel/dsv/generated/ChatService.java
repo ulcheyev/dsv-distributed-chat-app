@@ -113,45 +113,45 @@ public final class ChatService {
       "\037\n\004next\030\001 \001(\0132\021.generated.Remote\022#\n\010next" +
       "Next\030\002 \001(\0132\021.generated.Remote\022\037\n\004prev\030\003 " +
       "\001(\0132\021.generated.Remote\022!\n\006leader\030\004 \001(\0132\021" +
-      ".generated.Remote\"d\n\013JoinRequest\022\020\n\010room" +
+      ".generated.Remote\"Q\n\013JoinRequest\022\020\n\010room" +
       "Name\030\001 \001(\t\022!\n\006remote\030\002 \001(\0132\021.generated.R" +
-      "emote\022\r\n\005delay\030\003 \001(\005\022\021\n\tisInitial\030\004 \001(\010\"" +
-      "n\n\014JoinResponse\022\020\n\010isLeader\030\001 \001(\010\022!\n\006lea" +
-      "der\030\002 \001(\0132\021.generated.Remote\022)\n\nneighbou" +
-      "rs\030\003 \001(\0132\025.generated.Neighbours\"N\n\021Permi" +
-      "ssionRequest\022*\n\017requestByRemote\030\001 \001(\0132\021." +
-      "generated.Remote\022\r\n\005clock\030\002 \001(\005\"A\n\022Permi" +
-      "ssionResponse\022+\n\020responseByRemote\030\002 \001(\0132" +
-      "\021.generated.Remote\"\031\n\006Health\022\017\n\007isAlive\030" +
-      "\001 \001(\0102\277\003\n\rRemoteService\022+\n\004beat\022\020.genera" +
-      "ted.Empty\032\021.generated.Health\022;\n\010joinRoom" +
-      "\022\026.generated.JoinRequest\032\027.generated.Joi" +
-      "nResponse\0228\n\tpreflight\022\021.generated.Remot" +
-      "e\032\026.generated.ChatMessage0\001\022:\n\016receiveMe" +
-      "ssage\022\026.generated.ChatMessage\032\020.generate" +
-      "d.Empty\022G\n\031receiveGetRoomListRequest\022\020.g" +
-      "enerated.Empty\032\030.generated.StringPayload" +
-      "\022T\n&receiveGetNodeListInCurrentRoomReque" +
-      "st\022\020.generated.Empty\032\030.generated.StringP" +
-      "ayload\022/\n\010exitRoom\022\021.generated.Remote\032\020." +
-      "generated.Empty2\324\002\n\rUpdateService\022Q\n\030rec" +
-      "eivePermissionRequest\022\034.generated.Permis" +
-      "sionRequest\032\027.generated.GrantMessage\022I\n\026" +
-      "receivePermissionReply\022\035.generated.Permi" +
-      "ssionResponse\032\020.generated.Empty\0224\n\014recei" +
-      "veRooms\022\020.generated.Rooms\032\022.generated.Me" +
-      "ssage\0227\n\013receiveRoom\022\024.generated.RoomEnt" +
-      "ry\032\022.generated.Message\0226\n\nremoveRoom\022\024.g" +
-      "enerated.RoomEntry\032\022.generated.Message2\327" +
-      "\002\n\017ElectionService\0225\n\016changeNextNext\022\021.g" +
-      "enerated.Remote\032\020.generated.Empty\0222\n\ncha" +
-      "ngePrev\022\021.generated.Remote\032\021.generated.R" +
-      "emote\022/\n\010election\022\021.generated.Remote\032\020.g" +
-      "enerated.Empty\022.\n\007elected\022\021.generated.Re" +
-      "mote\032\020.generated.Empty\0225\n\016repairTopology" +
-      "\022\021.generated.Remote\032\020.generated.Empty\022A\n" +
-      "\020changeNeighbours\022\026.generated.JoinReques" +
-      "t\032\025.generated.NeighboursB\002P\001b\006proto3"
+      "emote\022\r\n\005delay\030\003 \001(\005\"n\n\014JoinResponse\022\020\n\010" +
+      "isLeader\030\001 \001(\010\022!\n\006leader\030\002 \001(\0132\021.generat" +
+      "ed.Remote\022)\n\nneighbours\030\003 \001(\0132\025.generate" +
+      "d.Neighbours\"N\n\021PermissionRequest\022*\n\017req" +
+      "uestByRemote\030\001 \001(\0132\021.generated.Remote\022\r\n" +
+      "\005clock\030\002 \001(\005\"A\n\022PermissionResponse\022+\n\020re" +
+      "sponseByRemote\030\002 \001(\0132\021.generated.Remote\"" +
+      "\031\n\006Health\022\017\n\007isAlive\030\001 \001(\0102\277\003\n\rRemoteSer" +
+      "vice\022+\n\004beat\022\020.generated.Empty\032\021.generat" +
+      "ed.Health\022;\n\010joinRoom\022\026.generated.JoinRe" +
+      "quest\032\027.generated.JoinResponse\0228\n\tprefli" +
+      "ght\022\021.generated.Remote\032\026.generated.ChatM" +
+      "essage0\001\022:\n\016receiveMessage\022\026.generated.C" +
+      "hatMessage\032\020.generated.Empty\022G\n\031receiveG" +
+      "etRoomListRequest\022\020.generated.Empty\032\030.ge" +
+      "nerated.StringPayload\022T\n&receiveGetNodeL" +
+      "istInCurrentRoomRequest\022\020.generated.Empt" +
+      "y\032\030.generated.StringPayload\022/\n\010exitRoom\022" +
+      "\021.generated.Remote\032\020.generated.Empty2\324\002\n" +
+      "\rUpdateService\022Q\n\030receivePermissionReque" +
+      "st\022\034.generated.PermissionRequest\032\027.gener" +
+      "ated.GrantMessage\022I\n\026receivePermissionRe" +
+      "ply\022\035.generated.PermissionResponse\032\020.gen" +
+      "erated.Empty\0224\n\014receiveRooms\022\020.generated" +
+      ".Rooms\032\022.generated.Message\0227\n\013receiveRoo" +
+      "m\022\024.generated.RoomEntry\032\022.generated.Mess" +
+      "age\0226\n\nremoveRoom\022\024.generated.RoomEntry\032" +
+      "\022.generated.Message2\327\002\n\017ElectionService\022" +
+      "5\n\016changeNextNext\022\021.generated.Remote\032\020.g" +
+      "enerated.Empty\0222\n\nchangePrev\022\021.generated" +
+      ".Remote\032\021.generated.Remote\022/\n\010election\022\021" +
+      ".generated.Remote\032\020.generated.Empty\022.\n\007e" +
+      "lected\022\021.generated.Remote\032\020.generated.Em" +
+      "pty\0225\n\016repairTopology\022\021.generated.Remote" +
+      "\032\020.generated.Empty\022A\n\020changeNeighbours\022\026" +
+      ".generated.JoinRequest\032\025.generated.Neigh" +
+      "boursB\002P\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -222,7 +222,7 @@ public final class ChatService {
     internal_static_generated_JoinRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_generated_JoinRequest_descriptor,
-        new java.lang.String[] { "RoomName", "Remote", "Delay", "IsInitial", });
+        new java.lang.String[] { "RoomName", "Remote", "Delay", });
     internal_static_generated_JoinResponse_descriptor =
       getDescriptor().getMessageTypes().get(11);
     internal_static_generated_JoinResponse_fieldAccessorTable = new

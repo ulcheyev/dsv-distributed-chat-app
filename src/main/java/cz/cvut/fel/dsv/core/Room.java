@@ -48,7 +48,7 @@ public class Room {
                 try {
                     user.getValue().onNext(msg);
                 } catch (StatusRuntimeException e) {
-                    generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(leader))
+                    generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(leader))
                             .repairTopology(Utils.Mapper.addressToRemote(user.getKey().getAddress()));
                     users.remove(user);
                 }

@@ -72,10 +72,13 @@ message JoinResponse {
 message PermissionRequest {
   Remote requestByRemote = 1;
   int32 clock = 2;
+  int32 delay = 3;
+  int64 id = 4;
 }
 
 message PermissionResponse {
   Remote responseByRemote = 2;
+  int64 id = 4;
 }
 
 message Health {

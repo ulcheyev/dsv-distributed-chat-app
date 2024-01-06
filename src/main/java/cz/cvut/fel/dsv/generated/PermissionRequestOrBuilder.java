@@ -27,4 +27,16 @@ public interface PermissionRequestOrBuilder extends
    * @return The clock.
    */
   int getClock();
+
+  /**
+   * <code>int32 delay = 3;</code>
+   * @return The delay.
+   */
+  int getDelay();
+
+  /**
+   * <code>int64 id = 4;</code>
+   * @return The id.
+   */
+  long getId();
 }

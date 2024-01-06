@@ -5,6 +5,7 @@ import cz.cvut.fel.dsv.core.data.Address;
 import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.data.SharedData;
 import cz.cvut.fel.dsv.core.service.MEUtils.CSManager;
+import cz.cvut.fel.dsv.utils.DsvConditionLock;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.Utils;
 import generated.*;
@@ -12,6 +13,7 @@ import generated.Remote;
 import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,11 +23,15 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
 
     private static final Logger logger = DsvLogger.getLogger("UPDATE SERVICE", ANSI_PURPLE_SERVICE, UpdateServiceImpl.class);
     private final Node node = Node.getInstance();
+
+    private  DsvConditionLock lock;
+
     private CSManager csManager;
 
     public UpdateServiceImpl(ElectionServiceImpl electionService) {
         electionService.setUpdateServiceToManager(this);
         csManager = new CSManager();
+        lock = new DsvConditionLock(true);
     }
 
     @Override
@@ -50,6 +56,7 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
             tempMap.put(room.getRoomName(), DsvPair.of(leader, backupNode));
         }
         SharedData.updateData(tempMap);
+        csManager.dataReceived();
         responseObserver.onNext(generated.Message.newBuilder().setMsg("OK: Rooms received").build());
         responseObserver.onCompleted();
     }
@@ -64,7 +71,7 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
 
     @Override
     public void receivePermissionRequest(generated.PermissionRequest request, StreamObserver<generated.GrantMessage> responseObserver) {
-        csManager.receiveRequest(Utils.Mapper.remoteToAddress(request.getRequestByRemote()), request.getClock());
+        csManager.receiveRequest(Utils.Mapper.remoteToAddress(request.getRequestByRemote()), request.getClock(), request.getDelay(), request.getId());
         responseObserver.onNext(generated.GrantMessage.newBuilder().setGrant(false).build());
         responseObserver.onCompleted();
     }
@@ -74,7 +81,7 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
         logger.log(Level.INFO, "[CS] received permit by {0}", Utils.Mapper.remoteToAddress(response.getResponseByRemote()));
         responseObserver.onNext(generated.Empty.getDefaultInstance());
         responseObserver.onCompleted();
-        csManager.receivePermit();
+        csManager.receivePermit(response.getId());
     }
 
     public void requestCS(Integer delay) {
