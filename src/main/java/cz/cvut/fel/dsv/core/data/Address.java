@@ -36,13 +36,12 @@ public class Address {
 
     @Override
     public String toString() {
-        return ("[Address] host:'" + hostname + "', port:'" + port + "'" + ", id:'" + id + "'");
+        return "[Address] host:'" + hostname + "', port:'" + port + "'" + ", id:'" + id + "'";
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Address) {
-            Address casted = (Address) obj;
+        if (obj instanceof Address casted) {
             return Objects.equals(casted.getHostname(), hostname)
                     && casted.getPort() == port;
         }
@@ -58,6 +57,6 @@ public class Address {
     }
 
     public String getStringAddress() {
-        return this.hostname+":"+port;
+        return this.hostname + ":" + port;
     }
 }

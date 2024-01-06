@@ -14,7 +14,7 @@ public class DsvThreadPool implements Executor {
     private static DsvThreadPool INSTANCE;
 
     public static DsvThreadPool getInstance() {
-        if(INSTANCE == null) {
+        if (INSTANCE == null) {
             synchronized (DsvThreadPool.class) {
                 if (INSTANCE == null) {
                     INSTANCE = new DsvThreadPool();
@@ -26,9 +26,8 @@ public class DsvThreadPool implements Executor {
 
     @Override
     public void execute(Runnable runn) {
-       pool.execute(runn);
+        pool.execute(runn);
     }
-
 
 
 }

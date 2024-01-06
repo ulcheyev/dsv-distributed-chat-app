@@ -38,9 +38,9 @@ public class DsvNeighbours {
 
     @Override
     public String toString() {
-        return ("[Neighbour] \n\t\t\tnext:" + next +
+        return "[Neighbour] \n\t\t\tnext:" + next +
                 ", \n\t\t\tnextNext:" + nextNext +
                 ", \n\t\t\tprev:" + prev +
-                ", \n\t\t\tleader:" + leader);
+                ", \n\t\t\tleader:" + leader;
     }
 }

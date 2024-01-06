@@ -8,7 +8,6 @@ import cz.cvut.fel.dsv.core.service.MEUtils.CSManager;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.Utils;
 import generated.*;
-import generated.PermissionResponse;
 import generated.Remote;
 import io.grpc.stub.StreamObserver;
 
@@ -25,7 +24,7 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
     private CSManager csManager;
 
     public UpdateServiceImpl(ElectionServiceImpl electionService) {
-        electionService.setUpdateService(this);
+        electionService.setUpdateServiceToManager(this);
         csManager = new CSManager();
     }
 
@@ -41,11 +40,11 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
 
     @Override
     public synchronized void receiveRooms(generated.Rooms request, StreamObserver<generated.Message> responseObserver) {
-        logger.log(Level.INFO, "Receiving rooms. Count = {0}",request.getRoomsCount());
+        logger.log(Level.INFO, "Receiving rooms. Count = {0}", request.getRoomsCount());
         var tempMap = new ConcurrentHashMap<String, DsvPair<Address, Address>>();
         for (var room : request.getRoomsList()) {
             Remote roomOwner = room.getRoomOwner();
-            logger.log(Level.INFO,"\t\t[{0}:{1} - {2}] [{3}:{4}]", new Object[]{roomOwner.getHostname(), roomOwner.getPort(), room.getRoomName(), room.getRoomBackup().getHostname(), room.getRoomBackup().getPort()});
+            logger.log(Level.INFO, "\t\t[{0}:{1} - {2}] [{3}:{4}]", new Object[]{roomOwner.getHostname(), roomOwner.getPort(), room.getRoomName(), room.getRoomBackup().getHostname(), room.getRoomBackup().getPort()});
             var leader = Utils.Mapper.remoteToAddress(roomOwner);
             var backupNode = Utils.Mapper.remoteToAddress(room.getRoomBackup());
             tempMap.put(room.getRoomName(), DsvPair.of(leader, backupNode));
@@ -69,7 +68,6 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
         responseObserver.onNext(generated.GrantMessage.newBuilder().setGrant(false).build());
         responseObserver.onCompleted();
     }
-
 
     @Override
     public void receivePermissionReply(generated.PermissionResponse response, StreamObserver<generated.Empty> responseObserver) {
@@ -95,6 +93,6 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
         csManager.receiveRelease();
     }
 
-    private UpdateServiceImpl() {}
-
+    private UpdateServiceImpl() {
+    }
 }

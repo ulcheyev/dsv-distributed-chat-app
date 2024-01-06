@@ -2,18 +2,21 @@ package cz.cvut.fel.dsv.core.service;
 
 import cz.cvut.fel.dsv.core.Node;
 import cz.cvut.fel.dsv.core.Room;
-import cz.cvut.fel.dsv.core.data.Address;
 import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.data.SharedData;
+import cz.cvut.fel.dsv.core.service.strategy.JoinRoomContext;
+import cz.cvut.fel.dsv.core.service.strategy.JoinViaLeaderRoomStrategy;
+import cz.cvut.fel.dsv.core.service.strategy.JoinViaNonLeaderRoomStrategy;
+import cz.cvut.fel.dsv.utils.Director;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.Utils;
 import generated.*;
 import generated.Empty;
-import generated.Neighbours;
 import generated.Remote;
 import io.grpc.stub.StreamObserver;
 
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static cz.cvut.fel.dsv.core.infrastructure.Config.ANSI_PURPLE_SERVICE;
@@ -24,6 +27,7 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
     private final ElectionServiceImpl electionService;
     private final UpdateServiceImpl updateService;
     private final Queue<DsvPair<generated.JoinRequest, StreamObserver<generated.JoinResponse>>> joinQueue = new LinkedList<>();
+    private final JoinRoomContext joinRoomContext = new JoinRoomContext();
 
     public RemoteServiceImpl(UpdateServiceImpl updateService, ElectionServiceImpl electionService) {
         this.electionService = electionService;
@@ -45,7 +49,7 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
             leadingRoom.disconnectAllUsers();
         }
         else {
-            logger.info(request.getUsername() + " exited room " + node.getCurrentRoom());
+            logger.log(Level.INFO, "{0} exited room {1}", new Object[]{request.getUsername(), node.getCurrentRoom()});
             node.getLeadingRoom().removeFromRoom(request.getNodeId());
         }
 
@@ -56,64 +60,15 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
 
     @Override
     public synchronized void joinRoom(generated.JoinRequest request, StreamObserver<generated.JoinResponse> responseObserver) {
-            logger.info("[request by Node " + request.getRemote().getUsername() + "] request to join is processing");
-            // If node is leader
-            if (node.isLeader()) {
-                updateService.requestCS(request.getDelay());
-                updateService.awaitPermitToEnterCS();
-                // Leader of requested room
-                if (Objects.equals(node.getLeadingRoom().getRoomName(), request.getRoomName())) {
-                    logger.info("[request by Node " + request.getRemote().getUsername() + "] requested node to connect is leader in requested room");
-                    Neighbours value = changeNeighbours(request);
-                    responseObserver.onNext(generated.JoinResponse.newBuilder()
-                            .setIsLeader(true)
-                            .setLeader(Utils.Mapper.addressToRemote(node.getDsvNeighbours().getLeader()))
-                            .setNeighbours(value)
-                            .build());
-                    responseObserver.onCompleted();
-                }
-                // Not a leader of requested room
-                else {
-                    logger.info("[request by Node " + request.getRemote().getUsername() + "] requested node to connect is leader, but not leader in requested room");
+        logger.log(Level.INFO, "[request by Node {0}] request to join is processing", request.getRemote().getUsername());
+        joinRoomContext.setStrategy(node.isLeader()
+                ? new JoinViaLeaderRoomStrategy(updateService, electionService)
+                : new JoinViaNonLeaderRoomStrategy());
 
-                    try {
-                        var leader = SharedData.get(request.getRoomName()).getKey();
-                        var neighbours = generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(leader)).changeNeighbours(request);
-                        responseObserver.onNext(generated.JoinResponse.newBuilder()
-                                .setIsLeader(true)
-                                .setLeader(Utils.Mapper.addressToRemote(leader))
-                                .setNeighbours(neighbours)
-                                .build());
-                        responseObserver.onCompleted();
-                        logger.info("[request by Node " + request.getRemote().getUsername() + "] requested room is exists. Find in leaders table");
-                    }
-                    // If not -> create the room and leader will be the sender
-                    catch (NullPointerException e) {
-                        logger.info("[request by Node " + request.getRemote().getUsername() + "] requested room does not exist. Update tables");
-                        Address toPut = Utils.Mapper.remoteToAddress(request.getRemote());
-                        SharedData.put(request.getRoomName(), DsvPair.of(toPut));
-                        updateService.updateTables();
-                        responseObserver.onNext(generated.JoinResponse
-                                .newBuilder()
-                                .setIsLeader(true)
-                                .setLeader(request.getRemote())
-                                .setNeighbours(Utils.Mapper.remoteToNeighbours(request.getRemote()))
-                                .build());
-                        responseObserver.onCompleted();
-                    }
-                }
-            }
-            // Not a leader at all, send a leader address
-            else {
-                logger.info("[request by Node " + request.getRemote().getUsername() + "] requested node is not a leader");
-                responseObserver.onNext(generated.JoinResponse.newBuilder()
-                        .setIsLeader(false)
-                        .setLeader(Utils.Mapper.addressToRemote(node.getDsvNeighbours().getLeader()))
-                        .build());
-                responseObserver.onCompleted();
-            }
-            updateService.releaseCS();
-        }
+        joinRoomContext.executeJoin(request, responseObserver);
+
+        updateService.releaseCS();
+    }
 
     @Override
     public void beat(Empty request, StreamObserver<generated.Health> responseObserver) {
@@ -132,9 +87,7 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
 
     @Override
     public void receiveGetNodeListInCurrentRoomRequest(Empty request, StreamObserver<generated.StringPayload> responseObserver) {
-        responseObserver.onNext(generated.StringPayload.newBuilder()
-                .setMsg(node.getLeadingRoom().toString())
-                .build());
+        responseObserver.onNext(Director.buildStrPayload(node.getLeadingRoom().toString()));
         responseObserver.onCompleted();
     }
 
@@ -147,11 +100,8 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
 
     @Override
     public void preflight(Remote request, StreamObserver<generated.ChatMessage> responseObserver) {
-        logger.info("Preflight received. Added [" + request.getUsername() + "] to room " + "[" + node.getCurrentRoom() + "]");
+        logger.log(Level.INFO, "Preflight received. Added [{0}] to room [{1}]",
+                new Object[]{request.getUsername(), node.getCurrentRoom()});
         node.getLeadingRoom().addToRoom(DsvPair.of(Utils.Mapper.remoteToDsvRemote(request), responseObserver));
-    }
-
-    private generated.Neighbours changeNeighbours(generated.JoinRequest request) {
-        return electionService.changeNeighbours(request);
     }
 }

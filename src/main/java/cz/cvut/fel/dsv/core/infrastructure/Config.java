@@ -21,7 +21,7 @@ public class Config {
 
     public static final String HELP_STRING = """
             Supported commands:
-                !join [room name]: enter a room named [room name];
+                !join [room name] [sec]: enter a room named [room name]. [sec] seconds for a delay is optional, otherwise the delay will be 0 seconds;
                 !online: show the list of online users in room;
                 !rooms: show list of available rooms;
                 !info:  show information about the current user;

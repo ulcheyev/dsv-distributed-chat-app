@@ -18,12 +18,9 @@ import static cz.cvut.fel.dsv.core.infrastructure.Config.ANSI_PURPLE_SERVICE;
 
 public class CSManager {
     private static final Logger logger = DsvLogger.getLogger("CS MANAGER", ANSI_PURPLE_SERVICE, CSManager.class);
-
     private final LamportClock logicalClock;
     private int replyCount;
-
     private final Queue<DelayedRequest> delayedRequests = new LinkedList<>();
-
     private CountDownLatch replyLatch;
 
     public CSManager() {
@@ -32,11 +29,11 @@ public class CSManager {
 
     public synchronized void requestCriticalSection(Integer delay) {
         replyCount = 0;
-        int necessaryReplyCount = SharedData.getSize()-1;
+        int necessaryReplyCount = SharedData.getSize() - 1;
         replyLatch = new CountDownLatch(necessaryReplyCount);
         Node.getInstance().setState(NodeState.REQUESTING);
         logger.log(Level.INFO, "[CS] Requesting nodes to enter CS. Clock: {0}. Need {1} replies", new Object[]{logicalClock, necessaryReplyCount});
-        for (var remoteNodeAddr: SharedData.getNodeAddressesWithoutCurrent()) {
+        for (var remoteNodeAddr : SharedData.getNodeAddressesWithoutCurrent()) {
             logicalClock.update();
             Utils.tryToSleep(delay);
             new UpdatableClient(Node.getInstance().getAddress(), remoteNodeAddr).sendRequestCriticalSection(logicalClock.getClock());
@@ -52,8 +49,7 @@ public class CSManager {
             new UpdatableClient(Node.getInstance().getAddress(), requestingNodeAddress).sendPermitCriticalSection();
             logger.log(Level.INFO, "[CS] request by {0} is permitted; Request clock: {1}; Node clock: {2}; State: {3}",
                     new Object[]{requestingNodeAddress, timestamp, currentClock, Node.getInstance().getState()});
-        }
-        else {
+        } else {
             logger.log(Level.INFO, "[CS] request by {0} is delayed; Request clock: {1}; Node clock: {2}; State: {3}",
                     new Object[]{requestingNodeAddress, timestamp, currentClock, Node.getInstance().getState()});
             delayedRequests.add(new DelayedRequest(requestingNodeAddress, timestamp));
@@ -65,7 +61,7 @@ public class CSManager {
         replyCount++;
         int awaitingReplies = necessarySize - replyCount;
         logger.log(Level.INFO, "[CS] Awaiting {0}", new Object[]{awaitingReplies});
-        if(replyCount == necessarySize){
+        if (replyCount == necessarySize) {
             enterCriticalSection();
         }
         replyLatch.countDown();
@@ -75,7 +71,7 @@ public class CSManager {
         while (!delayedRequests.isEmpty()) {
             DelayedRequest delayedRequest = delayedRequests.poll();
             logger.log(Level.INFO, "[CS] Processing delayed request {0}", delayedRequest);
-            new UpdatableClient(Node.getInstance().getAddress(), delayedRequest.getRequestingNodeAddress()).sendPermitCriticalSection();
+            new UpdatableClient(Node.getInstance().getAddress(), delayedRequest.requestingNodeAddress()).sendPermitCriticalSection();
         }
     }
 
@@ -108,28 +104,15 @@ public class CSManager {
     }
 
     private synchronized boolean isDelay(int timestamp, long requestedNodeId) {
-        if(Node.getInstance().getState().equals(NodeState.HOLDING)){
+        if (Node.getInstance().getState().equals(NodeState.HOLDING)) {
             return true;
         }
-        if(Node.getInstance().getState().equals(NodeState.REQUESTING) &&
+        return Node.getInstance().getState().equals(NodeState.REQUESTING) &&
                 ((logicalClock.isLessThan(timestamp))
-                || (logicalClock.isEqual(timestamp) && requestedNodeId > Node.getInstance().getAddress().getId()))) {
-            return true;
-        }
-        return false;
+                        || (logicalClock.isEqual(timestamp) && requestedNodeId > Node.getInstance().getAddress().getId()));
     }
 
-
-    @Getter
-    private static class DelayedRequest {
-        private final Address requestingNodeAddress;
-        private final int timestamp;
-
-        public DelayedRequest(Address requestingNodeAddress, int timestamp) {
-            this.requestingNodeAddress = requestingNodeAddress;
-            this.timestamp = timestamp;
-        }
-
+    private record DelayedRequest(Address requestingNodeAddress, int timestamp) {
         @Override
         public String toString() {
             return requestingNodeAddress.toString();

@@ -33,19 +33,19 @@ public class SharedData {
         data.clear();
     }
 
-    public static DsvPair<Address, Address> get(String key){
+    public static DsvPair<Address, Address> get(String key) {
         return data.get(key);
     }
 
-    public static int getSizeNecessaryForUpdate(){
+    public static int getSizeNecessaryForUpdate() {
         return getSize() - 1;
     }
 
-    public static DsvPair<Address, Address> remove(String key){
+    public static DsvPair<Address, Address> remove(String key) {
         return data.remove(key);
     }
 
-    public static String stringify(){
+    public static String stringify() {
         StringBuilder sb = new StringBuilder();
         for (var room : data.entrySet()) {
             sb.append("\n\t\t\t")
@@ -55,8 +55,6 @@ public class SharedData {
         }
         return sb.toString();
     }
-
-
 
 
 }

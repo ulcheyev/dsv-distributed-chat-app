@@ -5,7 +5,6 @@ import cz.cvut.fel.dsv.core.Node;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,7 +18,7 @@ public class ConsoleHandler implements Runnable {
         initMap();
     }
 
-    private void handleCommand(String command, String ...arg) {
+    private void handleCommand(String command, String... arg) {
         Command listener = commandMap.get(command);
         if (listener != null)
             listener.handle(this.node, arg);

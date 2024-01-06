@@ -1,18 +1,14 @@
 package cz.cvut.fel.dsv.core.service;
 
 import cz.cvut.fel.dsv.core.DsvRequestsQueue;
-import io.grpc.Metadata;
-import io.grpc.ServerCall;
-import io.grpc.ServerCallHandler;
-import io.grpc.ServerInterceptor;
+import io.grpc.*;
 import lombok.Getter;
 
 import java.util.concurrent.ExecutionException;
 
 
 public class DsvServerInterceptorImpl implements ServerInterceptor {
-    @Getter
-    private static String clientIP;
+    @Getter private static String clientIP;
     private static final DsvRequestsQueue requestsQueue = new DsvRequestsQueue();
     @Override
     public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(
