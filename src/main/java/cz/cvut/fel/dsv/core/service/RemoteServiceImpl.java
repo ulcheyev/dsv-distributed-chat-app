@@ -25,12 +25,13 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
     private final ElectionServiceImpl electionService;
     private final UpdateServiceImpl updateService;
 
-    private final DsvConditionLock lock;
-
     public RemoteServiceImpl(UpdateServiceImpl updateService, ElectionServiceImpl electionService) {
         this.electionService = electionService;
         this.updateService = updateService;
-        lock = new DsvConditionLock(true);
+        // final DsvConditionLock lock = new DsvConditionLock(true);
+        // lock.await()
+        // lock.lock()
+        // --- lock.signal()
     }
 
     @Override
@@ -59,13 +60,9 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
 
     @Override
     public void joinRoom(generated.JoinRequest request, StreamObserver<generated.JoinResponse> responseObserver) {
-            lock.await();
-            lock.lock();
             logger.info("[request by Node " + request.getRemote().getUsername() + "] request to join is processing");
             // If node is leader
             if (node.isLeader()) {
-                updateService.requestCS(request.getDelay());
-                updateService.awaitPermitToEnterCS();
                 // Leader of requested room
                 if (Objects.equals(node.getLeadingRoom().getRoomName(), request.getRoomName())) {
                     logger.info("[request by Node " + request.getRemote().getUsername() + "] requested node to connect is leader in requested room");
@@ -107,7 +104,6 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
                         responseObserver.onCompleted();
                     }
                 }
-                updateService.releaseCS();
             }
             // Not a leader at all, send a leader address
             else {
@@ -118,7 +114,6 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
                         .build());
                 responseObserver.onCompleted();
             }
-            lock.signal();
         }
 
     @Override

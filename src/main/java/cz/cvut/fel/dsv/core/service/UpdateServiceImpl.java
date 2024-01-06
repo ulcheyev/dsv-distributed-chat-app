@@ -5,6 +5,7 @@ import cz.cvut.fel.dsv.core.data.Address;
 import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.data.SharedData;
 import cz.cvut.fel.dsv.core.service.MEUtils.CSManager;
+import cz.cvut.fel.dsv.utils.DsvConditionLock;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.Utils;
 import generated.*;
@@ -23,11 +24,15 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
 
     private static final Logger logger = DsvLogger.getLogger("UPDATE SERVICE", ANSI_PURPLE_SERVICE, UpdateServiceImpl.class);
     private final Node node = Node.getInstance();
+
+    private  DsvConditionLock lock;
+
     private CSManager csManager;
 
     public UpdateServiceImpl(ElectionServiceImpl electionService) {
         electionService.setUpdateService(this);
         csManager = new CSManager();
+        lock = new DsvConditionLock(true);
     }
 
     @Override
@@ -95,10 +100,6 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
 
     public void releaseCS() {
         csManager.receiveRelease();
-    }
-
-    public void awaitCs() {
-        csManager.awaitCs();
     }
 
     private UpdateServiceImpl() {}
