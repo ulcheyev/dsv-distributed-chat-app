@@ -25,11 +25,12 @@ public class Director {
                 .build();
     }
 
-    public static generated.JoinRequest buildJoinReq(String roomName, Integer delay) {
+    public static generated.JoinRequest buildJoinReq(String roomName, Integer delay, boolean isInitial) {
         return generated.JoinRequest.newBuilder()
                 .setRoomName(roomName)
                 .setRemote(Utils.Mapper.nodeToRemote())
                 .setDelay(delay)
+                .setIsInitial(isInitial)
                 .build();
     }
 

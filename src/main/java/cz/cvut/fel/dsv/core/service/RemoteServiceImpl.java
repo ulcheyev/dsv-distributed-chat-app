@@ -4,7 +4,7 @@ import cz.cvut.fel.dsv.core.Node;
 import cz.cvut.fel.dsv.core.Room;
 import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.data.SharedData;
-import cz.cvut.fel.dsv.core.service.strategy.JoinRoomContext;
+import cz.cvut.fel.dsv.core.service.strategy.BaseJoinRoomStrategy;
 import cz.cvut.fel.dsv.core.service.strategy.JoinViaLeaderRoomStrategy;
 import cz.cvut.fel.dsv.core.service.strategy.JoinViaNonLeaderRoomStrategy;
 import cz.cvut.fel.dsv.utils.Director;
@@ -27,7 +27,6 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
     private final ElectionServiceImpl electionService;
     private final UpdateServiceImpl updateService;
     private final Queue<DsvPair<generated.JoinRequest, StreamObserver<generated.JoinResponse>>> joinQueue = new LinkedList<>();
-    private final JoinRoomContext joinRoomContext = new JoinRoomContext();
 
     public RemoteServiceImpl(UpdateServiceImpl updateService, ElectionServiceImpl electionService) {
         this.electionService = electionService;
@@ -36,36 +35,39 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
 
     @Override
     public void exitRoom(Remote request, StreamObserver<Empty> responseObserver) {
-        // If node to disconnect == leader node in room, then disconnect all nodes from current node
-        // Then node will change the room in joinRoom()
-
-        if (request.getNodeId() == node.getAddress().getId()) {
-            logger.info("Exited node was leader. Disconnect all nodes");
-
-            Room leadingRoom = node.getLeadingRoom();
-            if (!node.leadingRoomIsNotEmpty()) {
-                logger.warning("Exited node was the last node in room");
-            }
-            leadingRoom.disconnectAllUsers();
-        }
-        else {
-            logger.log(Level.INFO, "{0} exited room {1}", new Object[]{request.getUsername(), node.getCurrentRoom()});
-            node.getLeadingRoom().removeFromRoom(request.getNodeId());
-        }
-
+        // todo enter cs
+        executeExit(request);
+        // todo leave cs
         responseObserver.onNext(Empty.getDefaultInstance());
         responseObserver.onCompleted();
     }
 
+    public void executeExit(Remote request) {
+        // If node to disconnect == leader node in room, then disconnect all nodes from current node
+        // Then node will change the room in joinRoom()
+        node.startRepairTopology(node.getDsvNeighbours().getPrev(), node.getAddress());
+        if (request.getNodeId() == node.getAddress().getId()) { // checking leader and only leader!!!
+            logger.info("Exited node was leader. Disconnect all nodes");
+            Room leadingRoom = node.getLeadingRoom();
+            if (!node.leadingRoomIsNotEmpty()) {
+                logger.warning("Exited node was the last node in room");
+                // todo delete this room on all leaders
+            } else node.makeElection(node.getDsvNeighbours().getNext());
+            leadingRoom.disconnectAllUsers();
+        } else {
+            logger.log(Level.INFO, "{0} exited room {1}", new Object[]{request.getUsername(), node.getCurrentRoom()});
+            node.getLeadingRoom().removeFromRoom(request.getNodeId());
+        }
+    }
 
     @Override
     public synchronized void joinRoom(generated.JoinRequest request, StreamObserver<generated.JoinResponse> responseObserver) {
         logger.log(Level.INFO, "[request by Node {0}] request to join is processing", request.getRemote().getUsername());
-        joinRoomContext.setStrategy(node.isLeader()
+        BaseJoinRoomStrategy baseJoinRoomStrategy = (node.isLeader()
                 ? new JoinViaLeaderRoomStrategy(updateService, electionService)
-                : new JoinViaNonLeaderRoomStrategy());
-
-        joinRoomContext.executeJoin(request, responseObserver);
+                : new JoinViaNonLeaderRoomStrategy())
+                .setServices(this, updateService);
+        baseJoinRoomStrategy.executeJoin(request, responseObserver);
 
         updateService.releaseCS();
     }

@@ -63,7 +63,7 @@ public class Node {
     }
 
     private void joinRoom(Address joinAddress, generated.JoinRequest req) {
-        var stub = generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(joinAddress));
+        var stub = generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(joinAddress)); // TODO: if dead
         var joinResponse = stub.joinRoom(req);
         var leaderAddressFromResponse = Utils.Mapper.remoteToAddress(joinResponse.getLeader());
 
@@ -91,12 +91,9 @@ public class Node {
 
     public void joinRoomViaLeader(String roomName, Integer delay) {
         assert dsvNeighbours.getLeader() != null;
-        if (!Objects.equals(roomName, currentRoom))
-            executeExit();
-
         logger.log(Level.INFO, "Joining room {0}", roomName);
         if (currentRoom == null || !(currentRoom.equals(roomName)))
-            joinRoom(dsvNeighbours.getLeader(), Director.buildJoinReq(roomName, delay));
+            joinRoom(dsvNeighbours.getLeader(), Director.buildJoinReq(roomName, delay, false));
         else
             logger.log(Level.INFO, "You already in room {0}", roomName);
     }
@@ -113,7 +110,7 @@ public class Node {
         }
     }
 
-    private void startRepairTopology(Address onNode, Address missing) {
+    public void startRepairTopology(Address onNode, Address missing) {
         logger.log(Level.INFO, "Starting repair topology on {0}:{1} with missing node {2}:{3}",
                 new Object[]{onNode.getHostname(), onNode.getPort(), missing.getHostname(), missing.getPort()});
         generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(onNode))
@@ -129,7 +126,7 @@ public class Node {
         makeElection(address);
     }
 
-    private void makeElection(Address onNode) {
+    public void makeElection(Address onNode) {
         logger.log(Level.INFO, "Starting election on node {0}:{1}", new Object[]{onNode.getHostname(), onNode.getPort()});
         generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(onNode))
                 .election(Utils.Mapper.addressToRemote(new Address(Config.STUB_STRING, 0, -1)));
@@ -146,7 +143,7 @@ public class Node {
     public void sendMessage(String msg) {
         var stub = generated.RemoteServiceGrpc.newFutureStub(managedChannelToLeader);
         ListenableFuture<generated.Empty> sendMessageResponse = stub.receiveMessage(Utils.Mapper.stringToMessage(Utils.Mapper.nodeToRemote(), msg));
-        Futures.addCallback(sendMessageResponse, new FutureCallback<generated.Empty>() {
+        Futures.addCallback(sendMessageResponse, new FutureCallback<>() {
             @Override
             public void onSuccess(generated.Empty result) {
                 // Do nothing
@@ -173,7 +170,7 @@ public class Node {
                 if (args.length == 2)
                     firstInTopology();
                 else if (args.length == 4)
-                    joinRoom(new Address(args[2], Integer.parseInt(args[3])), Director.buildJoinReq(Config.INITIAL_ROOM_NAME, 0));
+                    joinRoom(new Address(args[2], Integer.parseInt(args[3])), Director.buildJoinReq(Config.INITIAL_ROOM_NAME, 0, true));
             } else {
                 System.err.println("Error while parsing args. Max number of args is 4.");
                 System.exit(1);

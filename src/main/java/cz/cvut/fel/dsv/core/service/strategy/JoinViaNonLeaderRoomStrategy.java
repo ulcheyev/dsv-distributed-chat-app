@@ -12,12 +12,12 @@ import java.util.logging.Logger;
 
 import static cz.cvut.fel.dsv.core.infrastructure.Config.ANSI_PURPLE_SERVICE;
 
-public class JoinViaNonLeaderRoomStrategy implements JoinRoomStrategy {
+public class JoinViaNonLeaderRoomStrategy extends BaseJoinRoomStrategy {
     private final Logger logger = DsvLogger.getLogger("VIA NON LEADER", ANSI_PURPLE_SERVICE, JoinViaNonLeaderRoomStrategy.class);
     private final Node node = Node.getInstance();
 
     @Override
-    public void execute(JoinRequest request, StreamObserver<JoinResponse> responseObserver) {
+    protected void execute(JoinRequest request, StreamObserver<JoinResponse> responseObserver) {
         logger.log(Level.INFO, "[request by Node {0}] requested node is not a leader", request.getRemote().getUsername());
         responseObserver.onNext(Director.buildJoinRes(false, node.getDsvNeighbours().getLeader(), null));
         responseObserver.onCompleted();

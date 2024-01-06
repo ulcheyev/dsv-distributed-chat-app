@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 
 import static cz.cvut.fel.dsv.core.infrastructure.Config.ANSI_PURPLE_SERVICE;
 
-public class JoinViaLeaderRoomStrategy implements JoinRoomStrategy {
+public class JoinViaLeaderRoomStrategy extends BaseJoinRoomStrategy {
     private final Logger logger = DsvLogger.getLogger("VIA LEADER", ANSI_PURPLE_SERVICE, JoinViaLeaderRoomStrategy.class);
     private final Node node = Node.getInstance();
     private final UpdateServiceImpl updateService;
@@ -31,7 +31,7 @@ public class JoinViaLeaderRoomStrategy implements JoinRoomStrategy {
     }
 
     @Override
-    public void execute(JoinRequest request, StreamObserver<JoinResponse> responseObserver) {
+    protected void execute(JoinRequest request, StreamObserver<JoinResponse> responseObserver) {
         updateService.requestCS(request.getDelay());
         updateService.awaitPermitToEnterCS();
         if (Objects.equals(node.getLeadingRoom().getRoomName(), request.getRoomName()))
