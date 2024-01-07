@@ -18,9 +18,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.net.InetAddress;
-import java.util.Objects;
-import java.util.Timer;
-import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,8 +36,6 @@ public class Node {
     @Getter @Setter private NodeState state;
     @Getter @Setter private DsvNeighbours dsvNeighbours;
     @Getter @Setter private boolean isVoting;
-    private ConsoleHandler consoleHandler;
-    private ServerWrapper server;
     private ManagedChannel managedChannelToLeader;
     private StreamObserver<generated.ChatMessage> receiveMessagesObserver;
     private static volatile Node INSTANCE;
@@ -48,7 +43,7 @@ public class Node {
     public Node() {
         isLeader = DsvPair.of(false, new Room.NullableRoom());
         state = NodeState.RELEASED;
-        init();
+        receiveMessagesObserver = new StreamObserverImpl();
     }
 
     public static Node getInstance() {
@@ -59,25 +54,6 @@ public class Node {
         return INSTANCE;
     }
 
-    private void init() {
-        receiveMessagesObserver = new StreamObserver<generated.ChatMessage>() {
-            @Override
-            public void onNext(generated.ChatMessage message) {
-                System.out.println("\r[" + currentRoom + "] " + message.getRemote().getUsername() + ": " + message.getMsg());
-            }
-
-            @Override
-            public void onError(Throwable throwable) {
-                // todo
-            }
-
-            @Override
-            public void onCompleted() {
-                // todo
-            }
-        };
-    }
-
     private void updateChannelToLeader() {
         managedChannelToLeader = ManagedChannelBuilder
                 .forAddress(dsvNeighbours.getLeader().getHostname(), dsvNeighbours.getLeader().getPort())
@@ -86,7 +62,7 @@ public class Node {
     }
 
     private void joinRoom(Address joinAddress, generated.JoinRequest req) {
-        var stub = generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(joinAddress)); // TODO: if dead
+        var stub = generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(joinAddress)); // TODO: if dead
         var joinResponse = stub.joinRoom(req);
         var leaderAddressFromResponse = Utils.Mapper.remoteToAddress(joinResponse.getLeader());
 
@@ -136,7 +112,7 @@ public class Node {
     public void startRepairTopology(Address onNode, Address missing) {
         logger.log(Level.INFO, "Starting repair topology on {0}:{1} with missing node {2}:{3}",
                 new Object[]{onNode.getHostname(), onNode.getPort(), missing.getHostname(), missing.getPort()});
-        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(onNode))
+        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(onNode))
                 .repairTopology(Utils.Mapper.addressToRemote(missing));
     }
 
@@ -222,8 +198,6 @@ public class Node {
 
     private void preflight() {
             logger.log(Level.INFO, "Sending preflight to {0}", dsvNeighbours.getLeader());
-            generated.RemoteServiceGrpc.newStub(Utils.Skeleton.buildChannel(dsvNeighbours.getLeader()))
-            logger.info("Sending preflight to " + dsvNeighbours.getLeader());
             generated.RemoteServiceGrpc.newStub(Utils.Skeleton.buildManagedChannel(dsvNeighbours.getLeader()))
                     .preflight(Utils.Mapper.nodeToRemote(), receiveMessagesObserver);
     }

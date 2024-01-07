@@ -61,6 +61,11 @@ private static final long serialVersionUID = 0L;
 
             break;
           }
+          case 32: {
+
+            id_ = input.readInt64();
+            break;
+          }
           default: {
             if (!parseUnknownField(
                 input, unknownFields, extensionRegistry, tag)) {
@@ -121,6 +126,17 @@ private static final long serialVersionUID = 0L;
     return getResponseByRemote();
   }
 
+  public static final int ID_FIELD_NUMBER = 4;
+  private long id_;
+  /**
+   * <code>int64 id = 4;</code>
+   * @return The id.
+   */
+  @java.lang.Override
+  public long getId() {
+    return id_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -138,6 +154,9 @@ private static final long serialVersionUID = 0L;
     if (responseByRemote_ != null) {
       output.writeMessage(2, getResponseByRemote());
     }
+    if (id_ != 0L) {
+      output.writeInt64(4, id_);
+    }
     unknownFields.writeTo(output);
   }
 
@@ -150,6 +169,10 @@ private static final long serialVersionUID = 0L;
     if (responseByRemote_ != null) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(2, getResponseByRemote());
+    }
+    if (id_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt64Size(4, id_);
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -171,6 +194,8 @@ private static final long serialVersionUID = 0L;
       if (!getResponseByRemote()
           .equals(other.getResponseByRemote())) return false;
     }
+    if (getId()
+        != other.getId()) return false;
     if (!unknownFields.equals(other.unknownFields)) return false;
     return true;
   }
@@ -186,6 +211,9 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + RESPONSEBYREMOTE_FIELD_NUMBER;
       hash = (53 * hash) + getResponseByRemote().hashCode();
     }
+    hash = (37 * hash) + ID_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getId());
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -325,6 +353,8 @@ private static final long serialVersionUID = 0L;
         responseByRemote_ = null;
         responseByRemoteBuilder_ = null;
       }
+      id_ = 0L;
+
       return this;
     }
 
@@ -356,6 +386,7 @@ private static final long serialVersionUID = 0L;
       } else {
         result.responseByRemote_ = responseByRemoteBuilder_.build();
       }
+      result.id_ = id_;
       onBuilt();
       return result;
     }
@@ -406,6 +437,9 @@ private static final long serialVersionUID = 0L;
       if (other == generated.PermissionResponse.getDefaultInstance()) return this;
       if (other.hasResponseByRemote()) {
         mergeResponseByRemote(other.getResponseByRemote());
+      }
+      if (other.getId() != 0L) {
+        setId(other.getId());
       }
       this.mergeUnknownFields(other.unknownFields);
       onChanged();
@@ -553,6 +587,37 @@ private static final long serialVersionUID = 0L;
         responseByRemote_ = null;
       }
       return responseByRemoteBuilder_;
+    }
+
+    private long id_ ;
+    /**
+     * <code>int64 id = 4;</code>
+     * @return The id.
+     */
+    @java.lang.Override
+    public long getId() {
+      return id_;
+    }
+    /**
+     * <code>int64 id = 4;</code>
+     * @param value The id to set.
+     * @return This builder for chaining.
+     */
+    public Builder setId(long value) {
+      
+      id_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>int64 id = 4;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearId() {
+      
+      id_ = 0L;
+      onChanged();
+      return this;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

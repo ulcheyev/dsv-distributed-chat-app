@@ -13,7 +13,6 @@ import java.util.logging.Logger;
 import static cz.cvut.fel.dsv.core.infrastructure.Config.ANSI_PURPLE_SERVICE;
 
 public class JoinViaNonLeaderRoomStrategy extends BaseJoinRoomStrategy {
-    private final Logger logger = DsvLogger.getLogger("VIA NON LEADER", ANSI_PURPLE_SERVICE, JoinViaNonLeaderRoomStrategy.class);
     private final Node node = Node.getInstance();
 
     @Override

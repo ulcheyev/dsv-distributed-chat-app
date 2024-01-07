@@ -13,7 +13,6 @@ import generated.Remote;
 import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

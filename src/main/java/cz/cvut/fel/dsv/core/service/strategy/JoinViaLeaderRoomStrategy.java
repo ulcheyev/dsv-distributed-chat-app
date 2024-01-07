@@ -20,20 +20,10 @@ import java.util.logging.Logger;
 import static cz.cvut.fel.dsv.core.infrastructure.Config.ANSI_PURPLE_SERVICE;
 
 public class JoinViaLeaderRoomStrategy extends BaseJoinRoomStrategy {
-    private final Logger logger = DsvLogger.getLogger("VIA LEADER", ANSI_PURPLE_SERVICE, JoinViaLeaderRoomStrategy.class);
     private final Node node = Node.getInstance();
-    private final UpdateServiceImpl updateService;
-    private final ElectionServiceImpl electionService;
-
-    public JoinViaLeaderRoomStrategy(UpdateServiceImpl updateService, ElectionServiceImpl electionService) {
-        this.updateService = updateService;
-        this.electionService = electionService;
-    }
 
     @Override
     protected void execute(JoinRequest request, StreamObserver<JoinResponse> responseObserver) {
-        updateService.requestCS(request.getDelay());
-        updateService.awaitPermitToEnterCS();
         if (Objects.equals(node.getLeadingRoom().getRoomName(), request.getRoomName()))
             handleLeaderOfReqRoom(request, responseObserver);
         else
@@ -54,7 +44,7 @@ public class JoinViaLeaderRoomStrategy extends BaseJoinRoomStrategy {
         try {
             var leader = SharedData.get(request.getRoomName()).getKey();
             var neighbours = generated.ElectionServiceGrpc
-                    .newBlockingStub(Utils.Skeleton.buildChannel(leader)).changeNeighbours(request);
+                    .newBlockingStub(Utils.Skeleton.buildManagedChannel(leader)).changeNeighbours(request);
             responseObserver.onNext(Director.buildJoinRes(true, leader, neighbours));
             responseObserver.onCompleted();
             logger.log(Level.INFO, "[request by Node {0}] requested room is exists. Find in leaders table",

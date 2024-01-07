@@ -66,6 +66,16 @@ private static final long serialVersionUID = 0L;
             clock_ = input.readInt32();
             break;
           }
+          case 24: {
+
+            delay_ = input.readInt32();
+            break;
+          }
+          case 32: {
+
+            id_ = input.readInt64();
+            break;
+          }
           default: {
             if (!parseUnknownField(
                 input, unknownFields, extensionRegistry, tag)) {
@@ -137,6 +147,28 @@ private static final long serialVersionUID = 0L;
     return clock_;
   }
 
+  public static final int DELAY_FIELD_NUMBER = 3;
+  private int delay_;
+  /**
+   * <code>int32 delay = 3;</code>
+   * @return The delay.
+   */
+  @java.lang.Override
+  public int getDelay() {
+    return delay_;
+  }
+
+  public static final int ID_FIELD_NUMBER = 4;
+  private long id_;
+  /**
+   * <code>int64 id = 4;</code>
+   * @return The id.
+   */
+  @java.lang.Override
+  public long getId() {
+    return id_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -157,6 +189,12 @@ private static final long serialVersionUID = 0L;
     if (clock_ != 0) {
       output.writeInt32(2, clock_);
     }
+    if (delay_ != 0) {
+      output.writeInt32(3, delay_);
+    }
+    if (id_ != 0L) {
+      output.writeInt64(4, id_);
+    }
     unknownFields.writeTo(output);
   }
 
@@ -173,6 +211,14 @@ private static final long serialVersionUID = 0L;
     if (clock_ != 0) {
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(2, clock_);
+    }
+    if (delay_ != 0) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(3, delay_);
+    }
+    if (id_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt64Size(4, id_);
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -196,6 +242,10 @@ private static final long serialVersionUID = 0L;
     }
     if (getClock()
         != other.getClock()) return false;
+    if (getDelay()
+        != other.getDelay()) return false;
+    if (getId()
+        != other.getId()) return false;
     if (!unknownFields.equals(other.unknownFields)) return false;
     return true;
   }
@@ -213,6 +263,11 @@ private static final long serialVersionUID = 0L;
     }
     hash = (37 * hash) + CLOCK_FIELD_NUMBER;
     hash = (53 * hash) + getClock();
+    hash = (37 * hash) + DELAY_FIELD_NUMBER;
+    hash = (53 * hash) + getDelay();
+    hash = (37 * hash) + ID_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getId());
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -354,6 +409,10 @@ private static final long serialVersionUID = 0L;
       }
       clock_ = 0;
 
+      delay_ = 0;
+
+      id_ = 0L;
+
       return this;
     }
 
@@ -386,6 +445,8 @@ private static final long serialVersionUID = 0L;
         result.requestByRemote_ = requestByRemoteBuilder_.build();
       }
       result.clock_ = clock_;
+      result.delay_ = delay_;
+      result.id_ = id_;
       onBuilt();
       return result;
     }
@@ -439,6 +500,12 @@ private static final long serialVersionUID = 0L;
       }
       if (other.getClock() != 0) {
         setClock(other.getClock());
+      }
+      if (other.getDelay() != 0) {
+        setDelay(other.getDelay());
+      }
+      if (other.getId() != 0L) {
+        setId(other.getId());
       }
       this.mergeUnknownFields(other.unknownFields);
       onChanged();
@@ -615,6 +682,68 @@ private static final long serialVersionUID = 0L;
     public Builder clearClock() {
       
       clock_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private int delay_ ;
+    /**
+     * <code>int32 delay = 3;</code>
+     * @return The delay.
+     */
+    @java.lang.Override
+    public int getDelay() {
+      return delay_;
+    }
+    /**
+     * <code>int32 delay = 3;</code>
+     * @param value The delay to set.
+     * @return This builder for chaining.
+     */
+    public Builder setDelay(int value) {
+      
+      delay_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>int32 delay = 3;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearDelay() {
+      
+      delay_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private long id_ ;
+    /**
+     * <code>int64 id = 4;</code>
+     * @return The id.
+     */
+    @java.lang.Override
+    public long getId() {
+      return id_;
+    }
+    /**
+     * <code>int64 id = 4;</code>
+     * @param value The id to set.
+     * @return This builder for chaining.
+     */
+    public Builder setId(long value) {
+      
+      id_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>int64 id = 4;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearId() {
+      
+      id_ = 0L;
       onChanged();
       return this;
     }

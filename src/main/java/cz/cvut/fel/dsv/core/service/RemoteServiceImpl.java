@@ -8,7 +8,6 @@ import cz.cvut.fel.dsv.core.service.strategy.BaseJoinRoomStrategy;
 import cz.cvut.fel.dsv.core.service.strategy.JoinViaLeaderRoomStrategy;
 import cz.cvut.fel.dsv.core.service.strategy.JoinViaNonLeaderRoomStrategy;
 import cz.cvut.fel.dsv.utils.Director;
-import cz.cvut.fel.dsv.utils.DsvConditionLock;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.Utils;
 import generated.*;
@@ -16,7 +15,6 @@ import generated.Empty;
 import generated.Remote;
 import io.grpc.stub.StreamObserver;
 
-import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,10 +29,6 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
     public RemoteServiceImpl(UpdateServiceImpl updateService, ElectionServiceImpl electionService) {
         this.electionService = electionService;
         this.updateService = updateService;
-        // final DsvConditionLock lock = new DsvConditionLock(true);
-        // lock.await()
-        // lock.lock()
-        // --- lock.signal()
     }
 
     @Override
@@ -49,7 +43,7 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
     public void executeExit(Remote request) {
         // If node to disconnect == leader node in room, then disconnect all nodes from current node
         // Then node will change the room in joinRoom()
-        node.startRepairTopology(node.getDsvNeighbours().getPrev(), node.getAddress());
+//        node.startRepairTopology(node.getDsvNeighbours().getPrev(), node.getAddress());
         if (request.getNodeId() == node.getAddress().getId()) { // checking leader and only leader!!!
             logger.info("Exited node was leader. Disconnect all nodes");
             Room leadingRoom = node.getLeadingRoom();
@@ -65,15 +59,13 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
     }
 
     @Override
-    public synchronized void joinRoom(generated.JoinRequest request, StreamObserver<generated.JoinResponse> responseObserver) {
+    public void joinRoom(generated.JoinRequest request, StreamObserver<generated.JoinResponse> responseObserver) {
         logger.log(Level.INFO, "[request by Node {0}] request to join is processing", request.getRemote().getUsername());
         BaseJoinRoomStrategy baseJoinRoomStrategy = (node.isLeader()
-                ? new JoinViaLeaderRoomStrategy(updateService, electionService)
+                ? new JoinViaLeaderRoomStrategy()
                 : new JoinViaNonLeaderRoomStrategy())
-                .setServices(this, updateService);
+                .setServices(this, updateService, electionService);
         baseJoinRoomStrategy.executeJoin(request, responseObserver);
-
-        updateService.releaseCS();
     }
 
     @Override

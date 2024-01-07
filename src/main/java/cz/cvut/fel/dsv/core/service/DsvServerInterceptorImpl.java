@@ -1,7 +1,10 @@
 package cz.cvut.fel.dsv.core.service;
 
 import cz.cvut.fel.dsv.core.DsvRequestsQueue;
-import io.grpc.*;
+import io.grpc.Metadata;
+import io.grpc.ServerCall;
+import io.grpc.ServerCallHandler;
+import io.grpc.ServerInterceptor;
 import lombok.Getter;
 
 import java.util.concurrent.ExecutionException;

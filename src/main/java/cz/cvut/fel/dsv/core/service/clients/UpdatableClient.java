@@ -1,14 +1,13 @@
 package cz.cvut.fel.dsv.core.service.clients;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import cz.cvut.fel.dsv.core.data.Address;
 import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.service.DsvClientInterceptor;
 import cz.cvut.fel.dsv.utils.Utils;
 import generated.*;
-import generated.GrantMessage;
 import generated.UpdateServiceGrpc;
-import io.grpc.*;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
