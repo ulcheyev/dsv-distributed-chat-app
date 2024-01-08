@@ -132,6 +132,14 @@ public class Utils {
                     .build();
         }
 
+        public static generated.RoomEntry pairToRoomEntry(String roomName, DsvPair<Address, Address> pair) {
+            return generated.RoomEntry.newBuilder()
+                    .setRoomName(roomName)
+                    .setRoomOwner(addressToRemote(pair.getKey()))
+                    .setRoomBackup(addressToRemote(pair.getValue()))
+                    .build();
+        }
+
         public static ConcurrentMap<String, Address> remoteRoomsToLeaderRooms(generated.Rooms rooms) {
             var map = new ConcurrentHashMap<String, Address>();
             for (var room : rooms.getRoomsList()) {

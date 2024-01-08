@@ -13,13 +13,13 @@ public class DsvConditionLock {
         this.conditionMet = startVal;
     }
 
-    public void await(){
+    public void await() {
         lock.lock();
         try {
             while (!conditionMet) {
                 try {
                     condition.await();
-                }catch (InterruptedException e){
+                } catch (InterruptedException e) {
                     // ignored
                 }
             }
@@ -28,8 +28,7 @@ public class DsvConditionLock {
         }
     }
 
-
-    public void lock(){
+    public void lock() {
         conditionMet = false;
     }
 

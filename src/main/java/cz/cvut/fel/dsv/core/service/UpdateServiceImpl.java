@@ -19,10 +19,8 @@ import java.util.logging.Logger;
 import static cz.cvut.fel.dsv.core.infrastructure.Config.ANSI_PURPLE_SERVICE;
 
 public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateServiceImplBase {
-
     private static final Logger logger = DsvLogger.getLogger("UPDATE SERVICE", ANSI_PURPLE_SERVICE, UpdateServiceImpl.class);
     private final Node node = Node.getInstance();
-
     private  DsvConditionLock lock;
 
     private CSManager csManager;

@@ -34,16 +34,19 @@ public class Director {
                 .build();
     }
 
-    public static generated.PermissionRequest buildPermReq(int timestamp, Address current) {
+    public static generated.PermissionRequest buildPermReq(int timestamp, int delay, Long requestId, Address current) {
         return generated.PermissionRequest.newBuilder()
                 .setClock(timestamp)
+                .setDelay(delay)
+                .setId(requestId)
                 .setRequestByRemote(Utils.Mapper.addressToRemote(current))
                 .build();
     }
 
-    public static generated.PermissionResponse buildPermRes(Address current) {
+    public static generated.PermissionResponse buildPermRes(Address current, Long requestId) {
         return generated.PermissionResponse.newBuilder()
                 .setResponseByRemote(Utils.Mapper.addressToRemote(current))
+                .setId(requestId)
                 .build();
     }
 }

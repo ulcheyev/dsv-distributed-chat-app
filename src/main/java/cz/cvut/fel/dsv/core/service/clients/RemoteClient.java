@@ -6,10 +6,7 @@ import generated.RemoteServiceGrpc;
 import io.grpc.ManagedChannel;
 
 public class RemoteClient {
-
-
     private final  RemoteServiceGrpc.RemoteServiceBlockingStub blockingStub;
-
     private final generated.RemoteServiceGrpc.RemoteServiceFutureStub futureStub;
     private final Address currentNodeAddress;
 

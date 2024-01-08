@@ -31,11 +31,9 @@ public class CSManager {
     private int replyCount;
     private final Set<DelayedRequest> permitDelayedRequests = new LinkedHashSet<>();
     private DynamicCountDownLatch awaitingResponsesLock;
-
     private final Lock csLock = new ReentrantLock();
     private final Condition csCondition = csLock.newCondition();
     private boolean inCriticalSection = false;
-
     private final AtomicLong requestIdCounter;
     private Integer delayOfCurrentCs;
 
@@ -65,15 +63,15 @@ public class CSManager {
     }
 
     private void sendPermissionRequest(Address remoteNodeAddr, int currentIntValueOfClock, Integer delay, Long requestId) {
-    CompletableFuture.runAsync(() -> {
-        try {
-            new UpdatableClient(Node.getInstance().getAddress(), remoteNodeAddr)
-                    .sendRequestCriticalSection(currentIntValueOfClock, delay, requestId)
-                    .clear();
-        } catch (Exception e) {
-            handleTimeout(remoteNodeAddr, delay, requestId);
-        }
-    });
+        CompletableFuture.runAsync(() -> {
+            try {
+                new UpdatableClient(Node.getInstance().getAddress(), remoteNodeAddr)
+                        .sendRequestCriticalSection(currentIntValueOfClock, delay, requestId)
+                        .clear();
+            } catch (Exception e) {
+                handleTimeout(remoteNodeAddr, delay, requestId);
+            }
+        });
     }
 
     private void handleTimeout(Address remoteNodeAddr, Integer delay, Long requestId) {
@@ -86,7 +84,6 @@ public class CSManager {
         } catch (StatusRuntimeException e) {
             handleBeatFailure(remoteNodeAddr);
         }
-
     }
 
     private synchronized void handleBeatFailure(Address remoteNodeAddr) {
@@ -94,7 +91,6 @@ public class CSManager {
         SharedData.removeByLeaderAddress(remoteNodeAddr);
         checkForPermit();
     }
-
 
     public synchronized void receiveRequest(Address requestingNodeAddress, int timestamp, int delay, Long requestId) {
         awaitCs();
@@ -109,12 +105,11 @@ public class CSManager {
                         .clear();
                 logger.log(Level.INFO, "[CS] request by {0} is permitted; Request clock: {1}; Node clock: {2}; State: {3}",
                         new Object[]{requestingNodeAddress, timestamp, nodeClock.getClock(), Node.getInstance().getState()});
-            } catch (StatusRuntimeException e){
+            } catch (StatusRuntimeException e) {
                 logger.log(Level.INFO, "[CS] request by {0} is cancelled; {1}",
                         new Object[]{requestingNodeAddress, e.getMessage()});
             }
-        }
-        else {
+        } else {
             DelayedRequest delayedReq = new DelayedRequest(requestingNodeAddress, timestamp, requestId);
             synchronized (permitDelayedRequests) {
                 if (permitDelayedRequests.add(delayedReq)) {
@@ -129,7 +124,7 @@ public class CSManager {
     }
 
     public void receivePermit(Long requestId) {
-        if(requestIdCounter.get() == requestId){
+        if (requestIdCounter.get() == requestId) {
             replyCount++;
             checkForPermit();
         } else {
@@ -139,18 +134,17 @@ public class CSManager {
 
     private synchronized void checkForPermit() {
         awaitingResponsesLock.countDown();
-        if(Node.getInstance().getState().equals(NodeState.HOLDING)){
+        if (Node.getInstance().getState().equals(NodeState.HOLDING)) {
             logger.log(Level.WARNING, "Already IN CS");
             return;
         }
         int necessarySize = SharedData.getSizeNecessaryForUpdate();
-        int awaitingReplies = necessarySize - replyCount;
-        logger.log(Level.INFO, "[CS] Awaiting {0}, Current {1}", new Object[]{awaitingReplies, replyCount});
-        if(replyCount == necessarySize){
+//        int awaitingReplies = necessarySize - replyCount; // TODO: meow meow =3
+//        logger.log(Level.INFO, "[CS] Awaiting {0}, Current {1}", new Object[]{awaitingReplies, replyCount});
+        if (replyCount == necessarySize) {
             logger.log(Level.WARNING, "[CS] Necessary {0}, Current {1}", new Object[]{necessarySize, replyCount});
             enterCriticalSection();
         }
-
     }
 
     public void awaitCs() {
@@ -178,10 +172,9 @@ public class CSManager {
                     new UpdatableClient(Node.getInstance().getAddress(), delayedRequest.requestingNodeAddress())
                             .sendPermitCriticalSection(delayedRequest.id)
                             .clear();
-                }catch (StatusRuntimeException e){
-                    logger.log(Level.SEVERE,"Error while process deferred request: {0}",e.getMessage());
+                } catch (StatusRuntimeException e) {
+                    logger.log(Level.SEVERE, "Error while process deferred request: {0}", e.getMessage());
                 }
-
             }
         }
     }
@@ -219,30 +212,25 @@ public class CSManager {
     }
 
     private synchronized boolean isDelay(int timestamp, long requestedNodeId) {
-        if(Node.getInstance().getState().equals(NodeState.HOLDING)){
+        if (Node.getInstance().getState().equals(NodeState.HOLDING)) {
             return true;
         }
-        if(Node.getInstance().getState().equals(NodeState.REQUESTING) &&
-                ((nodeClock.isLessThan(timestamp))
-                || (nodeClock.isEqual(timestamp) && requestedNodeId > Node.getInstance().getAddress().getId())))
-        {
-            return true;
-        }
-        return false;
+        return Node.getInstance().getState().equals(NodeState.REQUESTING)
+                && ((nodeClock.isLessThan(timestamp))
+                || (nodeClock.isEqual(timestamp) && requestedNodeId > Node.getInstance().getAddress().getId()));
     }
 
     public void dataReceived() {
-        if(Node.getInstance().getState().equals(NodeState.REQUESTING)){
+        if (Node.getInstance().getState().equals(NodeState.REQUESTING)) {
             requestCriticalSection(delayOfCurrentCs);
         }
     }
 
-
     private record DelayedRequest(Address requestingNodeAddress, int timestamp, Long id) {
 
         @Override
-            public String toString() {
-                return requestingNodeAddress.toString();
-            }
+        public String toString() {
+            return requestingNodeAddress.toString();
         }
+    }
 }

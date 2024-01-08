@@ -8,7 +8,7 @@ public class DisconnectCommand implements Command {
     @Override
     public void handle(Node node, String... arg) {
         System.out.println("Disconnecting...");
-        node.executeExit();
+        node.exitRoom();
         System.out.println("Disconnected... Bye " + node.getUsername() + "!");
 
         Utils.tryToSleep(1);

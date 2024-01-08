@@ -3,10 +3,10 @@ package cz.cvut.fel.dsv.utils;
 import cz.cvut.fel.dsv.core.service.DsvServerInterceptorImpl;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.*;
-
 
 public class DsvLogger {
     private static final DateFormat df = new SimpleDateFormat("dd/MM/yy hh:mm:ss:S");

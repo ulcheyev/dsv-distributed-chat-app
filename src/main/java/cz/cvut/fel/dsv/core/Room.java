@@ -44,10 +44,12 @@ public class Room {
 
     public void sendMessageToRoom(generated.ChatMessage msg) {
         for (var user : users) {
-            if (!Objects.equals(user.getKey().getAddress().getId(), msg.getRemote().getNodeId()))
+            if (user.getKey().getAddress().getId() != msg.getRemote().getNodeId())
                 try {
                     user.getValue().onNext(msg);
                 } catch (StatusRuntimeException e) {
+                    System.out.println(user.getKey().getAddress().getId());
+                    System.out.println(e.getMessage());
                     generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(leader))
                             .repairTopology(Utils.Mapper.addressToRemote(user.getKey().getAddress()));
                     users.remove(user);

@@ -40,20 +40,23 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
         responseObserver.onCompleted();
     }
 
-    public void executeExit(Remote request) {
+    public void executeExit(Remote request) { // request is node that joining to another room
         // If node to disconnect == leader node in room, then disconnect all nodes from current node
         // Then node will change the room in joinRoom()
-//        node.startRepairTopology(node.getDsvNeighbours().getPrev(), node.getAddress());
-        if (request.getNodeId() == node.getAddress().getId()) { // checking leader and only leader!!!
+        if (request.getNodeId() == node.getAddress().getId()) {
             logger.info("Exited node was leader. Disconnect all nodes");
             Room leadingRoom = node.getLeadingRoom();
             if (!node.leadingRoomIsNotEmpty()) {
                 logger.warning("Exited node was the last node in room");
-                // todo delete this room on all leaders
-            } else node.makeElection(node.getDsvNeighbours().getNext());
+                SharedData.remove(node.getCurrentRoom());
+            } else {
+                node.startRepairTopology(node.getAddress(), Utils.Mapper.remoteToAddress(request));
+                node.makeElection(node.getDsvNeighbours().getNext());
+            }
             leadingRoom.disconnectAllUsers();
         } else {
             logger.log(Level.INFO, "{0} exited room {1}", new Object[]{request.getUsername(), node.getCurrentRoom()});
+            node.startRepairTopology(node.getAddress(), Utils.Mapper.remoteToAddress(request));
             node.getLeadingRoom().removeFromRoom(request.getNodeId());
         }
     }
@@ -77,9 +80,7 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
     @Override
     public void receiveGetRoomListRequest(Empty request, StreamObserver<generated.StringPayload> responseObserver) {
         String sb = "[ROOMS]" + SharedData.stringify();
-        responseObserver.onNext(generated.StringPayload.newBuilder()
-                .setMsg(sb)
-                .build());
+        responseObserver.onNext(Director.buildStrPayload(sb));
         responseObserver.onCompleted();
     }
 

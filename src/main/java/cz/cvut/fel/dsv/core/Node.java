@@ -10,6 +10,7 @@ import cz.cvut.fel.dsv.utils.Director;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.Utils;
 import generated.*;
+import io.grpc.Context;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
@@ -28,9 +29,6 @@ public class Node {
     private static final Logger logger = DsvLogger.getLogger("NODE", ANSI_GREEN_NODE, Node.class);
     @Getter @Setter private String username;
     @Getter @Setter private String currentRoom;
-    // Flag, which represents the knowledge:
-    //      key == true => node is leader and in value is room which that node leads.
-    //      key == false => node is not leader in value is null.
     @Setter private volatile DsvPair<Boolean, Room> isLeader;
     @Getter @Setter private Address address;
     @Getter @Setter private NodeState state;
@@ -40,7 +38,7 @@ public class Node {
     private StreamObserver<generated.ChatMessage> receiveMessagesObserver;
     private static volatile Node INSTANCE;
 
-    public Node() {
+    private Node() {
         isLeader = DsvPair.of(false, new Room.NullableRoom());
         state = NodeState.RELEASED;
         receiveMessagesObserver = new StreamObserverImpl();
@@ -97,7 +95,7 @@ public class Node {
             logger.log(Level.INFO, "You already in room {0}", roomName);
     }
 
-    private void exitRoom() {
+    public void exitRoom() {
         logger.log(Level.INFO, "Exiting room {0}", currentRoom);
         try {
             generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(dsvNeighbours.getLeader()))
@@ -112,7 +110,7 @@ public class Node {
     public void startRepairTopology(Address onNode, Address missing) {
         logger.log(Level.INFO, "Starting repair topology on {0}:{1} with missing node {2}:{3}",
                 new Object[]{onNode.getHostname(), onNode.getPort(), missing.getHostname(), missing.getPort()});
-        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(onNode))
+        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(onNode))
                 .repairTopology(Utils.Mapper.addressToRemote(missing));
     }
 
@@ -127,7 +125,7 @@ public class Node {
 
     public void makeElection(Address onNode) {
         logger.log(Level.INFO, "Starting election on node {0}:{1}", new Object[]{onNode.getHostname(), onNode.getPort()});
-        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(onNode))
+        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(onNode))
                 .election(Utils.Mapper.addressToRemote(new Address(Config.STUB_STRING, 0, -1)));
     }
 
@@ -197,9 +195,12 @@ public class Node {
     }
 
     private void preflight() {
+        Context ctx = Context.current().fork();
+        ctx.run(() -> {
             logger.log(Level.INFO, "Sending preflight to {0}", dsvNeighbours.getLeader());
             generated.RemoteServiceGrpc.newStub(Utils.Skeleton.buildManagedChannel(dsvNeighbours.getLeader()))
                     .preflight(Utils.Mapper.nodeToRemote(), receiveMessagesObserver);
+        });
     }
 
     public String getNodeListInCurrentRoom() {
@@ -234,21 +235,8 @@ public class Node {
         DsvThreadPool.getInstance().execute(consoleHandler);
     }
 
-
     private boolean nodeWasLeader(Address address) {
         return dsvNeighbours.getLeader().equals(address);
-    }
-
-    public void executeExit() {
-        exitRoom();
-//        startRepairTopology(dsvNeighbours.getPrev(), address);
-        if (nodeWasLeader(address)) {
-//            logger.info("Was a leader. Remove this node from leaders tables");
-            if (leadingRoomIsNotEmpty()) {
-//                logger.info("Was a leader. Exited room is not empty. Start election");
-//                makeElection(dsvNeighbours.getNext());
-            }
-        }
     }
 
     public boolean isLeader() {

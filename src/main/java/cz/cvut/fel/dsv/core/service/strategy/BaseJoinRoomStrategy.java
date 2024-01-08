@@ -1,5 +1,6 @@
 package cz.cvut.fel.dsv.core.service.strategy;
 
+import cz.cvut.fel.dsv.core.Node;
 import cz.cvut.fel.dsv.core.service.ElectionServiceImpl;
 import cz.cvut.fel.dsv.core.service.RemoteServiceImpl;
 import cz.cvut.fel.dsv.core.service.UpdateServiceImpl;
@@ -17,6 +18,7 @@ public abstract class BaseJoinRoomStrategy {
     protected UpdateServiceImpl updateService;
     protected ElectionServiceImpl electionService;
     private final DsvConditionLock lock = new DsvConditionLock(true);
+    protected final Node node = Node.getInstance();
 
     public void executeJoin(generated.JoinRequest request, StreamObserver<generated.JoinResponse> responseObserver) {
          lock.await();
@@ -29,6 +31,7 @@ public abstract class BaseJoinRoomStrategy {
         updateService.awaitPermitToEnterCS();
         if (!request.getIsInitial()) {
             remoteService.executeExit(request.getRemote());
+            updateService.updateTables();
         }
         // repair
         // elect esli nado

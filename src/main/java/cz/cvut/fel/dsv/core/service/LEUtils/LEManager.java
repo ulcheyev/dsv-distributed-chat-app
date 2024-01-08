@@ -7,6 +7,7 @@ import cz.cvut.fel.dsv.core.data.DsvNeighbours;
 import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.data.SharedData;
 import cz.cvut.fel.dsv.core.service.UpdateServiceImpl;
+import cz.cvut.fel.dsv.core.service.clients.UpdatableClient;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.Utils;
 import lombok.Setter;
@@ -14,12 +15,13 @@ import lombok.Setter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static cz.cvut.fel.dsv.core.infrastructure.Config.ANSI_RED_SERVICE;
+import static cz.cvut.fel.dsv.core.infrastructure.Config.ANSI_PURPLE_SERVICE;
 
 public class LEManager {
-    @Setter private UpdateServiceImpl updateService;
+    @Setter
+    private UpdateServiceImpl updateService;
     private final Node node = Node.getInstance();
-    private static final Logger logger = DsvLogger.getLogger("LE MANAGER", ANSI_RED_SERVICE, LEManager.class);
+    private static final Logger logger = DsvLogger.getLogger("LE MANAGER", ANSI_PURPLE_SERVICE, LEManager.class);
 
     public void startChangingPrev(generated.Remote request) {
         Address prev = Utils.Mapper.remoteToAddress(request);
@@ -48,9 +50,10 @@ public class LEManager {
         logger.info("Node is elected candidate. Setting up properties...");
         node.setIsLeader(DsvPair.of(true, new Room(node.getAddress(), node.getCurrentRoom())));
         var former = node.getDsvNeighbours().getLeader();
-        Address prevToUpdate = node.getDsvNeighbours().getPrev();
         SharedData.put(node.getCurrentRoom(), DsvPair.of(node.getAddress(), node.getDsvNeighbours().getPrev()));
-//        updateService.makeUpdateRoomsTable(node.getRoomsAndLeaders(), List.of(former));
+        new UpdatableClient(node.getAddress(), former)
+                .sendData(node.getCurrentRoom(), DsvPair.of(node.getAddress(), node.getDsvNeighbours().getPrev()))
+                .clear();
 
         node.updateLeaderChannelAndObserver(node.getAddress());
         generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(node.getDsvNeighbours().getNext()))
@@ -78,7 +81,7 @@ public class LEManager {
                     .changeNextNext(Utils.Mapper.addressToRemote(dsvNeighbours.getNext()));
         } else {
             logger.log(Level.INFO, "Send message [repair topology] to the next node {0}", dsvNeighbours.getNext());
-            generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(dsvNeighbours.getNext()))
+            generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(dsvNeighbours.getNext()))
                     .repairTopology(request);
         }
     }
