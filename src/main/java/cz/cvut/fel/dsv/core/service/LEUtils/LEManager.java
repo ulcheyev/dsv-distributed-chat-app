@@ -81,7 +81,7 @@ public class LEManager {
                     .changeNextNext(Utils.Mapper.addressToRemote(dsvNeighbours.getNext()));
         } else {
             logger.log(Level.INFO, "Send message [repair topology] to the next node {0}", dsvNeighbours.getNext());
-            generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildChannel(dsvNeighbours.getNext()))
+            generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(dsvNeighbours.getNext()))
                     .repairTopology(request);
         }
     }

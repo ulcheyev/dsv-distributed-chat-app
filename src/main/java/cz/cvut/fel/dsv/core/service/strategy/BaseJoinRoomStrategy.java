@@ -21,25 +21,18 @@ public abstract class BaseJoinRoomStrategy {
     protected final Node node = Node.getInstance();
 
     public void executeJoin(generated.JoinRequest request, StreamObserver<generated.JoinResponse> responseObserver) {
-         lock.await();
-         lock.lock();
-
-        // Add logic exit -> (if leader exited) election -> send new leader -> update
-        //                |_________________________________________________|
-        //        updateService.awaitCs(); or lock self there
+        lock.await();
+        lock.lock();
         updateService.requestCS(request.getDelay());
         updateService.awaitPermitToEnterCS();
-        if (!request.getIsInitial()) {
-            remoteService.executeExit(request.getRemote());
-            updateService.updateTables();
+        if(Node.getInstance().isLeader()){
+            if (!request.getIsInitial()) {
+                remoteService.executeExit(request.getRemote());
+                updateService.updateTables();
+            }
         }
-        // repair
-        // elect esli nado
-        // update kto electnulsya (i esli mozhno sdelat kto udalilsa)
-
         execute(request, responseObserver);
         updateService.releaseCS();
-
         lock.signal();
     }
 

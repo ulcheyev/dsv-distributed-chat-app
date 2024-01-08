@@ -59,8 +59,9 @@ public class UpdatableClient {
         try {
             while (!managedChannel.awaitTermination(1, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
-
-        } // TODO: meow meow =3
+            // ignored
+            System.err.println("Error while clearing channel " + e.getMessage());
+        }
     }
 
     public UpdatableClient sendData(String roomName, DsvPair<Address, Address> val) {
