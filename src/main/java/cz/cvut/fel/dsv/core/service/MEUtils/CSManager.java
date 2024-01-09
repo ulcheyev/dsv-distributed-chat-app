@@ -7,6 +7,7 @@ import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.data.NodeState;
 import cz.cvut.fel.dsv.core.data.SharedData;
 import cz.cvut.fel.dsv.core.service.LEUtils.LEManager;
+import cz.cvut.fel.dsv.core.service.clients.ElectionClient;
 import cz.cvut.fel.dsv.core.service.clients.RemoteClient;
 import cz.cvut.fel.dsv.core.service.clients.UpdatableClient;
 import cz.cvut.fel.dsv.utils.DsvConditionLock;
@@ -14,6 +15,7 @@ import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.DynamicCountDownLatch;
 import cz.cvut.fel.dsv.utils.Utils;
 import io.grpc.StatusRuntimeException;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -72,7 +74,6 @@ public class CSManager {
         int currentIntValueOfClock = nodeClock.getClock();
         Node.getInstance().setState(NodeState.REQUESTING);
         Long requestId = requestIdCounter.incrementAndGet();
-
         logger.log(Level.INFO, "[CS] Requesting nodes to enter CS. Clock: {0}. Need {1} replies", new Object[]{currentIntValueOfClock, necessaryReplyCount});
         for (var remoteNodeAddr : SharedData.getNodeAddressesWithoutCurrent()) {
             logger.log(Level.INFO, "[- CS] Request sending to {0}", remoteNodeAddr);
@@ -104,17 +105,21 @@ public class CSManager {
         }
     }
 
-    private synchronized void handleBeatFailure(Address remoteNodeAddr) {
+    private  void handleBeatFailure(Address remoteNodeAddr) {
         logger.log(Level.WARNING, "[- CS] Failed beat checking for {0};...", remoteNodeAddr);
         // check back up
-        DsvPair<Address, Address> byLeaderAddress = SharedData.getByLeaderAddress(remoteNodeAddr);
-        Address backup = byLeaderAddress.getValue();
-        if(!backup.equals(remoteNodeAddr)) {
-
-        } else {
-
-        }
+        var byLeaderAddress = SharedData.getByLeaderAddress(remoteNodeAddr);
+        Address backup = byLeaderAddress.getValue().getValue();
+        String room = byLeaderAddress.getKey();
         SharedData.removeByLeaderAddress(remoteNodeAddr);
+        if(!backup.equals(remoteNodeAddr)) {
+            logger.log(Level.WARNING, "[- CS] start election on {0};...", backup);
+            ElectionClient electionClient = new ElectionClient(Node.getInstance().getAddress(), backup);
+            electionClient.sendStartRepairTopology(remoteNodeAddr);
+            electionClient.sendStartElection(backup);
+            electionClient.clear();
+            replyCount++;
+        }
         checkForPermit();
     }
 
@@ -205,7 +210,7 @@ public class CSManager {
         }
     }
 
-    public synchronized void receiveRelease() {
+    public void receiveRelease() {
         inCriticalSection = false;
         Node.getInstance().setState(NodeState.RELEASED);
         processDeferredRequests();
@@ -221,9 +226,13 @@ public class CSManager {
         logger.log(Level.INFO, "[CS] broadcast update on leaders. Size = {0}", SharedData.getSizeNecessaryForUpdate());
         for (var addr : SharedData.getNodeAddressesWithoutCurrent()) {
             logger.log(Level.INFO, "[- CS] sending new data to {0}", addr);
-            new UpdatableClient(Node.getInstance().getAddress(), addr)
-                    .sendAllData(SharedData.getData())
-                    .clear();
+            try {
+                new UpdatableClient(Node.getInstance().getAddress(), addr)
+                        .sendAllData(SharedData.getData())
+                        .clear();
+            } catch (StatusRuntimeException e) {
+                logger.log(Level.WARNING, "Node {0} is down while broadcast", addr);
+            }
         }
     }
 

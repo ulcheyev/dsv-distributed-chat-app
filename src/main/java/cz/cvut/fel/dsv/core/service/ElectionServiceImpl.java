@@ -67,8 +67,10 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
     public void repairTopology(generated.Remote request, StreamObserver<generated.Empty> responseObserver) {
         lock.await();
         lock.lock();
-        csManager.requestCriticalSection(0);
-        csManager.awaitReplies();
+        if(node.isLeader()){
+            csManager.requestCriticalSection(0);
+            csManager.awaitReplies();
+        }
         logger.info("Changing topology is started...");
         leManager.startRepairing(request);
         csManager.broadcastDataUpdate();

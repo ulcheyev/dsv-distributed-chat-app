@@ -69,14 +69,7 @@ public class LEManager {
         node.setIsLeader(DsvPair.of(true, new Room(node.getAddress(), node.getCurrentRoom())));
         var former = node.getDsvNeighbours().getLeader();
         SharedData.put(node.getCurrentRoom(), DsvPair.of(node.getAddress(), node.getDsvNeighbours().getPrev()));
-        try {
-            new UpdatableClient(node.getAddress(), former)
-                    .sendData(node.getCurrentRoom(), DsvPair.of(node.getAddress(), node.getDsvNeighbours().getPrev()))
-                    .clear();
-        }catch (StatusRuntimeException statusRuntimeException){
-            logger.log(Level.WARNING, "Node {0} is down. {1}", new Object[]{former, statusRuntimeException.getMessage()});
-        }
-
+        updateService.updateTables();
         node.updateLeaderChannelAndObserver(node.getAddress());
         generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(node.getDsvNeighbours().getNext()))
                 .elected(Utils.Mapper.addressToRemote(node.getAddress()));
@@ -103,8 +96,13 @@ public class LEManager {
                     .changeNextNext(Utils.Mapper.addressToRemote(dsvNeighbours.getNext()));
         } else {
             logger.log(Level.INFO, "Send message [repair topology] to the next node {0}", dsvNeighbours.getNext());
-            generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(dsvNeighbours.getNext()))
-                    .repairTopology(request);
+            try {
+                generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(dsvNeighbours.getNext()))
+                        .repairTopology(request);
+            } catch (StatusRuntimeException runtimeException){
+                logger.log(Level.WARNING, "Node is down {0}", dsvNeighbours.getNext());
+            }
+
         }
     }
 

@@ -29,13 +29,13 @@ public class ElectionClient {
         futureStub = ElectionServiceGrpc.newFutureStub(managedChannel);
     }
 
-    public ElectionClient sendStartElection(Address missing) {
-        blockingStub.repairTopology(Utils.Mapper.addressToRemote(missing));
+    public ElectionClient sendStartElection(Address onNode) {
+        blockingStub.election(Utils.Mapper.addressToRemote(onNode));
         return this;
     }
 
-    public ElectionClient sendStartRepairTopology(Address onNode) {
-        blockingStub.election(Utils.Mapper.addressToRemote(onNode));
+    public ElectionClient sendStartRepairTopology(Address missing) {
+        blockingStub.repairTopology(Utils.Mapper.addressToRemote(missing));
         return this;
     }
 

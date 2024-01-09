@@ -4,6 +4,7 @@ import cz.cvut.fel.dsv.core.Node;
 import org.checkerframework.checker.units.qual.A;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -51,14 +52,13 @@ public class SharedData {
         data.entrySet().removeIf(entry -> entry.getValue().getKey().equals(leaderAddress));
     }
 
-    public static synchronized  DsvPair<Address, Address> getByLeaderAddress(Address leaderAddress) {
+    public static synchronized Map.Entry<String, DsvPair<Address, Address>> getByLeaderAddress(Address leaderAddress) {
         return data
                 .entrySet()
                 .stream()
                 .filter(entry -> entry.getValue().getKey().equals(leaderAddress))
                 .toList()
-                .get(0)
-                .getValue();
+                .get(0);
     }
 
     public static String stringify() {
