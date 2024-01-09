@@ -68,7 +68,4 @@ public class UpdatableClient {
         blockingStub.receiveRoom(Utils.Mapper.pairToRoomEntry(roomName, val));
         return this;
     }
-
-
-
 }
