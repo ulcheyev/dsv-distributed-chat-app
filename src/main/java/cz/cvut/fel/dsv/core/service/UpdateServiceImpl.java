@@ -39,7 +39,7 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
         var leader = Utils.Mapper.remoteToAddress(request.getRoomOwner());
         var backupNode = Utils.Mapper.remoteToAddress(request.getRoomBackup());
         SharedData.put(request.getRoomName(), DsvPair.of(leader, backupNode));
-        reflectOnBackup();
+        Node.getInstance().reflectOnBackup();
         responseObserver.onNext(generated.Message.newBuilder().setMsg("OK: Room received").build());
         responseObserver.onCompleted();
     }
@@ -59,22 +59,24 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
         csManager.dataReceived();
         responseObserver.onNext(generated.Message.newBuilder().setMsg("OK: Rooms received").build());
         responseObserver.onCompleted();
-        reflectOnBackup();
+        Node.getInstance().reflectOnBackup();
+
     }
 
     @Override
     public synchronized void removeRoom(generated.RoomEntry request, StreamObserver<generated.Message> responseObserver) {
         logger.log(Level.INFO, "Remove room [{0}]", request.getRoomName());
         SharedData.remove(request.getRoomName());
-        reflectOnBackup();
+        Node.getInstance().reflectOnBackup();
+
         responseObserver.onNext(generated.Message.newBuilder().setMsg("OK: Room removed").build());
         responseObserver.onCompleted();
     }
 
 
-    private void reflectOnBackup(){
-        if(!Node.getInstance().isLeader()
-        &&  Node.getInstance().getAddress().equals(Node.getInstance().getDsvNeighbours().getPrev()))
+    public void reflectOnBackup(){
+        if(Node.getInstance().isLeader()
+        &&  !Node.getInstance().getAddress().equals(Node.getInstance().getDsvNeighbours().getPrev()))
         {
             logger.log(Level.INFO, "Reflected rooms update on {0}", Node.getInstance().getDsvNeighbours().getPrev());
             new UpdatableClient(node.getAddress(), node.getDsvNeighbours().getPrev())

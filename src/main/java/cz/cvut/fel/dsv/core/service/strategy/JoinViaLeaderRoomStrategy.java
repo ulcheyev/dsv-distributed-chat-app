@@ -1,5 +1,6 @@
 package cz.cvut.fel.dsv.core.service.strategy;
 
+import cz.cvut.fel.dsv.core.Node;
 import cz.cvut.fel.dsv.core.data.Address;
 import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.data.SharedData;
@@ -51,6 +52,7 @@ public class JoinViaLeaderRoomStrategy extends BaseJoinRoomStrategy {
                 request.getRemote().getUsername());
         Address toPut = Utils.Mapper.remoteToAddress(request.getRemote());
         SharedData.put(request.getRoomName(), DsvPair.of(toPut));
+        Node.getInstance().reflectOnBackup();
         updateService.updateTables();
         responseObserver.onNext(Director.buildJoinRes(true, request.getRemote(),
                 Utils.Mapper.remoteToNeighbours(request.getRemote())));

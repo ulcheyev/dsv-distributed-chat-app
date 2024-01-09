@@ -28,12 +28,13 @@ public class LEManager {
 
 
     public void startChangingPrev(generated.Remote request) {
+        // TODO NEED TO BE IN CS
         Address prev = Utils.Mapper.remoteToAddress(request);
         node.getDsvNeighbours().setPrev(prev);
         if (node.isLeader()) {
             SharedData.put(node.getCurrentRoom(), DsvPair.of(node.getAddress(), prev));
-//            List<Address> nodeAddresses = updateService.getSpecifiedAddressesToRequest(node.getRoomsAndLeaders());
-//            updateService.makeUpdateRoomsTable(node.getRoomsAndLeaders(), nodeAddresses);
+            Node.getInstance().reflectOnBackup();
+            updateService.updateTables();
         }
     }
 

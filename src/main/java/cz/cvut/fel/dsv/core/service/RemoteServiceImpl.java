@@ -56,9 +56,10 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
                 node.makeElection(node.getDsvNeighbours().getNext());
             }
             leadingRoom.disconnectAllUsers();
+
         } else {
             logger.log(Level.INFO, "{0} exited room {1}", new Object[]{request.getUsername(), node.getCurrentRoom()});
-            node.startRepairTopology(node.getAddress(), Utils.Mapper.remoteToAddress(request));
+            LEManager.getInstance().startRepairing(request);
             node.getLeadingRoom().removeFromRoom(request.getNodeId());
         }
     }

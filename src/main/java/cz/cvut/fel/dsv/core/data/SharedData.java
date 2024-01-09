@@ -15,6 +15,7 @@ public class SharedData {
 
     public static synchronized void put(String key, DsvPair<Address, Address> value) {
         data.put(key, value);
+
     }
 
     public static synchronized void updateData(ConcurrentMap<String, DsvPair<Address, Address>> repl) {
@@ -38,7 +39,7 @@ public class SharedData {
     }
 
     public static int getSizeNecessaryForUpdate() {
-        return getSize() - 1;
+        return Math.max(getSize() - 1, 0);
     }
 
     public static DsvPair<Address, Address> remove(String key) {

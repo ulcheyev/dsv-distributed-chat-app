@@ -24,9 +24,9 @@ public abstract class BaseJoinRoomStrategy {
     public void executeJoin(generated.JoinRequest request, StreamObserver<generated.JoinResponse> responseObserver) {
         lock.await();
         lock.lock();
-        updateService.requestCS(request.getDelay());
-        updateService.awaitPermitToEnterCS();
         if(Node.getInstance().isLeader()){
+            updateService.requestCS(request.getDelay());
+            updateService.awaitPermitToEnterCS();
             if (!request.getIsInitial()) {
                 remoteService.executeExit(request.getRemote());
                 updateService.updateTables();

@@ -39,9 +39,6 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
         logger.log(Level.INFO, "Changing prev to {0}", Utils.Mapper.remoteToAddress(request));
         leManager.startChangingPrev(request);
         logger.log(Level.INFO, "Returning next node {0}", node.getDsvNeighbours().getNext());
-
-
-
         responseObserver.onNext(Utils.Mapper.addressToRemote(node.getDsvNeighbours().getNext()));
         responseObserver.onCompleted();
     }
@@ -75,10 +72,10 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
         logger.info("Changing topology is started...");
         leManager.startRepairing(request);
         csManager.broadcastDataUpdate();
-        responseObserver.onNext(generated.Empty.getDefaultInstance());
-        responseObserver.onCompleted();
         csManager.receiveRelease();
         lock.signal();
+        responseObserver.onNext(generated.Empty.getDefaultInstance());
+        responseObserver.onCompleted();
     }
 
     @Override

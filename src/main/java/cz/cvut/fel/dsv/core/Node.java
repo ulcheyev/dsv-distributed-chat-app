@@ -6,6 +6,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import cz.cvut.fel.dsv.core.command.ConsoleHandler;
 import cz.cvut.fel.dsv.core.data.*;
 import cz.cvut.fel.dsv.core.infrastructure.Config;
+import cz.cvut.fel.dsv.core.service.clients.UpdatableClient;
 import cz.cvut.fel.dsv.utils.Director;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.Utils;
@@ -75,10 +76,13 @@ public class Node {
         if (leaderAddressFromResponse.equals(address)) { // Node created a room. Set properties.
             logger.log(Level.INFO, "Node created the room {0}", req.getRoomName());
             isLeader = DsvPair.of(true, new Room(address, req.getRoomName()));
-        } else if (isLeader()) { // Delete data about rooms and leaders.
+        } else { // Delete data about rooms and leaders.
             logger.log(Level.INFO, "Joined room {0}", req.getRoomName());
+            if(!dsvNeighbours.getNext().equals(dsvNeighbours.getLeader()))
+            {
+                SharedData.clear();
+            }
             isLeader = DsvPair.of(false, new Room.NullableRoom());
-            SharedData.clear();
         }
 
         currentRoom = req.getRoomName();
@@ -152,6 +156,17 @@ public class Node {
                 makeElection(address);
             }
         }, DsvThreadPool.getInstance().getPool());
+    }
+
+    public void reflectOnBackup() {
+        if(isLeader()
+                &&  !address.equals(dsvNeighbours.getPrev()))
+        {
+            logger.log(Level.INFO, "Reflected rooms update on {0}", Node.getInstance().getDsvNeighbours().getPrev());
+            new UpdatableClient(address, dsvNeighbours.getPrev())
+                    .sendAllData(SharedData.getData())
+                    .clear();
+        }
     }
 
     private void handleArgs(String[] args) {
