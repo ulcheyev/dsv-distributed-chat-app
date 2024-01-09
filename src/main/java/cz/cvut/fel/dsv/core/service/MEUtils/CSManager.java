@@ -3,8 +3,10 @@ package cz.cvut.fel.dsv.core.service.MEUtils;
 import cz.cvut.fel.dsv.core.DsvThreadPool;
 import cz.cvut.fel.dsv.core.Node;
 import cz.cvut.fel.dsv.core.data.Address;
+import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.data.NodeState;
 import cz.cvut.fel.dsv.core.data.SharedData;
+import cz.cvut.fel.dsv.core.service.LEUtils.LEManager;
 import cz.cvut.fel.dsv.core.service.clients.RemoteClient;
 import cz.cvut.fel.dsv.core.service.clients.UpdatableClient;
 import cz.cvut.fel.dsv.utils.DsvConditionLock;
@@ -103,7 +105,15 @@ public class CSManager {
     }
 
     private synchronized void handleBeatFailure(Address remoteNodeAddr) {
-        logger.log(Level.WARNING, "[- CS] Failed beat checking for {0}; Removing...", remoteNodeAddr);
+        logger.log(Level.WARNING, "[- CS] Failed beat checking for {0};...", remoteNodeAddr);
+        // check back up
+        DsvPair<Address, Address> byLeaderAddress = SharedData.getByLeaderAddress(remoteNodeAddr);
+        Address backup = byLeaderAddress.getValue();
+        if(!backup.equals(remoteNodeAddr)) {
+
+        } else {
+
+        }
         SharedData.removeByLeaderAddress(remoteNodeAddr);
         checkForPermit();
     }

@@ -11,6 +11,7 @@ import cz.cvut.fel.dsv.utils.Director;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.Utils;
 import generated.*;
+import generated.JoinResponse;
 import io.grpc.Context;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -61,8 +62,17 @@ public class Node {
     }
 
     private void joinRoom(Address joinAddress, generated.JoinRequest req) {
-        var stub = generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(joinAddress)); // TODO: if dead
-        var joinResponse = stub.joinRoom(req);
+        var stub = generated.RemoteServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(joinAddress));
+        JoinResponse joinResponse;
+        try {
+            joinResponse = stub.joinRoom(req);
+        }catch (StatusRuntimeException statusRuntimeException){
+            startRepairTopology(address, joinAddress);
+            makeElection(address);
+            joinRoom(dsvNeighbours.getLeader(), req);
+            return;
+        }
+
         var leaderAddressFromResponse = Utils.Mapper.remoteToAddress(joinResponse.getLeader());
 
         if (!joinResponse.getIsLeader()) {

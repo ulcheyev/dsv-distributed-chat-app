@@ -1,6 +1,7 @@
 package cz.cvut.fel.dsv.core.data;
 
 import cz.cvut.fel.dsv.core.Node;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,6 +49,16 @@ public class SharedData {
 
     public static synchronized void removeByLeaderAddress(Address leaderAddress) {
         data.entrySet().removeIf(entry -> entry.getValue().getKey().equals(leaderAddress));
+    }
+
+    public static synchronized  DsvPair<Address, Address> getByLeaderAddress(Address leaderAddress) {
+        return data
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().getKey().equals(leaderAddress))
+                .toList()
+                .get(0)
+                .getValue();
     }
 
     public static String stringify() {

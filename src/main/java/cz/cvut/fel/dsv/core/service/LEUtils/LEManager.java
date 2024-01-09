@@ -11,6 +11,7 @@ import cz.cvut.fel.dsv.core.service.UpdateServiceImpl;
 import cz.cvut.fel.dsv.core.service.clients.UpdatableClient;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.Utils;
+import io.grpc.StatusRuntimeException;
 import lombok.Setter;
 
 import java.util.logging.Level;
@@ -63,13 +64,18 @@ public class LEManager {
     }
 
     private void electedCandidate() {
+        // TODO Need to be in CS
         logger.info("Node is elected candidate. Setting up properties...");
         node.setIsLeader(DsvPair.of(true, new Room(node.getAddress(), node.getCurrentRoom())));
         var former = node.getDsvNeighbours().getLeader();
         SharedData.put(node.getCurrentRoom(), DsvPair.of(node.getAddress(), node.getDsvNeighbours().getPrev()));
-        new UpdatableClient(node.getAddress(), former)
-                .sendData(node.getCurrentRoom(), DsvPair.of(node.getAddress(), node.getDsvNeighbours().getPrev()))
-                .clear();
+        try {
+            new UpdatableClient(node.getAddress(), former)
+                    .sendData(node.getCurrentRoom(), DsvPair.of(node.getAddress(), node.getDsvNeighbours().getPrev()))
+                    .clear();
+        }catch (StatusRuntimeException statusRuntimeException){
+            logger.log(Level.WARNING, "Node {0} is down. {1}", new Object[]{former, statusRuntimeException.getMessage()});
+        }
 
         node.updateLeaderChannelAndObserver(node.getAddress());
         generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(node.getDsvNeighbours().getNext()))
