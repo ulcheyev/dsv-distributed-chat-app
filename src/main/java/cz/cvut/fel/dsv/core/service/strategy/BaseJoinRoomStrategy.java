@@ -17,8 +17,9 @@ public abstract class BaseJoinRoomStrategy {
     protected RemoteServiceImpl remoteService;
     protected UpdateServiceImpl updateService;
     protected ElectionServiceImpl electionService;
-    private final DsvConditionLock lock = new DsvConditionLock(true);
     protected final Node node = Node.getInstance();
+
+    private final DsvConditionLock lock = new DsvConditionLock(true);
 
     public void executeJoin(generated.JoinRequest request, StreamObserver<generated.JoinResponse> responseObserver) {
         lock.await();

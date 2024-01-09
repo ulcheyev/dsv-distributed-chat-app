@@ -1,11 +1,13 @@
 package cz.cvut.fel.dsv.core.service.MEUtils;
 
+import cz.cvut.fel.dsv.core.DsvThreadPool;
 import cz.cvut.fel.dsv.core.Node;
 import cz.cvut.fel.dsv.core.data.Address;
 import cz.cvut.fel.dsv.core.data.NodeState;
 import cz.cvut.fel.dsv.core.data.SharedData;
 import cz.cvut.fel.dsv.core.service.clients.RemoteClient;
 import cz.cvut.fel.dsv.core.service.clients.UpdatableClient;
+import cz.cvut.fel.dsv.utils.DsvConditionLock;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.DynamicCountDownLatch;
 import cz.cvut.fel.dsv.utils.Utils;
@@ -26,6 +28,7 @@ import static cz.cvut.fel.dsv.core.infrastructure.Config.ANSI_PURPLE_SERVICE;
 
 public class CSManager {
     private static final Logger logger = DsvLogger.getLogger("CS MANAGER", ANSI_PURPLE_SERVICE, CSManager.class);
+    private static CSManager INSTANCE;
     private final TimesTamp maxClock;
     private final TimesTamp nodeClock;
     private int replyCount;
@@ -37,11 +40,24 @@ public class CSManager {
     private final AtomicLong requestIdCounter;
     private Integer delayOfCurrentCs;
 
-    public CSManager() {
+
+    private CSManager() {
         maxClock = new TimesTamp();
         nodeClock = new TimesTamp();
         requestIdCounter = new AtomicLong(0);
         awaitingResponsesLock = new DynamicCountDownLatch(0);
+    }
+
+
+    public static CSManager getInstance() {
+        if (INSTANCE == null) {
+            synchronized (CSManager.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new CSManager();
+                }
+            }
+        }
+        return INSTANCE;
     }
 
     public synchronized void requestCriticalSection(Integer delay) {

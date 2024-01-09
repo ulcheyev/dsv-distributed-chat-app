@@ -4,6 +4,7 @@ import cz.cvut.fel.dsv.core.Node;
 import cz.cvut.fel.dsv.core.Room;
 import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.data.SharedData;
+import cz.cvut.fel.dsv.core.service.LEUtils.LEManager;
 import cz.cvut.fel.dsv.core.service.strategy.BaseJoinRoomStrategy;
 import cz.cvut.fel.dsv.core.service.strategy.JoinViaLeaderRoomStrategy;
 import cz.cvut.fel.dsv.core.service.strategy.JoinViaNonLeaderRoomStrategy;
@@ -50,7 +51,8 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
                 logger.warning("Exited node was the last node in room");
                 SharedData.remove(node.getCurrentRoom());
             } else {
-                node.startRepairTopology(node.getAddress(), Utils.Mapper.remoteToAddress(request));
+                // TODO remote ??
+                LEManager.getInstance().startRepairing(request);
                 node.makeElection(node.getDsvNeighbours().getNext());
             }
             leadingRoom.disconnectAllUsers();

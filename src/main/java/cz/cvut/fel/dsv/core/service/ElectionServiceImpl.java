@@ -2,6 +2,8 @@ package cz.cvut.fel.dsv.core.service;
 
 import cz.cvut.fel.dsv.core.Node;
 import cz.cvut.fel.dsv.core.service.LEUtils.LEManager;
+import cz.cvut.fel.dsv.core.service.MEUtils.CSManager;
+import cz.cvut.fel.dsv.utils.DsvConditionLock;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.Utils;
 import generated.ElectionServiceGrpc;
@@ -18,6 +20,10 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
     private final Node node = Node.getInstance();
     private final LEManager leManager = new LEManager();
 
+    private final DsvConditionLock lock = new DsvConditionLock(true);
+    private static final CSManager csManager = CSManager.getInstance();
+
+
     @Override
     public void changeNextNext(generated.Remote request, StreamObserver<generated.Empty> responseObserver) {
         logger.info("Method changeNextNext is called...");
@@ -32,8 +38,10 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
         logger.info("Method changePrev is called...");
         logger.log(Level.INFO, "Changing prev to {0}", Utils.Mapper.remoteToAddress(request));
         leManager.startChangingPrev(request);
-
         logger.log(Level.INFO, "Returning next node {0}", node.getDsvNeighbours().getNext());
+
+
+
         responseObserver.onNext(Utils.Mapper.addressToRemote(node.getDsvNeighbours().getNext()));
         responseObserver.onCompleted();
     }
@@ -54,17 +62,23 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
             generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(node.getDsvNeighbours().getNext()))
                     .elected(request);
         }
-
         responseObserver.onNext(generated.Empty.getDefaultInstance());
         responseObserver.onCompleted();
     }
 
     @Override
     public void repairTopology(generated.Remote request, StreamObserver<generated.Empty> responseObserver) {
+        lock.await();
+        lock.lock();
+        csManager.requestCriticalSection(0);
+        csManager.awaitReplies();
         logger.info("Changing topology is started...");
         leManager.startRepairing(request);
+        csManager.broadcastDataUpdate();
         responseObserver.onNext(generated.Empty.getDefaultInstance());
         responseObserver.onCompleted();
+        csManager.receiveRelease();
+        lock.signal();
     }
 
     @Override

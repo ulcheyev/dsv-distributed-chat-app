@@ -5,12 +5,14 @@ import cz.cvut.fel.dsv.core.data.Address;
 import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.data.SharedData;
 import cz.cvut.fel.dsv.core.service.MEUtils.CSManager;
+import cz.cvut.fel.dsv.core.service.clients.UpdatableClient;
 import cz.cvut.fel.dsv.utils.DsvConditionLock;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.Utils;
 import generated.*;
 import generated.Remote;
 import io.grpc.stub.StreamObserver;
+import org.checkerframework.checker.units.qual.N;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -27,16 +29,17 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
 
     public UpdateServiceImpl(ElectionServiceImpl electionService) {
         electionService.setUpdateServiceToManager(this);
-        csManager = new CSManager();
+        csManager = CSManager.getInstance();
         lock = new DsvConditionLock(true);
     }
 
     @Override
-    public void receiveRoom(generated.RoomEntry request, StreamObserver<generated.Message> responseObserver) {
+    public synchronized void receiveRoom(generated.RoomEntry request, StreamObserver<generated.Message> responseObserver) {
         logger.log(Level.INFO, "Receiving room [{0} - {1}:{2} - {3}]", new Object[]{request.getRoomOwner().getUsername(), request.getRoomOwner().getHostname(), request.getRoomOwner().getPort(), request.getRoomName()});
         var leader = Utils.Mapper.remoteToAddress(request.getRoomOwner());
         var backupNode = Utils.Mapper.remoteToAddress(request.getRoomBackup());
         SharedData.put(request.getRoomName(), DsvPair.of(leader, backupNode));
+        reflectOnBackup();
         responseObserver.onNext(generated.Message.newBuilder().setMsg("OK: Room received").build());
         responseObserver.onCompleted();
     }
@@ -56,14 +59,28 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
         csManager.dataReceived();
         responseObserver.onNext(generated.Message.newBuilder().setMsg("OK: Rooms received").build());
         responseObserver.onCompleted();
+        reflectOnBackup();
     }
 
     @Override
-    public void removeRoom(generated.RoomEntry request, StreamObserver<generated.Message> responseObserver) {
+    public synchronized void removeRoom(generated.RoomEntry request, StreamObserver<generated.Message> responseObserver) {
         logger.log(Level.INFO, "Remove room [{0}]", request.getRoomName());
         SharedData.remove(request.getRoomName());
+        reflectOnBackup();
         responseObserver.onNext(generated.Message.newBuilder().setMsg("OK: Room removed").build());
         responseObserver.onCompleted();
+    }
+
+
+    private void reflectOnBackup(){
+        if(!Node.getInstance().isLeader()
+        &&  Node.getInstance().getAddress().equals(Node.getInstance().getDsvNeighbours().getPrev()))
+        {
+            logger.log(Level.INFO, "Reflected rooms update on {0}", Node.getInstance().getDsvNeighbours().getPrev());
+            new UpdatableClient(node.getAddress(), node.getDsvNeighbours().getPrev())
+                    .sendAllData(SharedData.getData())
+                    .clear();
+        }
     }
 
     @Override

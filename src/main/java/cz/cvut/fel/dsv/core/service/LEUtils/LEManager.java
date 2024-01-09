@@ -6,6 +6,7 @@ import cz.cvut.fel.dsv.core.data.Address;
 import cz.cvut.fel.dsv.core.data.DsvNeighbours;
 import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.data.SharedData;
+import cz.cvut.fel.dsv.core.service.MEUtils.CSManager;
 import cz.cvut.fel.dsv.core.service.UpdateServiceImpl;
 import cz.cvut.fel.dsv.core.service.clients.UpdatableClient;
 import cz.cvut.fel.dsv.utils.DsvLogger;
@@ -18,10 +19,13 @@ import java.util.logging.Logger;
 import static cz.cvut.fel.dsv.core.infrastructure.Config.ANSI_PURPLE_SERVICE;
 
 public class LEManager {
+
+    private static final Logger logger = DsvLogger.getLogger("LE MANAGER", ANSI_PURPLE_SERVICE, LEManager.class);
+    private static  LEManager INSTANCE;
     @Setter
     private UpdateServiceImpl updateService;
     private final Node node = Node.getInstance();
-    private static final Logger logger = DsvLogger.getLogger("LE MANAGER", ANSI_PURPLE_SERVICE, LEManager.class);
+
 
     public void startChangingPrev(generated.Remote request) {
         Address prev = Utils.Mapper.remoteToAddress(request);
@@ -31,6 +35,17 @@ public class LEManager {
 //            List<Address> nodeAddresses = updateService.getSpecifiedAddressesToRequest(node.getRoomsAndLeaders());
 //            updateService.makeUpdateRoomsTable(node.getRoomsAndLeaders(), nodeAddresses);
         }
+    }
+
+    public static LEManager getInstance() {
+        if (INSTANCE == null) {
+            synchronized (CSManager.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new LEManager();
+                }
+            }
+        }
+        return INSTANCE;
     }
 
     public void startElection(generated.Remote request) {
