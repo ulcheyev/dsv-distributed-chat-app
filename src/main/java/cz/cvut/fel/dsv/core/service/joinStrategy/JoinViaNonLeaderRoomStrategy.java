@@ -1,4 +1,4 @@
-package cz.cvut.fel.dsv.core.service.strategy;
+package cz.cvut.fel.dsv.core.service.joinStrategy;
 
 import cz.cvut.fel.dsv.utils.Director;
 import generated.JoinRequest;

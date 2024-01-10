@@ -21,6 +21,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -183,9 +185,7 @@ public class Node {
         try {
             if (args.length <= 4) {
                 this.username = args[0];
-                this.address = new Address(InetAddress.getLocalHost().getHostName(), Integer.parseInt(args[1]));
-                logger.info(InetAddress.getLocalHost().getHostAddress());
-                logger.log(Level.INFO, "Lol");
+                this.address = new Address(Utils.getMachineIp("enp0s1"), Integer.parseInt(args[1]));
                 this.address.generateId();
                 this.dsvNeighbours = new DsvNeighbours(this.address);
                 ServerWrapper server = new ServerWrapper(address.getPort());
