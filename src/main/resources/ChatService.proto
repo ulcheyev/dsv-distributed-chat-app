@@ -1,0 +1,119 @@
+syntax ="proto3";
+option java_multiple_files = true;
+package generated;
+
+
+message Empty {}
+
+message Message {
+  string msg = 1;
+}
+message GrantMessage {
+  bool grant = 1;
+}
+
+message StringPayload {
+  string msg = 1;
+}
+
+message ChatMessage {
+  Remote remote = 1;
+  string msg = 2;
+}
+
+message Rooms {
+  repeated RoomEntry rooms = 1;
+}
+
+message RoomEntry {
+  Remote roomOwner = 1;
+  Remote roomBackup = 2;
+  string roomName = 3;
+}
+
+message Remote {
+  int64 nodeId = 1;
+  string hostname = 2;
+  int32 port = 3;
+  string username = 4;
+}
+
+message RemoteResponse {
+  // Indicator of adding or not
+  bool added = 1;
+  // Connected node room
+  string room = 2;
+}
+
+message Neighbours {
+  Remote next = 1;
+  Remote nextNext = 2;
+  Remote prev = 3;
+  Remote leader = 4;
+}
+
+message JoinRequest {
+  string roomName = 1;
+  Remote remote = 2;
+  int32 delay = 3;
+  bool isInitial = 4;
+}
+
+message JoinResponse {
+  bool isLeader = 1;
+  // 1. If isLeader == false => it is not leader, sends leader address to request to join
+
+  // 2. If isLeader == true => it is leader, sends requested room leader
+  //    a) maybe leader will be current node (when room does not exist)
+  Remote leader = 2;
+  Neighbours neighbours = 3;
+}
+
+message PermissionRequest {
+  Remote requestByRemote = 1;
+  int32 clock = 2;
+  int32 delay = 3;
+  int64 id = 4;
+}
+
+message PermissionResponse {
+  Remote responseByRemote = 2;
+  int64 id = 4;
+}
+
+message Health {
+  bool isAlive = 1;
+}
+
+
+
+service RemoteService {
+  rpc beat(Empty) returns (Health);
+  rpc joinRoom(JoinRequest) returns (JoinResponse);
+  rpc preflight(Remote) returns (stream ChatMessage);
+  rpc receiveMessage(ChatMessage) returns (Empty);
+  rpc receiveGetRoomListRequest(Empty) returns (StringPayload);
+  rpc receiveGetNodeListInCurrentRoomRequest(Empty) returns (StringPayload);
+  rpc exitRoom(Remote) returns (Empty);
+}
+
+service UpdateService {
+  rpc receivePermissionRequest(PermissionRequest) returns (GrantMessage);
+  rpc receivePermissionReply(PermissionResponse) returns (Empty);
+  rpc receiveRooms(Rooms) returns (Message);
+  rpc receiveRoom(RoomEntry) returns (Message);
+  rpc removeRoom(RoomEntry) returns (Message);
+}
+
+service ElectionService {
+  rpc changeNextNext(Remote) returns (Empty);
+  rpc changePrev(Remote) returns (Remote);
+  rpc election(Remote) returns (Empty);
+  rpc elected(Remote) returns (Empty);
+  rpc repairTopology(Remote) returns (Empty);
+  rpc changeNeighbours(JoinRequest) returns (Neighbours);
+}
+
+
+
+

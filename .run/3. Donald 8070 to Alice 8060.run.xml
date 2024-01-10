@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="3. Donald 8070 to Alice 8060" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="cz.cvut.fel.dsv.core.Node" />
+    <module name="dsva-distibuted-chat-app" />
+    <option name="PROGRAM_PARAMETERS" value="Donald 8070 localhost 8060" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
