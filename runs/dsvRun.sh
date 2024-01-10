@@ -9,7 +9,7 @@ MavenProjectPath="../"
 
 args=""
 for arg in "$@"; do
-    args="$args $arg"
+     args="$args $arg"
 done
 
 cd "$MavenProjectPath"
