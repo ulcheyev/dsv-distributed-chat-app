@@ -76,7 +76,7 @@
                         </goals>
                         <configuration>
                             <includeMavenTypes>direct</includeMavenTypes>
-                            <protocCommand>protoc</protocCommand>
+<!--                            <protocCommand>protoc</protocCommand>-->
                             <protocArtifact>com.google.protobuf:protoc:3.21.1</protocArtifact>
                             <inputDirectories>
                                 <include>src/main/resources</include>

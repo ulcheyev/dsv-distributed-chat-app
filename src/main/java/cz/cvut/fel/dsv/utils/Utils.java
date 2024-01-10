@@ -12,6 +12,12 @@ import io.grpc.ConnectivityState;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
+import java.net.Socket;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,6 +47,26 @@ public class Utils {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static String getMachineIp(String interfaCe){
+        String addr = "localhost";
+        try {
+            NetworkInterface networkInterface = NetworkInterface.getByName(interfaCe);
+            if (networkInterface == null) {
+                return addr;
+            }
+
+            Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+            while (inetAddresses.hasMoreElements()) {
+                InetAddress inetAddress = inetAddresses.nextElement();
+                addr = inetAddress.getHostAddress();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            addr =  "localhost";
+        }
+        return addr;
     }
 
     public static class Skeleton {

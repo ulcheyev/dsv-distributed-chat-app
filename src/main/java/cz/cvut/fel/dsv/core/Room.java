@@ -33,6 +33,7 @@ public class Room {
     }
 
     public void removeFromRoom(Long id) {
+        // removing
         for (var user : users) {
             if (Objects.equals(user.getKey().getAddress().getId(), id)) {
                 user.getValue().onCompleted();
