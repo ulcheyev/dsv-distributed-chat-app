@@ -183,12 +183,13 @@ public class Node {
         try {
             if (args.length <= 4) {
                 this.username = args[0];
-                this.address = new Address(InetAddress.getLocalHost().getHostAddress(), Integer.parseInt(args[1]));
+                this.address = new Address(InetAddress.getLocalHost().getHostName(), Integer.parseInt(args[1]));
+                logger.info(InetAddress.getLocalHost().getHostAddress());
+                logger.log(Level.INFO, "Lol");
                 this.address.generateId();
                 this.dsvNeighbours = new DsvNeighbours(this.address);
                 ServerWrapper server = new ServerWrapper(address.getPort());
                 DsvThreadPool.getInstance().execute(server);
-
                 if (args.length == 2)
                     firstInTopology();
                 else if (args.length == 4)
@@ -197,7 +198,6 @@ public class Node {
                 System.err.println("Error while parsing args. Max number of args is 4.");
                 System.exit(1);
             }
-
         } catch (Exception e) {
             logger.severe("Error while handling input args. Max. quantity of parameters is 4, Min. is 2.");
             logger.severe(e.getMessage());
