@@ -35,16 +35,24 @@ The semester project serves as a comprehensive learning opportunity, combining t
 5. Ensures the system's robustness and availability under varying conditions.
 
 ## Prerequisites
-
-To write...
+To run the distributed chat application you will need several prerequisites:
+- JDK 17
+- Maven
+- gRPC framework
+- Bash
+- Internet connection
 
 ## Install
-
+1. Clone this project;
+2. Go to the /runs directory;
+3. Run script to start initial node
 ```
-To write...
+./dsvRun [name] [port]
+```
+4. Run script to start additional nodes
+```
+./dsvRun [name] [port] [ip to connect] [port to connect]
 ```
 
 ## Usage
-
-To write...
-
+Type !help in node console for more information about supported commands.
