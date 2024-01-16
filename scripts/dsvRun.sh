@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ "$#" -gt 4 ]; then
-    echo "Max is 4 args"
+if [ "$#" -gt 5 ]; then
+    echo "Max is 5 args"
     exit 1
 fi
 
