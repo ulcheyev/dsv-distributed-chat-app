@@ -30,7 +30,7 @@ The semester project serves as a comprehensive learning opportunity, combining t
 
 1. Supports dynamic creation and participation in rooms, fostering interactive discussions.
 2. Chang-Roberts algorithm ensures a fair and reliable mechanism for electing a leader among system nodes.
-3. Mutual Exclusion guarantees that critical sections of code are executed by only one node at a time, preventing conflicts.
+3. Ricart-Agrawala algorithm for mutual exclusion guarantees that critical sections of code are executed by only one node at a time, preventing conflicts.
 4. Maintains detailed logs for system activities, aiding in debugging and analysis.
 5. Ensures the system's robustness and availability under varying conditions.
 
