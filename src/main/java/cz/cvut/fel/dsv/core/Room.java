@@ -58,7 +58,7 @@ public class Room {
                     user.getValue().onNext(msg);
                 } catch (StatusRuntimeException e) {
                     logger.log(Level.WARNING, "Node {0} is down. Start repairing.", user.getKey());
-                    new ElectionClient(leader, leader) // todo direct because its leader
+                    new ElectionClient(leader, leader)
                             .sendStartRepairTopology(user.getKey().getAddress())
                             .clear();
                     iterator.remove();
