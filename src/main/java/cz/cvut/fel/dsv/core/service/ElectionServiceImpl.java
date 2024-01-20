@@ -2,7 +2,7 @@ package cz.cvut.fel.dsv.core.service;
 
 import cz.cvut.fel.dsv.core.Node;
 import cz.cvut.fel.dsv.core.service.LEUtils.LEManager;
-import cz.cvut.fel.dsv.core.service.MEUtils.CSManager;
+import cz.cvut.fel.dsv.core.service.clients.ElectionClient;
 import cz.cvut.fel.dsv.utils.DsvConditionLock;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.Utils;
@@ -19,9 +19,7 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
     private static final Logger logger = DsvLogger.getLogger("ELECTION SERVICE", ANSI_PURPLE_SERVICE, ElectionServiceImpl.class);
     private final Node node = Node.getInstance();
     private final LEManager leManager = new LEManager();
-
     private final DsvConditionLock lock = new DsvConditionLock(true);
-    private static final CSManager csManager = CSManager.getInstance();
 
 
     @Override
@@ -55,9 +53,9 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
     public void elected(generated.Remote request, StreamObserver<generated.Empty> responseObserver) {
         logger.log(Level.INFO, "Elected is called with ID: {0}", request.getNodeId());
         if (node.getAddress().getId() != request.getNodeId()) {
-            node.updateLeaderChannelAndObserver(Utils.Mapper.remoteToAddress(request));
-            generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(node.getDsvNeighbours().getNext()))
-                    .elected(request);
+            node.updateConnectionPropertiesToLeader(Utils.Mapper.remoteToAddress(request));
+            new ElectionClient(node.getAddress(), node.getDsvNeighbours().getNext())
+                    .sendElected(Utils.Mapper.remoteToAddress(request));
         }
         responseObserver.onNext(generated.Empty.getDefaultInstance());
         responseObserver.onCompleted();
@@ -67,14 +65,8 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
     public void repairTopology(generated.Remote request, StreamObserver<generated.Empty> responseObserver) {
         lock.await();
         lock.lock();
-        if(node.isLeader()){
-            csManager.requestCriticalSection(0);
-            csManager.awaitReplies();
-        }
         logger.info("Changing topology is started...");
         leManager.startRepairing(request);
-        csManager.broadcastDataUpdate();
-        csManager.receiveRelease();
         lock.signal();
         responseObserver.onNext(generated.Empty.getDefaultInstance());
         responseObserver.onCompleted();
@@ -88,7 +80,8 @@ public class ElectionServiceImpl extends ElectionServiceGrpc.ElectionServiceImpl
     }
 
     public generated.Neighbours changeNeighbours(generated.JoinRequest request) {
-        logger.info("Changing neighbours is started...");
+        logger.log(Level.INFO, "Changing neighbours for {0}:{1} is started...", new Object[]{request.getRemote().getHostname(),
+                request.getRemote().getPort()});
         return Utils.Mapper.dsvNeighboursToNeighbours(leManager.startChanging(request));
     }
 

@@ -1,26 +1,23 @@
 package cz.cvut.fel.dsv.core.service.MEUtils;
 
-import cz.cvut.fel.dsv.core.DsvThreadPool;
 import cz.cvut.fel.dsv.core.Node;
 import cz.cvut.fel.dsv.core.data.Address;
 import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.data.NodeState;
 import cz.cvut.fel.dsv.core.data.SharedData;
-import cz.cvut.fel.dsv.core.service.LEUtils.LEManager;
-import cz.cvut.fel.dsv.core.service.clients.ElectionClient;
 import cz.cvut.fel.dsv.core.service.clients.RemoteClient;
 import cz.cvut.fel.dsv.core.service.clients.UpdatableClient;
 import cz.cvut.fel.dsv.utils.DsvConditionLock;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.DynamicCountDownLatch;
 import cz.cvut.fel.dsv.utils.Utils;
+import io.grpc.Context;
 import io.grpc.StatusRuntimeException;
-import org.checkerframework.checker.units.qual.A;
 
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -31,26 +28,25 @@ import java.util.logging.Logger;
 import static cz.cvut.fel.dsv.core.infrastructure.Config.ANSI_PURPLE_SERVICE;
 
 public class CSManager {
+
     private static final Logger logger = DsvLogger.getLogger("CS MANAGER", ANSI_PURPLE_SERVICE, CSManager.class);
     private static CSManager INSTANCE;
-    private final TimesTamp maxClock;
-    private final TimesTamp nodeClock;
-    private int replyCount;
-    private final Set<DelayedRequest> permitDelayedRequests = new LinkedHashSet<>();
-    private DynamicCountDownLatch awaitingResponsesLock;
-    private final Lock csLock = new ReentrantLock();
-    private final Condition csCondition = csLock.newCondition();
-    private boolean inCriticalSection = false;
-    private final AtomicLong requestIdCounter;
-    private Integer delayOfCurrentCs;
+    private static final Set<DelayedRequest> permitDelayedRequests = new LinkedHashSet<>();
+    private static final DynamicCountDownLatch awaitingResponsesLock = new DynamicCountDownLatch(0);
+    private static final Lock csLock = new ReentrantLock();
+    private static final Condition csCondition = csLock.newCondition();
+    private static final AtomicBoolean inCriticalSection = new AtomicBoolean(false);
+    private static final AtomicLong requestIdCounter = new AtomicLong(0);
+    private static final AtomicInteger delayOfCurrentCs = new AtomicInteger(0);
+    private static final DsvConditionLock lock = new DsvConditionLock(true);
+    private static final TimesTamp maxClock = new TimesTamp();
+    private static final TimesTamp nodeClock = new TimesTamp();
+    private static final AtomicInteger replyCount = new AtomicInteger(0);
+    private static final AtomicInteger necessaryCount = new AtomicInteger(0);
+    private static final List<Address> receivedPermissionsBy = new ArrayList<>();
+    private static final long CHECK_INTERVAL_MS = 5000;
 
-
-    private CSManager() {
-        maxClock = new TimesTamp();
-        nodeClock = new TimesTamp();
-        requestIdCounter = new AtomicLong(0);
-        awaitingResponsesLock = new DynamicCountDownLatch(0);
-    }
+    private CSManager() {}
 
 
     public static CSManager getInstance() {
@@ -65,16 +61,28 @@ public class CSManager {
     }
 
     public synchronized void requestCriticalSection(Integer delay) {
-        replyCount = 0;
+        lock.await();
+        lock.lock();
+        executeSendingRequests(delay);
+    }
+
+    private void executeSendingRequests(Integer delay) {
+        receivedPermissionsBy.clear();
+        replyCount.set(0);
         maxClock.update();
-        int necessaryReplyCount = SharedData.getSizeNecessaryForUpdate();
-        awaitingResponsesLock.setCount(necessaryReplyCount);
-        delayOfCurrentCs = delay;
+        var listWithLeaders = SharedData.getNodeAddressesWithoutCurrent();
+        int necessCount = listWithLeaders.size();
+
+        necessaryCount.set(necessCount);
+        awaitingResponsesLock.setCount(necessCount);
+        delayOfCurrentCs.set(delay);
         nodeClock.setClock(maxClock);
-        int currentIntValueOfClock = nodeClock.getClock();
+
         Node.getInstance().setState(NodeState.REQUESTING);
+        int currentIntValueOfClock = nodeClock.getClock();
         Long requestId = requestIdCounter.incrementAndGet();
-        logger.log(Level.INFO, "[CS] Requesting nodes to enter CS. Clock: {0}. Need {1} replies", new Object[]{currentIntValueOfClock, necessaryReplyCount});
+
+        logger.log(Level.INFO, "[CS] Requesting nodes to enter CS. Clock: {0}. Need {1} replies", new Object[]{currentIntValueOfClock, necessCount});
         for (var remoteNodeAddr : SharedData.getNodeAddressesWithoutCurrent()) {
             logger.log(Level.INFO, "[- CS] Request sending to {0}", remoteNodeAddr);
             sendPermissionRequest(remoteNodeAddr, currentIntValueOfClock, delay, requestId);
@@ -82,63 +90,85 @@ public class CSManager {
     }
 
     private void sendPermissionRequest(Address remoteNodeAddr, int currentIntValueOfClock, Integer delay, Long requestId) {
-        CompletableFuture.runAsync(() -> {
-            try {
-                new UpdatableClient(Node.getInstance().getAddress(), remoteNodeAddr)
-                        .sendRequestCriticalSection(currentIntValueOfClock, delay, requestId)
-                        .clear();
-            } catch (Exception e) {
-                handleTimeout(remoteNodeAddr, delay, requestId);
-            }
-        });
+        try {
+            new UpdatableClient(Node.getInstance().getAddress(), remoteNodeAddr)
+                    .sendRequestCriticalSection(currentIntValueOfClock, delay, requestId);
+        } catch (Exception e) {
+            handleTimeout(remoteNodeAddr);
+        }
     }
 
-    private void handleTimeout(Address remoteNodeAddr, Integer delay, Long requestId) {
+
+    private void startNodeCheckingTask(Address remoteNodeAddr) {
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.scheduleAtFixedRate(new Runnable() {
+            int numberOfRepetitions = 10;
+            @Override
+            public void run() {
+                try {
+                    if(receivedPermissionsBy.contains(remoteNodeAddr)){
+                        logger.log(Level.INFO, "[CS] Stop waiting for node {0} response.", remoteNodeAddr);
+                        executorService.shutdown();
+                        return;
+                    }
+
+                    new RemoteClient(Node.getInstance().getAddress(), remoteNodeAddr)
+                            .sendTryLocateWithBeat();
+
+                    logger.log(Level.WARNING, "[- CS] Timeout for {0}, Beat OK; ", remoteNodeAddr);
+                    numberOfRepetitions--;
+                    if (numberOfRepetitions == 0) {
+                        logger.log(Level.WARNING, "[CS] Node is node responding until {} requests. Handling as failure...", numberOfRepetitions);
+                        handleBeatFailure(remoteNodeAddr);
+                        executorService.shutdown();
+                    }
+                } catch (StatusRuntimeException e) {
+                    handleBeatFailure(remoteNodeAddr);
+                }
+            }
+        }, 0, CHECK_INTERVAL_MS, TimeUnit.MILLISECONDS);
+    }
+
+    private void handleTimeout(Address remoteNodeAddr) {
         logger.log(Level.WARNING, "[- CS] Timeout for {0}, Beat checking...", remoteNodeAddr);
         try {
-            new RemoteClient(Node.getInstance().getAddress(), remoteNodeAddr).tryToLocateWithBeat();
-            logger.log(Level.WARNING, "[- CS] Timeout for {0}, Beat OK; Sending request again...", remoteNodeAddr);
-            int decrementedDelay = Math.max(0, delay - 1);
-            sendPermissionRequest(remoteNodeAddr, nodeClock.getClock(), decrementedDelay, requestId);
+            new RemoteClient(Node.getInstance().getAddress(), remoteNodeAddr)
+                    .sendTryLocateWithBeat();
+            logger.log(Level.WARNING, "[- CS] Timeout for {0}, Beat OK; ", remoteNodeAddr);
+            startNodeCheckingTask(remoteNodeAddr);
         } catch (StatusRuntimeException e) {
             handleBeatFailure(remoteNodeAddr);
         }
     }
 
-    private  void handleBeatFailure(Address remoteNodeAddr) {
+    private void handleBeatFailure(Address remoteNodeAddr) {
         logger.log(Level.WARNING, "[- CS] Failed beat checking for {0};...", remoteNodeAddr);
-        // check back up
         var byLeaderAddress = SharedData.getByLeaderAddress(remoteNodeAddr);
         Address backup = byLeaderAddress.getValue().getValue();
-        String room = byLeaderAddress.getKey();
         SharedData.removeByLeaderAddress(remoteNodeAddr);
         if(!backup.equals(remoteNodeAddr)) {
-            logger.log(Level.WARNING, "[- CS] start election on {0};...", backup);
-            ElectionClient electionClient = new ElectionClient(Node.getInstance().getAddress(), backup);
-            electionClient.sendStartRepairTopology(remoteNodeAddr);
-            electionClient.sendStartElection(backup);
-            electionClient.clear();
-            replyCount++;
+            SharedData.put(byLeaderAddress.getKey(), DsvPair.of(backup, backup));
         }
         checkForPermit();
     }
 
     public synchronized void receiveRequest(Address requestingNodeAddress, int timestamp, int delay, Long requestId) {
-        awaitCs();
         logger.log(Level.INFO, "[CS] request by {0} is received; Delay: {1}", new Object[]{requestingNodeAddress, delay});
         Utils.tryToSleep(delay);
         boolean isWillDelay = isDelay(timestamp, requestingNodeAddress.getId());
         maxClock.receiveMsg(timestamp);
         if (!isWillDelay) {
             try {
-                new UpdatableClient(Node.getInstance().getAddress(), requestingNodeAddress)
-                        .sendPermitCriticalSection(requestId)
-                        .clear();
+                Context.current().fork().run(() -> {
+                    new UpdatableClient(Node.getInstance().getAddress(), requestingNodeAddress)
+                            .sendPermitCriticalSection(requestId);
+                });
                 logger.log(Level.INFO, "[CS] request by {0} is permitted; Request clock: {1}; Node clock: {2}; State: {3}",
                         new Object[]{requestingNodeAddress, timestamp, nodeClock.getClock(), Node.getInstance().getState()});
             } catch (StatusRuntimeException e) {
                 logger.log(Level.INFO, "[CS] request by {0} is cancelled; {1}",
                         new Object[]{requestingNodeAddress, e.getMessage()});
+
             }
         } else {
             DelayedRequest delayedReq = new DelayedRequest(requestingNodeAddress, timestamp, requestId);
@@ -154,26 +184,21 @@ public class CSManager {
         }
     }
 
-    public void receivePermit(Long requestId) {
+    public void receivePermit(Address byAddress, Long requestId) {
+        receivedPermissionsBy.add(byAddress);
         if (requestIdCounter.get() == requestId) {
-            replyCount++;
             checkForPermit();
         } else {
             logger.log(Level.WARNING, "Permit was ignored; expected id: {0}, was: {1}", new Object[]{requestIdCounter.get(), requestId});
         }
     }
 
-    private synchronized void checkForPermit() {
+    private void checkForPermit() {
+        replyCount.incrementAndGet();
         awaitingResponsesLock.countDown();
-        if (Node.getInstance().getState().equals(NodeState.HOLDING)) {
-            logger.log(Level.WARNING, "Already IN CS");
-            return;
-        }
-        int necessarySize = SharedData.getSizeNecessaryForUpdate();
-//        int awaitingReplies = necessarySize - replyCount; // TODO: meow meow =3
-//        logger.log(Level.INFO, "[CS] Awaiting {0}, Current {1}", new Object[]{awaitingReplies, replyCount});
-        if (replyCount == necessarySize) {
-            logger.log(Level.WARNING, "[CS] Necessary {0}, Current {1}", new Object[]{necessarySize, replyCount});
+        int necessCount = necessaryCount.get();
+        if (replyCount.get() == necessCount) {
+            logger.log(Level.WARNING, "[CS] Necessary {0}, Current {1}", new Object[]{necessCount, replyCount});
             enterCriticalSection();
         }
     }
@@ -181,7 +206,7 @@ public class CSManager {
     public void awaitCs() {
         csLock.lock();
         try {
-            while (inCriticalSection) {
+            while (inCriticalSection.get()) {
                 csCondition.await();
             }
         } catch (InterruptedException e) {
@@ -201,8 +226,7 @@ public class CSManager {
                 logger.log(Level.INFO, "[CS] Processing delayed request {0}", delayedRequest);
                 try {
                     new UpdatableClient(Node.getInstance().getAddress(), delayedRequest.requestingNodeAddress())
-                            .sendPermitCriticalSection(delayedRequest.id)
-                            .clear();
+                            .sendPermitCriticalSection(delayedRequest.id);
                 } catch (StatusRuntimeException e) {
                     logger.log(Level.SEVERE, "Error while process deferred request: {0}", e.getMessage());
                 }
@@ -211,33 +235,44 @@ public class CSManager {
     }
 
     public void receiveRelease() {
-        inCriticalSection = false;
+        logger.log(Level.INFO, "[CS] Release Resources");
+        inCriticalSection.set(false);
         Node.getInstance().setState(NodeState.RELEASED);
         processDeferredRequests();
+        lock.signal();
     }
 
     private void enterCriticalSection() {
-        replyCount = 0;
+        replyCount.set(0);
+        inCriticalSection.set(true);
         Node.getInstance().setState(NodeState.HOLDING);
         logger.log(Level.INFO, "[CS] Node {0} entered critical section", Node.getInstance().getAddress());
     }
 
-    public synchronized void broadcastDataUpdate() {
-        logger.log(Level.INFO, "[CS] broadcast update on leaders. Size = {0}", SharedData.getSizeNecessaryForUpdate());
-        for (var addr : SharedData.getNodeAddressesWithoutCurrent()) {
+    public synchronized void broadcastDataUpdate(List<Address> willBeUpdatedOn, ConcurrentMap<String, DsvPair<Address, Address>> toSend) {
+        logger.log(Level.INFO, "[CS] broadcast update on leaders. Size = {0}", willBeUpdatedOn.size());
+        for (var addr : willBeUpdatedOn) {
             logger.log(Level.INFO, "[- CS] sending new data to {0}", addr);
             try {
                 new UpdatableClient(Node.getInstance().getAddress(), addr)
-                        .sendAllData(SharedData.getData())
-                        .clear();
+                        .sendAllData(toSend);
             } catch (StatusRuntimeException e) {
                 logger.log(Level.WARNING, "Node {0} is down while broadcast", addr);
+                var byAddr = Utils.Mapper.getPairByAddress(addr, toSend);
+                if(byAddr.isPresent()) {
+                    var map = new ConcurrentHashMap<>(toSend);
+                    map.remove(byAddr.get().getKey());
+                    broadcastDataUpdate(willBeUpdatedOn, map);
+                }
+                else {
+                    logger.log(Level.WARNING, "Node {0} is not present in map to update", addr);
+                }
             }
         }
     }
 
     public void awaitReplies() {
-        logger.log(Level.INFO, "[CS] awaiting {0} replies; Node clock: {1}", new Object[]{SharedData.getSizeNecessaryForUpdate(), maxClock});
+        logger.log(Level.INFO, "[CS] awaiting", new Object[]{SharedData.getSizeNecessaryForUpdate(), maxClock});
         try {
             awaitingResponsesLock.await();
         } catch (InterruptedException e) {
@@ -257,7 +292,8 @@ public class CSManager {
 
     public void dataReceived() {
         if (Node.getInstance().getState().equals(NodeState.REQUESTING)) {
-            requestCriticalSection(delayOfCurrentCs);
+            logger.log(Level.INFO, "Table updating in REQUESTING State. Need to send permission requests again...");
+            executeSendingRequests(delayOfCurrentCs.get());
         }
     }
 

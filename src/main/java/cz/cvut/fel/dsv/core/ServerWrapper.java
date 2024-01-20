@@ -17,13 +17,16 @@ public class ServerWrapper implements Runnable {
     private Server server;
     private int port;
 
+    private Runnable callback;
+
     @Override
     public void run() {
         this.startServer(port);
     }
 
-    public ServerWrapper(int port) {
+    public ServerWrapper(int port, Runnable runnable) {
         this.port = port;
+        this.callback = runnable;
     }
 
     private ServerWrapper() {
@@ -47,6 +50,7 @@ public class ServerWrapper implements Runnable {
                 System.err.println("Server shut down");
             }));
             logger.log(Level.INFO, "Server started on port {0}", server.getPort());
+            callback.run();
             server.awaitTermination();
 
         } catch (Exception e) {

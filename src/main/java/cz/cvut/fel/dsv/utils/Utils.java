@@ -81,7 +81,6 @@ public class Utils {
                     .usePlaintext()
                     .intercept(new DsvClientInterceptor())
                     .build();
-            build.notifyWhenStateChanged(ConnectivityState.IDLE, build::shutdown);
             return build;
         }
 

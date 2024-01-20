@@ -4,6 +4,7 @@ import cz.cvut.fel.dsv.core.Node;
 import cz.cvut.fel.dsv.core.data.Address;
 import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.data.SharedData;
+import cz.cvut.fel.dsv.core.service.clients.ElectionClient;
 import cz.cvut.fel.dsv.utils.Director;
 import cz.cvut.fel.dsv.utils.Utils;
 import generated.JoinRequest;
@@ -33,11 +34,19 @@ public class JoinViaLeaderRoomStrategy extends BaseJoinRoomStrategy {
     private void handleNotLeaderOfReqRoom(JoinRequest request, StreamObserver<JoinResponse> responseObserver) {
         logger.log(Level.INFO, "[request by Node {0}] requested node to connect is leader, " +
                 "but not leader in requested room", request.getRemote().getUsername());
-
         try {
             var leader = SharedData.get(request.getRoomName()).getKey();
-            var neighbours = generated.ElectionServiceGrpc
-                    .newBlockingStub(Utils.Skeleton.buildManagedChannel(leader)).changeNeighbours(request);
+            var neighboursElectionClientDsvPair = new ElectionClient(node.getAddress(), leader)
+                    .sendChangeNeighbours(request);
+            var neighbours = neighboursElectionClientDsvPair.getKey();
+            neighboursElectionClientDsvPair
+                    .getValue()
+                    .clear();
+            if(neighbours == null){
+                handleCreateRoom(request, responseObserver);
+                return;
+            }
+
             responseObserver.onNext(Director.buildJoinRes(true, leader, neighbours));
             responseObserver.onCompleted();
             logger.log(Level.INFO, "[request by Node {0}] requested room is exists. Find in leaders table",
@@ -52,8 +61,8 @@ public class JoinViaLeaderRoomStrategy extends BaseJoinRoomStrategy {
                 request.getRemote().getUsername());
         Address toPut = Utils.Mapper.remoteToAddress(request.getRemote());
         SharedData.put(request.getRoomName(), DsvPair.of(toPut));
+        updateService.updateTables(SharedData.getNodeAddressesWithoutCurrent(), SharedData.getData());
         Node.getInstance().reflectOnBackup();
-        updateService.updateTables();
         responseObserver.onNext(Director.buildJoinRes(true, request.getRemote(),
                 Utils.Mapper.remoteToNeighbours(request.getRemote())));
         responseObserver.onCompleted();

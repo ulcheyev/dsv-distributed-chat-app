@@ -1,9 +1,9 @@
 package cz.cvut.fel.dsv.utils;
 
-import cz.cvut.fel.dsv.core.service.DsvServerInterceptorImpl;
+
+import cz.cvut.fel.dsv.core.prototypes.DsvServerInterceptorImpl;
 
 import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.*;
@@ -39,7 +39,7 @@ public class DsvLogger {
         public String format(LogRecord record) {
             StringBuilder builder = new StringBuilder(1000);
             String nodeIp = DsvServerInterceptorImpl.getClientIP() == null ? "" : " by " + DsvServerInterceptorImpl.getClientIP();
-//                builder.append('\r');
+                builder.append('\r');
             builder.append(ansiCol);
             builder.append(df.format(new Date(record.getMillis()))).append(" ");
             builder.append("[").append(record.getLevel()).append("] ");

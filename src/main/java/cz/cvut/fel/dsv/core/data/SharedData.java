@@ -1,7 +1,6 @@
 package cz.cvut.fel.dsv.core.data;
 
 import cz.cvut.fel.dsv.core.Node;
-import org.checkerframework.checker.units.qual.A;
 
 import java.util.List;
 import java.util.Map;
@@ -53,16 +52,21 @@ public class SharedData {
     }
 
     public static synchronized Map.Entry<String, DsvPair<Address, Address>> getByLeaderAddress(Address leaderAddress) {
-        return data
+        List<Map.Entry<String, DsvPair<Address, Address>>> list = data
                 .entrySet()
                 .stream()
                 .filter(entry -> entry.getValue().getKey().equals(leaderAddress))
-                .toList()
-                .get(0);
+                .toList();
+        if(list.isEmpty()) {
+            return null;
+        } else {
+            return list.get(0);
+        }
     }
 
     public static String stringify() {
         StringBuilder sb = new StringBuilder();
+        sb.append("[ROOMS]");
         for (var room : data.entrySet()) {
             sb.append("\n\t\t\t")
                     .append(room.getKey())

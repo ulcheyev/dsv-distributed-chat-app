@@ -5,16 +5,16 @@ import cz.cvut.fel.dsv.core.data.Address;
 import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.data.SharedData;
 import cz.cvut.fel.dsv.core.service.MEUtils.CSManager;
-import cz.cvut.fel.dsv.core.service.clients.UpdatableClient;
 import cz.cvut.fel.dsv.utils.DsvConditionLock;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.Utils;
 import generated.*;
 import generated.Remote;
 import io.grpc.stub.StreamObserver;
-import org.checkerframework.checker.units.qual.N;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -56,7 +56,7 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
             tempMap.put(room.getRoomName(), DsvPair.of(leader, backupNode));
         }
         SharedData.updateData(tempMap);
-        csManager.dataReceived();
+//        csManager.dataReceived();
         responseObserver.onNext(generated.Message.newBuilder().setMsg("OK: Rooms received").build());
         responseObserver.onCompleted();
         Node.getInstance().reflectOnBackup();
@@ -74,16 +74,6 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
     }
 
 
-    public void reflectOnBackup(){
-        if(Node.getInstance().isLeader()
-        &&  !Node.getInstance().getAddress().equals(Node.getInstance().getDsvNeighbours().getPrev()))
-        {
-            logger.log(Level.INFO, "Reflected rooms update on {0}", Node.getInstance().getDsvNeighbours().getPrev());
-            new UpdatableClient(node.getAddress(), node.getDsvNeighbours().getPrev())
-                    .sendAllData(SharedData.getData())
-                    .clear();
-        }
-    }
 
     @Override
     public void receivePermissionRequest(generated.PermissionRequest request, StreamObserver<generated.GrantMessage> responseObserver) {
@@ -97,19 +87,24 @@ public class UpdateServiceImpl extends generated.UpdateServiceGrpc.UpdateService
         logger.log(Level.INFO, "[CS] received permit by {0}", Utils.Mapper.remoteToAddress(response.getResponseByRemote()));
         responseObserver.onNext(generated.Empty.getDefaultInstance());
         responseObserver.onCompleted();
-        csManager.receivePermit(response.getId());
+        csManager.receivePermit(Utils.Mapper.remoteToAddress(response.getResponseByRemote()), response.getId());
     }
 
     public void requestCS(Integer delay) {
-        csManager.requestCriticalSection(delay);
+        if(!Node.getInstance().isInCS()) {
+            csManager.requestCriticalSection(delay);
+            csManager.awaitReplies();
+        } else {
+            logger.log(Level.INFO, "Already in CS");
+        }
     }
 
     public void awaitPermitToEnterCS() {
         csManager.awaitReplies();
     }
 
-    public void updateTables() {
-        csManager.broadcastDataUpdate();
+    public void updateTables(List<Address> willBeUpdatedOn, ConcurrentMap<String, DsvPair<Address, Address>> toSend) {
+        csManager.broadcastDataUpdate(willBeUpdatedOn, toSend);
     }
 
     public void releaseCS() {

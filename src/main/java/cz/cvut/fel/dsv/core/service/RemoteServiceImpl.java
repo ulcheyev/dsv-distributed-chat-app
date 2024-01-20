@@ -9,6 +9,7 @@ import cz.cvut.fel.dsv.core.service.joinStrategy.BaseJoinRoomStrategy;
 import cz.cvut.fel.dsv.core.service.joinStrategy.JoinViaLeaderRoomStrategy;
 import cz.cvut.fel.dsv.core.service.joinStrategy.JoinViaNonLeaderRoomStrategy;
 import cz.cvut.fel.dsv.utils.Director;
+import cz.cvut.fel.dsv.utils.DsvConditionLock;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.Utils;
 import generated.*;
@@ -26,6 +27,7 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
     private final Node node = Node.getInstance();
     private final ElectionServiceImpl electionService;
     private final UpdateServiceImpl updateService;
+    private static final DsvConditionLock lock = new DsvConditionLock(true);
 
     public RemoteServiceImpl(UpdateServiceImpl updateService, ElectionServiceImpl electionService) {
         this.electionService = electionService;
@@ -34,11 +36,15 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
 
     @Override
     public void exitRoom(Remote request, StreamObserver<Empty> responseObserver) {
-        // todo enter cs
+        lock.await();
+        lock.lock();
+        updateService.requestCS(0);
+        updateService.awaitPermitToEnterCS();
         executeExit(request);
-        // todo leave cs
+        updateService.releaseCS();
         responseObserver.onNext(Empty.getDefaultInstance());
         responseObserver.onCompleted();
+        lock.signal();
     }
 
     public void executeExit(Remote request) { // request is node that joining to another room
@@ -49,14 +55,13 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
             Room leadingRoom = node.getLeadingRoom();
             if (!node.leadingRoomIsNotEmpty()) {
                 logger.warning("Exited node was the last node in room");
-                SharedData.remove(node.getCurrentRoom());
+                SharedData.remove(Node.getInstance().getCurrentRoom());
+                updateService.updateTables(SharedData.getNodeAddressesWithoutCurrent(), SharedData.getData());
             } else {
-                // TODO remote ??
                 LEManager.getInstance().startRepairing(request);
                 node.makeElection(node.getDsvNeighbours().getNext());
             }
             leadingRoom.disconnectAllUsers();
-
         } else {
             logger.log(Level.INFO, "{0} exited room {1}", new Object[]{request.getUsername(), node.getCurrentRoom()});
             LEManager.getInstance().startRepairing(request);
@@ -82,8 +87,7 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
 
     @Override
     public void receiveGetRoomListRequest(Empty request, StreamObserver<generated.StringPayload> responseObserver) {
-        String sb = "[ROOMS]" + SharedData.stringify();
-        responseObserver.onNext(Director.buildStrPayload(sb));
+        responseObserver.onNext(Director.buildStrPayload(SharedData.stringify()));
         responseObserver.onCompleted();
     }
 
@@ -102,7 +106,7 @@ public class RemoteServiceImpl extends generated.RemoteServiceGrpc.RemoteService
 
     @Override
     public void preflight(Remote request, StreamObserver<generated.ChatMessage> responseObserver) {
-        logger.log(Level.INFO, "Preflight received. Added [{0}] to room [{1}]",
+        logger.log(Level.INFO, "Preflight received. Adding [{0}] to room [{1}]",
                 new Object[]{request.getUsername(), node.getCurrentRoom()});
         node.getLeadingRoom().addToRoom(DsvPair.of(Utils.Mapper.remoteToDsvRemote(request), responseObserver));
     }

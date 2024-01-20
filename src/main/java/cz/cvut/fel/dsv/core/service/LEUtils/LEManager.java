@@ -8,12 +8,13 @@ import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.data.SharedData;
 import cz.cvut.fel.dsv.core.service.MEUtils.CSManager;
 import cz.cvut.fel.dsv.core.service.UpdateServiceImpl;
-import cz.cvut.fel.dsv.core.service.clients.UpdatableClient;
+import cz.cvut.fel.dsv.core.service.clients.ElectionClient;
 import cz.cvut.fel.dsv.utils.DsvLogger;
 import cz.cvut.fel.dsv.utils.Utils;
-import io.grpc.StatusRuntimeException;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,13 +30,13 @@ public class LEManager {
 
 
     public void startChangingPrev(generated.Remote request) {
-        // TODO NEED TO BE IN CS
+        assert Node.getInstance().isInCS() : "Node is not in CS";
         Address prev = Utils.Mapper.remoteToAddress(request);
         node.getDsvNeighbours().setPrev(prev);
         if (node.isLeader()) {
             SharedData.put(node.getCurrentRoom(), DsvPair.of(node.getAddress(), prev));
+            updateService.updateTables(SharedData.getNodeAddressesWithoutCurrent(), SharedData.getData());
             Node.getInstance().reflectOnBackup();
-            updateService.updateTables();
         }
     }
 
@@ -51,58 +52,68 @@ public class LEManager {
     }
 
     public void startElection(generated.Remote request) {
-        var nextSkeleton = generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(node.getDsvNeighbours().getNext()));
+        var electionClientNext = new ElectionClient(node.getAddress(), node.getDsvNeighbours().getNext());
 
         if (node.getAddress().getId() < request.getNodeId()) {
             node.setVoting(true);
-            nextSkeleton.election(request);
+            electionClientNext.sendStartElection(Utils.Mapper.remoteToAddress(request));
         } else if ((node.getAddress().getId() > request.getNodeId()) && !node.isVoting()) {
             node.setVoting(true);
-            nextSkeleton.election(Utils.Mapper.addressToRemote(node.getAddress()));
+            electionClientNext.sendStartElection(node.getAddress());
         } else if (node.getAddress().getId() == request.getNodeId())
             electedCandidate();
     }
 
     private void electedCandidate() {
-        // TODO Need to be in CS
+        assert Node.getInstance().isInCS() : "Node is not in CS";
         logger.info("Node is elected candidate. Setting up properties...");
-        node.setIsLeader(DsvPair.of(true, new Room(node.getAddress(), node.getCurrentRoom())));
         var former = node.getDsvNeighbours().getLeader();
+        node.setIsLeader(DsvPair.of(true, new Room(node.getAddress(), node.getCurrentRoom())));
         SharedData.put(node.getCurrentRoom(), DsvPair.of(node.getAddress(), node.getDsvNeighbours().getPrev()));
-        updateService.updateTables();
-        node.updateLeaderChannelAndObserver(node.getAddress());
-        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(node.getDsvNeighbours().getNext()))
-                .elected(Utils.Mapper.addressToRemote(node.getAddress()));
+
+
+        List<Address> newNodeAddresses = new ArrayList<>(SharedData.getNodeAddressesWithoutCurrent());
+        newNodeAddresses.add(former);
+        updateService.updateTables(newNodeAddresses, SharedData.getData());
+
+        node.reflectOnBackup();
+        node.updateConnectionPropertiesToLeader(node.getAddress());
+        new ElectionClient(node.getAddress(), node.getDsvNeighbours().getNext())
+                .sendElected(node.getAddress());
     }
 
     public void startRepairing(generated.Remote request) {
         DsvNeighbours dsvNeighbours = node.getDsvNeighbours();
         if (request.getNodeId() == node.getDsvNeighbours().getNext().getId()) {
-            var nextNextSkeleton = generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(dsvNeighbours.getNextNext()));
 
             logger.log(Level.INFO, "Setting next to {0}", dsvNeighbours.getNextNext());
             dsvNeighbours.setNext(dsvNeighbours.getNextNext());
 
             logger.log(Level.INFO, "Changing prev on {0} to {1} called by {2}",
                     new Object[]{dsvNeighbours.getNextNext(), node.getAddress(), node.getAddress()});
-            var nextOfNextNextNode = nextNextSkeleton.changePrev(Utils.Mapper.addressToRemote(node.getAddress()));
+            var pairOfResAndClientNextNext = new ElectionClient(node.getAddress(), dsvNeighbours.getNextNext())
+                    .sendChangePrev(node.getAddress());
+            var nextOfNextNextNode = pairOfResAndClientNextNext.getKey();
+            pairOfResAndClientNextNext.getValue();
 
             logger.log(Level.INFO, "Setting nextNext to {0}", Utils.Mapper.remoteToAddress(nextOfNextNextNode));
             dsvNeighbours.setNextNext(Utils.Mapper.remoteToAddress(nextOfNextNextNode));
 
             logger.log(Level.INFO, "Changing nextNext on {0} to {1} called by {2}",
                     new Object[]{dsvNeighbours.getPrev(), dsvNeighbours.getNext(), node.getAddress()});
-            generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(dsvNeighbours.getPrev()))
-                    .changeNextNext(Utils.Mapper.addressToRemote(dsvNeighbours.getNext()));
-        } else {
-            logger.log(Level.INFO, "Send message [repair topology] to the next node {0}", dsvNeighbours.getNext());
-            try {
-                generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(dsvNeighbours.getNext()))
-                        .repairTopology(request);
-            } catch (StatusRuntimeException runtimeException){
-                logger.log(Level.WARNING, "Node is down {0}", dsvNeighbours.getNext());
-            }
+            new ElectionClient(node.getAddress(), dsvNeighbours.getPrev())
+                    .sendChangeNextNext(dsvNeighbours.getNext());
 
+        } else {
+            if(!dsvNeighbours.getNext().equals(Node.getInstance().getAddress()))
+            {
+                logger.log(Level.INFO, "Send message [repair topology] to the next node {0}", dsvNeighbours.getNext());
+                new ElectionClient(node.getAddress(), dsvNeighbours.getNext())
+                        .sendStartRepairTopology(Utils.Mapper.remoteToAddress(request));
+            }
+            else {
+                logger.log(Level.WARNING, "Next is similar to current node. Stop repair...");
+            }
         }
     }
 
@@ -114,10 +125,12 @@ public class LEManager {
                 myDsvNeighbours.getNext(), myDsvNeighbours.getNextNext(), node.getAddress(), myDsvNeighbours.getLeader()
         );
 
-        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(node.getDsvNeighbours().getNext()))
-                .changePrev(request.getRemote());
-        generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(initialPrev))
-                .changeNextNext(request.getRemote());
+        new ElectionClient(node.getAddress(), myDsvNeighbours.getNext())
+                .sendChangePrev(Utils.Mapper.remoteToAddress(request.getRemote()))
+                .getValue();
+
+        new ElectionClient(node.getAddress(), initialPrev)
+                .sendChangeNextNext(Utils.Mapper.remoteToAddress(request.getRemote()));
 
         tempDsvNeighbours.setNextNext(myDsvNeighbours.getNextNext());
         myDsvNeighbours.setNextNext(initialNext);

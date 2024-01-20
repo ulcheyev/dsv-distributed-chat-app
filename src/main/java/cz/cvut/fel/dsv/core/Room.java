@@ -3,7 +3,9 @@ package cz.cvut.fel.dsv.core;
 import cz.cvut.fel.dsv.core.data.Address;
 import cz.cvut.fel.dsv.core.data.DsvPair;
 import cz.cvut.fel.dsv.core.data.DsvRemote;
-import cz.cvut.fel.dsv.utils.Utils;
+import cz.cvut.fel.dsv.core.infrastructure.Config;
+import cz.cvut.fel.dsv.core.service.clients.ElectionClient;
+import cz.cvut.fel.dsv.utils.DsvLogger;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 import lombok.Getter;
@@ -11,8 +13,14 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 public class Room {
+
+    private static final Logger logger = DsvLogger.getLogger("ROOM", Config.ANSI_YELLOW, Room.class);
+
     @Getter private final String roomName;
     private final List<DsvPair<DsvRemote, StreamObserver<generated.ChatMessage>>> users;
     private Address leader;
@@ -33,7 +41,6 @@ public class Room {
     }
 
     public void removeFromRoom(Long id) {
-        // removing
         for (var user : users) {
             if (Objects.equals(user.getKey().getAddress().getId(), id)) {
                 user.getValue().onCompleted();
@@ -44,16 +51,17 @@ public class Room {
     }
 
     public void sendMessageToRoom(generated.ChatMessage msg) {
-        for (var user : users) {
+        for (var iterator = users.iterator(); iterator.hasNext();) {
+            var user = iterator.next();
             if (user.getKey().getAddress().getId() != msg.getRemote().getNodeId())
                 try {
                     user.getValue().onNext(msg);
                 } catch (StatusRuntimeException e) {
-                    System.out.println(user.getKey().getAddress().getId());
-                    System.out.println(e.getMessage());
-                    generated.ElectionServiceGrpc.newBlockingStub(Utils.Skeleton.buildManagedChannel(leader))
-                            .repairTopology(Utils.Mapper.addressToRemote(user.getKey().getAddress()));
-                    users.remove(user);
+                    logger.log(Level.WARNING, "Node {0} is down. Start repairing.", user.getKey());
+                    new ElectionClient(leader, leader) // todo direct because its leader
+                            .sendStartRepairTopology(user.getKey().getAddress())
+                            .clear();
+                    iterator.remove();
                 }
         }
     }
