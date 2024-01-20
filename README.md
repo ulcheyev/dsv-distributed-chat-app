@@ -44,14 +44,14 @@ To run the distributed chat application you will need several prerequisites:
 
 ## Install
 1. Clone this project;
-2. Go to the /runs directory;
-3. Run script to start initial node
+2. Go to the /scripts directory;
+3. Run script to start initial node in topology
 ```
-./dsvRun [name] [port]
+./dsvRun [node name] [current node port] [current node IP]
 ```
-4. Run script to start additional nodes
+4. Run script to start additional nodes in topology
 ```
-./dsvRun [name] [port] [ip to connect] [port to connect]
+./dsvRun [node name] [current node port] [current node IP] [the IP address of the node to connect to] [the port of the node to connect to]
 ```
 
 ## Usage
