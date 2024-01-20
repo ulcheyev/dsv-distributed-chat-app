@@ -116,6 +116,15 @@ public class Utils {
                     .build();
         }
 
+
+        public static Optional<DsvPair<String, DsvPair<Address, Address>>> getPairByAddress(Address address,
+                                                                                            ConcurrentMap<String, DsvPair<Address, Address>> map) {
+            return map.entrySet().stream()
+                    .filter(entry -> entry.getValue().getKey() == address)
+                    .findFirst()
+                    .map(entry -> DsvPair.of(entry.getKey(), entry.getValue()));
+        }
+
         public static Address remoteToAddress(generated.Remote remote) {
             return new Address(remote.getHostname(), remote.getPort(), remote.getNodeId());
         }
