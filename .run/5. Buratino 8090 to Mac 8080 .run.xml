@@ -2,7 +2,7 @@
   <configuration default="false" name="5. Buratino 8090 to Mac 8080 " type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="cz.cvut.fel.dsv.core.Node" />
     <module name="dsva-distibuted-chat-app" />
-    <option name="PROGRAM_PARAMETERS" value="Buratino 8090 localhost 8080" />
+    <option name="PROGRAM_PARAMETERS" value="Buratino 8090 127.0.0.1 127.0.0.1 8080" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
