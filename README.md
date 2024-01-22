@@ -1,4 +1,5 @@
-# dsva-chat-leader-election
+# Distributed Chat App
+
 Semestral work from Distributed Computing subject
 ## What?
 
